@@ -2,12 +2,12 @@ from flask import Flask, request, jsonify
 import dill
 import os
 import sys
-import cors
+from flask_cors import CORS
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from legal_case_classifier import LegalCaseClassifier
 app = Flask(__name__)
-cors.CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
+CORS(app)
 
 MODEL_PATH = "legal_case_classifier.pkl"
 if not os.path.exists(MODEL_PATH):
