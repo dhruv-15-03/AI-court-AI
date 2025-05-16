@@ -1,0 +1,162 @@
+2025-05-16 01:59:57,039 - INFO - 🔄 Setting up the scraper...
+2025-05-16 01:59:57,040 - INFO - ====== WebDriver manager ======
+2025-05-16 01:59:57,449 - INFO - Get LATEST chromedriver version for google-chrome
+2025-05-16 01:59:57,796 - INFO - About to download new driver from https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip
+2025-05-16 01:59:57,837 - INFO - Driver downloading response is 200
+2025-05-16 01:59:58,557 - INFO - Get LATEST chromedriver version for google-chrome
+2025-05-16 01:59:58,870 - INFO - Get LATEST chromedriver version for google-chrome
+2025-05-16 01:59:59,149 - INFO - Driver has been saved in cache [/home/dhruv/.wdm/drivers/chromedriver/linux64/114.0.5735.90]
+2025-05-16 01:59:59,455 - ERROR - ❌ Failed to initialize WebDriver: Message: unknown error: cannot find Chrome binary
+Stacktrace:
+#0 0x56298d2064e3 <unknown>
+#1 0x56298cf35c76 <unknown>
+#2 0x56298cf5c757 <unknown>
+#3 0x56298cf5b029 <unknown>
+#4 0x56298cf99ccc <unknown>
+#5 0x56298cf9947f <unknown>
+#6 0x56298cf90de3 <unknown>
+#7 0x56298cf662dd <unknown>
+#8 0x56298cf6734e <unknown>
+#9 0x56298d1c63e4 <unknown>
+#10 0x56298d1ca3d7 <unknown>
+#11 0x56298d1d4b20 <unknown>
+#12 0x56298d1cb023 <unknown>
+#13 0x56298d1991aa <unknown>
+#14 0x56298d1ef6b8 <unknown>
+#15 0x56298d1ef847 <unknown>
+#16 0x56298d1ff243 <unknown>
+#17 0x7fee6e232ac3 <unknown>
+
+2025-05-16 01:59:59,456 - ERROR - ❌ Fatal error: Message: unknown error: cannot find Chrome binary
+Stacktrace:
+#0 0x56298d2064e3 <unknown>
+#1 0x56298cf35c76 <unknown>
+#2 0x56298cf5c757 <unknown>
+#3 0x56298cf5b029 <unknown>
+#4 0x56298cf99ccc <unknown>
+#5 0x56298cf9947f <unknown>
+#6 0x56298cf90de3 <unknown>
+#7 0x56298cf662dd <unknown>
+#8 0x56298cf6734e <unknown>
+#9 0x56298d1c63e4 <unknown>
+#10 0x56298d1ca3d7 <unknown>
+#11 0x56298d1d4b20 <unknown>
+#12 0x56298d1cb023 <unknown>
+#13 0x56298d1991aa <unknown>
+#14 0x56298d1ef6b8 <unknown>
+#15 0x56298d1ef847 <unknown>
+#16 0x56298d1ff243 <unknown>
+#17 0x7fee6e232ac3 <unknown>
+
+2025-05-16 02:03:38,076 - INFO - 🔄 Setting up the scraper...
+2025-05-16 02:03:38,076 - INFO - ====== WebDriver manager ======
+2025-05-16 02:03:38,356 - INFO - Get LATEST chromedriver version for google-chrome
+2025-05-16 02:03:38,450 - INFO - About to download new driver from https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip
+2025-05-16 02:03:38,539 - INFO - Driver downloading response is 200
+2025-05-16 02:03:39,352 - INFO - Get LATEST chromedriver version for google-chrome
+2025-05-16 02:03:39,737 - INFO - Get LATEST chromedriver version for google-chrome
+2025-05-16 02:03:39,996 - INFO - Driver has been saved in cache [/home/dhruv/.wdm/drivers/chromedriver/linux64/114.0.5735.90]
+2025-05-16 02:03:40,269 - ERROR - ❌ Failed to initialize WebDriver: Message: unknown error: cannot find Chrome binary
+Stacktrace:
+#0 0x55d8cdfa44e3 <unknown>
+#1 0x55d8cdcd3c76 <unknown>
+#2 0x55d8cdcfa757 <unknown>
+#3 0x55d8cdcf9029 <unknown>
+#4 0x55d8cdd37ccc <unknown>
+#5 0x55d8cdd3747f <unknown>
+#6 0x55d8cdd2ede3 <unknown>
+#7 0x55d8cdd042dd <unknown>
+#8 0x55d8cdd0534e <unknown>
+#9 0x55d8cdf643e4 <unknown>
+#10 0x55d8cdf683d7 <unknown>
+#11 0x55d8cdf72b20 <unknown>
+#12 0x55d8cdf69023 <unknown>
+#13 0x55d8cdf371aa <unknown>
+#14 0x55d8cdf8d6b8 <unknown>
+#15 0x55d8cdf8d847 <unknown>
+#16 0x55d8cdf9d243 <unknown>
+#17 0x7fcc13adeac3 <unknown>
+
+2025-05-16 02:03:40,270 - INFO - 🔄 Attempting to use Firefox as fallback...
+2025-05-16 02:03:40,272 - INFO - ====== WebDriver manager ======
+2025-05-16 02:03:40,356 - INFO - Get LATEST geckodriver version for None firefox
+2025-05-16 02:03:40,950 - INFO - Getting latest mozilla release info for v0.36.0
+2025-05-16 02:03:41,932 - INFO - About to download new driver from https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-linux64.tar.gz
+2025-05-16 02:03:44,985 - INFO - Driver downloading response is 200
+2025-05-16 02:03:45,348 - INFO - Get LATEST geckodriver version for None firefox
+2025-05-16 02:03:45,807 - INFO - Get LATEST geckodriver version for None firefox
+2025-05-16 02:03:46,777 - INFO - Driver has been saved in cache [/home/dhruv/.wdm/drivers/geckodriver/linux64/v0.36.0]
+2025-05-16 02:03:46,840 - ERROR - ❌ Firefox fallback also failed: Message: Expected browser binary location, but unable to find binary in default location, no 'moz:firefoxOptions.binary' capability provided, and no binary flag set on the command line
+
+2025-05-16 02:03:46,840 - ERROR - ❌ Fatal error: Message: unknown error: cannot find Chrome binary
+Stacktrace:
+#0 0x55d8cdfa44e3 <unknown>
+#1 0x55d8cdcd3c76 <unknown>
+#2 0x55d8cdcfa757 <unknown>
+#3 0x55d8cdcf9029 <unknown>
+#4 0x55d8cdd37ccc <unknown>
+#5 0x55d8cdd3747f <unknown>
+#6 0x55d8cdd2ede3 <unknown>
+#7 0x55d8cdd042dd <unknown>
+#8 0x55d8cdd0534e <unknown>
+#9 0x55d8cdf643e4 <unknown>
+#10 0x55d8cdf683d7 <unknown>
+#11 0x55d8cdf72b20 <unknown>
+#12 0x55d8cdf69023 <unknown>
+#13 0x55d8cdf371aa <unknown>
+#14 0x55d8cdf8d6b8 <unknown>
+#15 0x55d8cdf8d847 <unknown>
+#16 0x55d8cdf9d243 <unknown>
+#17 0x7fcc13adeac3 <unknown>
+
+2025-05-16 02:03:46,840 - INFO - 🔄 Attempting simplified scraper without Chrome...
+2025-05-16 02:03:46,841 - INFO - 🔍 Simple search on page 1: https://indiankanoon.org/search/?formInput=cases+on+rape+and+murder&pagenum=1
+2025-05-16 02:03:47,407 - INFO - ✅ Found 0 cases on page 1
+2025-05-16 02:03:50,411 - INFO - 🔍 Simple search on page 2: https://indiankanoon.org/search/?formInput=cases+on+rape+and+murder&pagenum=2
+2025-05-16 02:03:50,957 - INFO - ✅ Found 0 cases on page 2
+2025-05-16 02:03:53,963 - ERROR - ❌ No links found
+2025-05-16 02:21:27,523 - INFO - Loading summarization model...
+2025-05-16 02:21:33,559 - INFO - Searching page 1: https://indiankanoon.org/search/?formInput=service+law&pagenum=1
+2025-05-16 02:21:33,995 - INFO - Found 11 links on page 1
+2025-05-16 02:21:37,467 - INFO - Searching page 2: https://indiankanoon.org/search/?formInput=service+law&pagenum=2
+2025-05-16 02:21:38,241 - INFO - Found 1 links on page 2
+2025-05-16 02:21:40,653 - INFO - Total cases to process: 12
+2025-05-16 02:21:40,654 - INFO - Processing 1/12: https://indiankanoon.org/doc/116672068/
+2025-05-16 02:21:40,952 - WARNING - Skipping - insufficient content
+2025-05-16 02:21:40,953 - INFO - Processing 2/12: https://indiankanoon.org/doc/91518200/
+2025-05-16 02:21:41,279 - WARNING - Skipping - insufficient content
+2025-05-16 02:21:41,279 - INFO - Processing 3/12: https://indiankanoon.org/doc/158430292/
+2025-05-16 02:21:41,626 - WARNING - Skipping - insufficient content
+2025-05-16 02:21:41,627 - INFO - Processing 4/12: https://indiankanoon.org/doc/80244783/
+2025-05-16 02:21:41,925 - WARNING - Skipping - insufficient content
+2025-05-16 02:21:41,925 - INFO - Processing 5/12: https://indiankanoon.org/doc/77807985/
+2025-05-16 02:21:42,293 - WARNING - Skipping - insufficient content
+2025-05-16 02:21:42,294 - INFO - Processing 6/12: https://indiankanoon.org/doc/125511616/
+2025-05-16 02:21:42,595 - WARNING - Skipping - insufficient content
+2025-05-16 02:21:42,596 - INFO - Processing 7/12: https://indiankanoon.org/doc/87222154/
+2025-05-16 02:21:42,890 - WARNING - Skipping - insufficient content
+2025-05-16 02:21:42,891 - INFO - Processing 8/12: https://indiankanoon.org/doc/97261295/
+2025-05-16 02:21:43,197 - WARNING - Skipping - insufficient content
+2025-05-16 02:21:43,198 - INFO - Processing 9/12: https://indiankanoon.org/doc/179877004/
+2025-05-16 02:21:43,513 - WARNING - Skipping - insufficient content
+2025-05-16 02:21:43,514 - INFO - Processing 10/12: https://indiankanoon.org/doc/189543865/
+2025-05-16 02:21:43,821 - WARNING - Skipping - insufficient content
+2025-05-16 02:21:43,822 - INFO - Processing 11/12: https://indiankanoon.org/doc/4914598/
+2025-05-16 02:21:44,117 - WARNING - Skipping - insufficient content
+2025-05-16 02:21:44,118 - INFO - Processing 12/12: https://indiankanoon.org/doc/10071769/
+2025-05-16 02:21:44,412 - WARNING - Skipping - insufficient content
+2025-05-16 02:21:44,427 - INFO - Saved 0 records to case_summaries.csv
+2025-05-16 02:22:24,079 - INFO - Loading summarization model...
+2025-05-16 02:22:32,541 - INFO - Searching page 1: https://indiankanoon.org/search/?formInput=rape+and+murder+cases&pagenum=1
+2025-05-16 02:22:33,236 - INFO - Regex fallback for links...
+2025-05-16 02:22:33,237 - INFO - Found 0 links on page 1
+2025-05-16 02:22:35,386 - INFO - Searching page 2: https://indiankanoon.org/search/?formInput=rape+and+murder+cases&pagenum=2
+2025-05-16 02:22:36,246 - INFO - Regex fallback for links...
+2025-05-16 02:22:36,247 - INFO - Found 0 links on page 2
+2025-05-16 02:22:38,641 - INFO - Total cases to process: 20
+2025-05-16 02:22:38,660 - INFO - Processing 1/20: https://indiankanoon.org/doc/181505792/
+2025-05-16 02:22:44,890 - INFO - Processing 2/20: https://indiankanoon.org/doc/6888559/
+2025-05-16 02:22:45,266 - WARNING - Skipping - insufficient content
+2025-05-16 02:22:45,267 - INFO - Processing 3/20: https://indiankanoon.org/doc/154462684/
+2025-05-16 02:22:45,622 - WARNING - Skipping - insufficient content
+2025-05-16 02:22:45,623 - INFO - Processing 4/20: https://indiankanoon.org/doc/142729398/
