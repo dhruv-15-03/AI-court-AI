@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
@@ -16,10 +17,14 @@ import warnings
 
 warnings.filterwarnings('ignore')
 
-# Download NLTK resources
-nltk.download('punkt', quiet=True)
-nltk.download('stopwords', quiet=True)
-nltk.download('wordnet', quiet=True)
+nltk_data_path = "/tmp/nltk_data"
+os.makedirs(nltk_data_path, exist_ok=True)
+os.environ["NLTK_DATA"] = nltk_data_path
+
+# Download necessary corpora to that path
+nltk.download('punkt', download_dir=nltk_data_path, quiet=True)
+nltk.download('stopwords', download_dir=nltk_data_path, quiet=True)
+nltk.download('wordnet', download_dir=nltk_data_path, quiet=True)
 
 class LegalCaseClassifier:
     def __init__(self):
