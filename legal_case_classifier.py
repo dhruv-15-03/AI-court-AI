@@ -24,12 +24,14 @@ os.environ["NLTK_DATA"] = nltk_data_path
 # Download necessary corpora to that path
 nltk.download('punkt', download_dir=nltk_data_path, quiet=True)
 nltk.download('stopwords', download_dir=nltk_data_path, quiet=True)
+nltk.download('punkt_tab',download_dir=nltk_data_path, quiet=True)
 nltk.download('wordnet', download_dir=nltk_data_path, quiet=True)
 
 class LegalCaseClassifier:
     def __init__(self):
         self.model = None
         self.label_encoder = None
+        nltk.download('stopwords', download_dir=nltk_data_path, quiet=True)
         self.stop_words = set(stopwords.words('english'))
         self.lemmatizer = WordNetLemmatizer()
         self.legal_terms = {
@@ -40,7 +42,6 @@ class LegalCaseClassifier:
         }
 
     def preprocess_text(self, text):
-        """Enhanced legal text preprocessing"""
         if not isinstance(text, str):
             return ""
 
@@ -98,8 +99,6 @@ class LegalCaseClassifier:
                 df['case_type'].str.lower() + " " +
                 df['case_data']
         )
-
-
         df['processed_text'] = df['legal_features'].apply(self.preprocess_text)
 
 
