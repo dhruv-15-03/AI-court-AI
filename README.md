@@ -30,25 +30,28 @@ Predict outcomes of Indian court cases using a boosted RandomForest text model w
 ## Train
 
 - Quick start:
-  - `python train_model.py`
+  - `python scripts/train_model.py`
   - If `data/processed/all_cases.csv` exists, trainer uses it; otherwise it auto-discovers CSVs in the repo.
 - Model artifact saved to `models/legal_case_classifier.pkl`
 
 ## Serve API
 
-- Start server: `python app.py`
+- Start server: `python run_server.py`
 - Endpoints:
   - `GET /api/questions` → questionnaire
   - `POST /api/analyze` → infer outcome; pass JSON with `case_type` and fields
 
 ## Project structure
 
-- `app.py` — Flask API
-- `legal_case_classifier.py` — training pipeline (TF-IDF + AdaBoost(RandomForest))
+- `src/ai_court/api/server.py` — Flask API
+- `src/ai_court/model/legal_case_classifier.py` — training pipeline (TF-IDF + AdaBoost(RandomForest))
+- `src/ai_court/scraper/legacy_kanoon.py` — Kanoon scraping (legacy)
+- `src/ai_court/scraper/kanoon.py` — scraper wrapper module
 - `src/ai_court/data/ingestion.py` — scraper wrapper → `data/raw/`
 - `src/ai_court/data/prepare_dataset.py` — schema coercion → `data/processed/all_cases.csv`
 - `models/` — saved model artifacts
 - `logs/` — scraper/debug logs
+- `scripts/` — utilities (train_model.py, smoke_client.py, cleanup_repo.py)
 
 ## Notes
 
