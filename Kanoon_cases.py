@@ -8,12 +8,14 @@ import pandas as pd
 from urllib.parse import quote_plus
 from bs4 import BeautifulSoup
 
-# Setup logging
+# Setup logging (write logs under logs/ directory)
+LOG_DIR = os.path.join("logs")
+os.makedirs(LOG_DIR, exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler("legal_scraper.log"),
+        logging.FileHandler(os.path.join(LOG_DIR, "legal_scraper.log")),
         logging.StreamHandler()
     ]
 )
@@ -23,8 +25,8 @@ BASE_URL = "https://indiankanoon.org"
 SEARCH_URL = f"{BASE_URL}/search/?formInput="
 
 # Configuration for Hugging Face Inference API
-# Replace with your actual Hugging Face API token
-HUGGINGFACE_API_TOKEN = "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"
+# Read token from environment variable to avoid committing secrets
+HUGGINGFACE_API_TOKEN = os.getenv("HUGGINGFACE_API_TOKEN", "")
 # You can use different summarization models by changing this URL
 HUGGINGFACE_API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
 
@@ -62,7 +64,7 @@ def get_case_links(query, pages=1):
                 logger.info(f"✅ Got page content (length: {len(response.text)} bytes)")
 
                 # Save HTML for debugging
-                with open(f"debug_page_{page}.html", "w", encoding="utf-8") as f:
+                with open(os.path.join(LOG_DIR, f"debug_page_{page}.html"), "w", encoding="utf-8") as f:
                     f.write(response.text)
 
                 # First try to extract using BeautifulSoup
@@ -175,7 +177,7 @@ def get_case_content(url):
                 judgment_text = re.sub(r'\n\s*\n', '\n\n', judgment_text)
                 judgment_text = judgment_text.strip()
                 safe_title = re.sub(r'[^\w]+', '_', title[:30])
-                file_name = f"debug_case_{safe_title}.txt"
+                file_name = os.path.join(LOG_DIR, f"debug_case_{safe_title}.txt")
                 with open(file_name, "w", encoding="utf-8") as f:
                     f.write(judgment_text)
 
@@ -223,6 +225,8 @@ def extract_judgment_section(text):
 
 def get_case_summary(case_text, target_length=1500):
     try:
+        if not HUGGINGFACE_API_TOKEN:
+            raise RuntimeError("Missing HUGGINGFACE_API_TOKEN; set it in your environment to enable API summarization")
         headers = {
             "Authorization": f"Bearer {HUGGINGFACE_API_TOKEN}",
             "Content-Type": "application/json"
@@ -377,7 +381,7 @@ if __name__ == "__main__":
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s',
         handlers=[
-            logging.FileHandler("legal_scraper.log"),
+            logging.FileHandler(os.path.join(LOG_DIR, "legal_scraper.log")),
             logging.StreamHandler()
         ]
     )
@@ -388,7 +392,7 @@ if __name__ == "__main__":
         logger.info(f"Using Hugging Face model: {HUGGINGFACE_API_URL}")
         test_text = "This is a test to verify the Hugging Face API connection."
         try:
-            headers = {"Authorization": f"Bearer {HUGGINGFACE_API_TOKEN}"}
+            headers = {"Authorization": f"Bearer {HUGGINGFACE_API_TOKEN}"} if HUGGINGFACE_API_TOKEN else {}
             response = requests.post(
                 HUGGINGFACE_API_URL,
                 json={"inputs": test_text},

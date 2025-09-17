@@ -1,0 +1,31 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+.env/
+.env.local
+
+# Logs and debug artifacts
+*.log
+logs/
+debug_*.html
+debug_*.txt
+simple_scraper.log
+scraper.log
+legal_scraper.log
+
+# Model artifacts (keep only canonical path under models/)
+*.pkl
+!models/**
+
+# Data caches
+*.tmp
+.temp_*
+
+# OS/editor
+.DS_Store
+.vscode/

@@ -32,6 +32,7 @@ for pkg, kind in [("punkt", "tokenizers"), ("punkt_tab", "tokenizers"), ("stopwo
         except Exception:
             pass
 
+
 class LegalCaseClassifier:
     """
     End-to-end text model to predict legal case judgement/outcome.
@@ -229,13 +230,8 @@ class LegalCaseClassifier:
         target_names = [self.label_encoder.inverse_transform([i])[0] for i in present]
 
         print(f"\nTest Accuracy: {accuracy:.4f}\n")
-        print("Classification Report (filtered to present classes):")
         report = classification_report(
-            y_test,
-            y_pred,
-            labels=present,
-            target_names=target_names,
-            zero_division=0
+            y_test, y_pred, labels=present, target_names=target_names, digits=4, zero_division=0
         )
         print(report)
 
@@ -264,6 +260,7 @@ class LegalCaseClassifier:
         processed_input = self.preprocess_text(legal_input)
         pred = self.model.predict([processed_input])[0]
         return self.label_encoder.inverse_transform([pred])[0]
+
 
 def main():
     """Train and persist the boosted RandomForest model using all compatible CSVs in the repo."""
@@ -329,5 +326,7 @@ def main():
     except Exception as e:
         print(f"\nError: {e}")
 
+
 if __name__ == "__main__":
     main()
+
