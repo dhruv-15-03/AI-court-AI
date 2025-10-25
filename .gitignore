@@ -26,6 +26,8 @@ tmp*/
 # Models (keep top-level artifacts, ignore runs and heavy bundles)
 models/runs/
 models/multi_axis/
+models/production/**
+*.safetensors
 !models/legal_case_classifier.pkl
 !models/metrics.json
 !models/confusion_matrix.json
@@ -35,14 +37,15 @@ models/multi_axis/
 # Data (ignore raw and large processed; allow small samples if added under data/samples)
 data/raw/**
 data/raw_enriched/**
+data/legal_cases_10M.db
 data/processed/*.parquet
 data/processed/*.arrow
 data/processed/*.feather
 data/processed/*.pkl
 data/processed/*.npy
 data/processed/*.npz
-# Uncomment to exclude processed CSVs by default
-# data/processed/*.csv
+# Exclude processed CSVs by default to keep repo lean (deployment builds from DB)
+data/processed/*.csv
 !data/samples/**
 
 # Notebooks
