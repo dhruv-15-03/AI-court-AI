@@ -1,3 +1,62 @@
+# OS/Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage*
+
+# Environments
+.env
+.venv/
+venv/
+
+# Logs & temp
+logs/
+*.log
+tmp*/
+
+# Models (keep top-level artifacts, ignore runs and heavy bundles)
+models/runs/
+models/multi_axis/
+!models/legal_case_classifier.pkl
+!models/metrics.json
+!models/confusion_matrix.json
+!models/metadata.json
+!models/search_index.pkl
+
+# Data (ignore raw and large processed; allow small samples if added under data/samples)
+data/raw/**
+data/raw_enriched/**
+data/processed/*.parquet
+data/processed/*.arrow
+data/processed/*.feather
+data/processed/*.pkl
+data/processed/*.npy
+data/processed/*.npz
+# Uncomment to exclude processed CSVs by default
+# data/processed/*.csv
+!data/samples/**
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Build & containers
+dist/
+build/
+*.egg-info/
+*.egg
+node_modules/
+
+# Docker compose local artifacts
+.docker/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -29,3 +88,29 @@ legal_scraper.log
 # OS/editor
 .DS_Store
 .vscode/
+
+# Python cache directories
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.tox/
+.coverage
+htmlcov/
+
+# MLflow & experiment tracking
+mlruns/
+models/runs/
+models/hf_runs/
+models/checkpoints/
+
+# Temporary files
+*.tmp
+.temp_*
+harvest_checkpoint.json
+
+# Old/archive directories
+evaluation/
+ingestion/
+ontology/
+schemas/
+scripts/archive/

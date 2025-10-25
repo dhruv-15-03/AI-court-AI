@@ -1,4 +1,4 @@
-import requests
+import requests  # type: ignore[import-untyped]
 import re
 import time
 import os
@@ -7,15 +7,15 @@ import logging
 import pandas as pd
 from urllib.parse import quote_plus
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 
-# Setup logging (write logs under logs/ directory)
 LOG_DIR = os.path.join("logs")
 os.makedirs(LOG_DIR, exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler(os.path.join(LOG_DIR, "legal_scraper.log")),
+        logging.FileHandler(os.path.join(LOG_DIR, "legal_scraper.log"), encoding="utf-8"),
         logging.StreamHandler()
     ]
 )
@@ -24,11 +24,17 @@ logger = logging.getLogger(__name__)
 BASE_URL = "https://indiankanoon.org"
 SEARCH_URL = f"{BASE_URL}/search/?formInput="
 
-# Configuration for Hugging Face Inference API
-# Read token from environment variable to avoid committing secrets
+load_dotenv()
+
 HUGGINGFACE_API_TOKEN = os.getenv("HUGGINGFACE_API_TOKEN", "")
-# You can use different summarization models by changing this URL
-HUGGINGFACE_API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
+HUGGINGFACE_API_URL = os.getenv(
+    "HUGGINGFACE_API_URL",
+    "https://api-inference.huggingface.co/models/facebook/bart-large-cnn",
+)
+# Optional kill-switch to disable HF entirely during long harvests
+HUGGINGFACE_DISABLE = os.getenv("HUGGINGFACE_DISABLE", "0") == "1"
+# One-time availability flag to prevent repeated attempts after a failure
+_HF_AVAILABLE = True
 
 def get_case_links(query, pages=1):
     """Get links to cases using only requests (no browser automation)"""
@@ -37,7 +43,7 @@ def get_case_links(query, pages=1):
 
     for page in range(1, pages + 1):
         url = f"{SEARCH_URL}{encoded_query}&pagenum={page}"
-        logger.info(f"🔍 Searching page {page}: {url}")
+        logger.info(f"Searching page {page}: {url}")
 
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36',
@@ -56,12 +62,12 @@ def get_case_links(query, pages=1):
                     response = requests.get(url, headers=headers, timeout=15)
                     break
                 except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
-                    logger.warning(f"⚠️ Request attempt {attempt+1} failed: {e}")
+                    logger.warning(f"Request attempt {attempt+1} failed: {e}")
                     if attempt < 2:  # Don't sleep after last attempt
                         time.sleep(3)
 
             if response.status_code == 200:
-                logger.info(f"✅ Got page content (length: {len(response.text)} bytes)")
+                logger.info(f"Got page content (length: {len(response.text)} bytes)")
 
                 # Save HTML for debugging
                 with open(os.path.join(LOG_DIR, f"debug_page_{page}.html"), "w", encoding="utf-8") as f:
@@ -84,7 +90,7 @@ def get_case_links(query, pages=1):
                 for selector in selectors:
                     result_blocks = soup.select(selector)
                     if result_blocks:
-                        logger.info(f"✅ Found results with selector: {selector}")
+                        logger.info(f"Found results with selector: {selector}")
                         break
 
                 page_links = []
@@ -115,12 +121,12 @@ def get_case_links(query, pages=1):
                                 })
 
                 links.extend(page_links)
-                logger.info(f"✅ Found {len(page_links)} cases on page {page}")
+                logger.info(f"Found {len(page_links)} cases on page {page}")
             else:
-                logger.error(f"❌ HTTP error: {response.status_code}")
+                logger.error(f"HTTP error: {response.status_code}")
 
         except Exception as e:
-            logger.error(f"❌ Error processing page {page}: {e}")
+            logger.error(f"Error processing page {page}: {e}")
 
         if page < pages:
             delay = random.uniform(2, 4)
@@ -130,7 +136,7 @@ def get_case_links(query, pages=1):
     return links
 
 def get_case_content(url):
-    logger.info(f"📄 Getting case: {url}")
+    logger.info(f"Getting case: {url}")
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36',
@@ -144,7 +150,7 @@ def get_case_content(url):
                 response = requests.get(url, headers=headers, timeout=45)  # Extended timeout for large documents
                 break
             except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
-                logger.warning(f"⚠️ Request attempt {attempt+1} failed: {e}")
+                logger.warning(f"Request attempt {attempt+1} failed: {e}")
                 if attempt < 2:  # Don't sleep after last attempt
                     time.sleep(3)
 
@@ -187,18 +193,18 @@ def get_case_content(url):
                     "url": url
                 }
             else:
-                logger.warning(f"⚠️ No judgment text found at {url}")
+                logger.warning(f"No judgment text found at {url}")
                 return {
                     "title": title,
                     "text": "Judgment text not found",
                     "url": url
                 }
         else:
-            logger.error(f"❌ HTTP error: {response.status_code}")
+            logger.error(f"HTTP error: {response.status_code}")
             return None
 
     except Exception as e:
-        logger.error(f"❌ Error fetching case: {e}")
+        logger.error(f"Error fetching case: {e}")
         return None
 
 def extract_judgment_section(text):
@@ -224,55 +230,52 @@ def extract_judgment_section(text):
     return " ".join(last_lines)
 
 def get_case_summary(case_text, target_length=1500):
-    try:
-        if not HUGGINGFACE_API_TOKEN:
-            raise RuntimeError("Missing HUGGINGFACE_API_TOKEN; set it in your environment to enable API summarization")
-        headers = {
-            "Authorization": f"Bearer {HUGGINGFACE_API_TOKEN}",
-            "Content-Type": "application/json"
-        }
-        max_input_length = 1024  # Most models have input length limitations
+    # Try Hugging Face API when token is available; otherwise quickly fall back.
+    global _HF_AVAILABLE
+    if HUGGINGFACE_API_TOKEN and not HUGGINGFACE_DISABLE and _HF_AVAILABLE:
+        headers = {"Authorization": f"Bearer {HUGGINGFACE_API_TOKEN}", "Content-Type": "application/json"}
+        max_input_length = 1024
         truncated_text = case_text[:max_input_length] if len(case_text) > max_input_length else case_text
-
         payload = {
             "inputs": truncated_text,
-            "parameters": {
-                "max_length": min(200, target_length // 5),  # Approx 200 words ≈ 1500 characters
-                "min_length": 50,
-                "do_sample": False
-            }
+            "parameters": {"max_length": min(200, target_length // 5), "min_length": 50, "do_sample": False},
+            "options": {"wait_for_model": True},
         }
-
-        response = requests.post(
-            HUGGINGFACE_API_URL,
-            json=payload,
-            headers=headers,
-            timeout=30
-        )
-
-        if response.status_code == 200:
-            result = response.json()
-            # Different models might have different response formats
-            if isinstance(result, list) and len(result) > 0:
-                if isinstance(result[0], dict) and "summary_text" in result[0]:
-                    summary = result[0]["summary_text"]
+        for attempt in range(2):
+            try:
+                response = requests.post(HUGGINGFACE_API_URL, json=payload, headers=headers, timeout=30)
+                if response.status_code == 200:
+                    result = response.json()
+                    if isinstance(result, list) and result:
+                        if isinstance(result[0], dict) and "summary_text" in result[0]:
+                            summary = result[0]["summary_text"]
+                        else:
+                            summary = str(result[0])
+                    elif isinstance(result, dict) and "summary_text" in result:
+                        summary = result["summary_text"]
+                    else:
+                        summary = str(result)
+                    if summary:
+                        return summary
+                    logger.warning("HF API returned empty summary; falling back")
+                    break
                 else:
-                    summary = result[0]
-            elif isinstance(result, dict) and "summary_text" in result:
-                summary = result["summary_text"]
-            else:
-                summary = str(result)
-
-            if summary:
-                return summary
-            else:
-                logger.warning("⚠️ API returned no summary")
+                    logger.warning(
+                        f"HF API non-200 ({response.status_code}); falling back (attempt {attempt+1})"
+                    )
+            except Exception as e:
+                logger.warning(f"HF API error (attempt {attempt+1}): {e}")
+                time.sleep(1.0)
+        # Disable for the remainder of the run to avoid repeated timeouts
+        _HF_AVAILABLE = False
+        logger.info("HF summarization unavailable; using fallback")
+    else:
+        if not HUGGINGFACE_API_TOKEN:
+            logger.info("HF token not set; using fallback summarization")
+        elif HUGGINGFACE_DISABLE:
+            logger.info("HF summarization disabled by env; using fallback")
         else:
-            logger.error(f"❌ API error: {response.status_code}, Message: {response.text}")
-
-    except Exception as e:
-        logger.error(f"❌ Error with Hugging Face API: {e}")
-    logger.info("Using fallback summarization method")
+            logger.debug("HF summarization previously disabled after failures; using fallback")
     sentences = re.split(r'(?<=[.!?]) +', case_text)
     intro = ' '.join(sentences[:5])
     judgment_section = extract_judgment_section(case_text)
@@ -283,14 +286,33 @@ def create_dataset(query, pages, output_csv):
     case_links = get_case_links(query, pages)
 
     if not case_links:
-        logger.error("❌ No case links found")
+        logger.error("No case links found")
         return 0
 
-    logger.info(f"✅ Found {len(case_links)} cases. Getting details...")
-    os.makedirs(os.path.dirname(output_csv) if os.path.dirname(output_csv) else '.', exist_ok=True)
+    logger.info(f"Found {len(case_links)} cases. Getting details...")
+    out_dir = os.path.dirname(output_csv) if os.path.dirname(output_csv) else '.'
+    os.makedirs(out_dir, exist_ok=True)
+
+    # Resume support: load existing records and skip URLs already processed
+    processed_urls = set()
     data = []
-    for i, case in enumerate(case_links):
-        logger.info(f"Processing case {i+1}/{len(case_links)}: {case['title']}")
+    if os.path.exists(output_csv):
+        try:
+            prev = pd.read_csv(output_csv)
+            if {'url', 'title', 'case_summary', 'judgment'}.issubset(set(prev.columns)):
+                data = prev[['id','title','url','case_summary','judgment']].to_dict(orient='records')
+                processed_urls = set(prev['url'].dropna().astype(str).tolist())
+                logger.info(f"Resuming: loaded {len(data)} existing records from {output_csv}")
+        except Exception as e:
+            logger.warning(f"Could not load existing dataset for resume: {e}")
+
+    next_id = len(data) + 1
+    total = len(case_links)
+    for idx, case in enumerate(case_links, start=1):
+        if case['url'] in processed_urls:
+            logger.info(f"Skipping already processed URL: {case['url']}")
+            continue
+        logger.info(f"Processing case {idx}/{total}: {case['title']}")
 
         try:
             # Get case content
@@ -312,7 +334,7 @@ def create_dataset(query, pages, output_csv):
                 else:
                     case_summary = get_case_summary(full_text)
                 record = {
-                    "id": i + 1,
+                    "id": next_id,
                     "title": case_data['title'],
                     "url": case['url'],
                     "case_summary": case_summary,
@@ -320,26 +342,36 @@ def create_dataset(query, pages, output_csv):
                 }
 
                 data.append(record)
-                logger.info(f"✅ Successfully processed case {i+1}")
-                if i % 5 == 0 and i > 0:
+                processed_urls.add(case['url'])
+                logger.info(f"Successfully processed case {next_id}")
+                next_id += 1
+                # Periodic checkpoint save
+                if (next_id - 1) % 5 == 0:
                     temp_df = pd.DataFrame(data)
-                    temp_df.to_csv(f"temp_{output_csv}", index=False)
-                    logger.info(f"💾 Saved intermediate results ({len(data)} cases)")
+                    temp_path = f"temp_{output_csv}"
+                    temp_dir = os.path.dirname(temp_path)
+                    if temp_dir and not os.path.exists(temp_dir):
+                        os.makedirs(temp_dir, exist_ok=True)
+                    temp_df.to_csv(temp_path, index=False)
+                    logger.info(f"Saved intermediate results ({len(data)} cases)")
             else:
-                logger.warning(f"⚠️ Skipping case {i+1} due to missing content")
+                logger.warning(f"Skipping case due to missing content: {case['url']}")
 
         except Exception as e:
-            logger.error(f"❌ Error processing case {i+1}: {e}")
+            logger.error(f"Error processing case {idx}: {e}")
 
-        if i < len(case_links) - 1:
+        if idx < total:
             delay = random.uniform(2, 4)
             time.sleep(delay)
     if data:
-        df = pd.DataFrame(data)
-        df.to_csv(output_csv, index=False)
-        logger.info(f"💾 Successfully saved {len(data)} cases to '{output_csv}'")
+        df = pd.DataFrame(data, columns=["id","title","url","case_summary","judgment"])
+        # Atomic write
+        tmp_final = os.path.join(out_dir, f".tmp_{os.path.basename(output_csv)}")
+        df.to_csv(tmp_final, index=False)
+        os.replace(tmp_final, output_csv)
+        logger.info(f"Successfully saved {len(data)} cases to '{output_csv}'")
     else:
-        logger.error("❌ No data collected, dataset not created")
+        logger.error("No data collected, dataset not created")
 
     return len(data)
 def setup_local_summarizer():
@@ -348,7 +380,7 @@ def setup_local_summarizer():
         summarizer = pipeline("summarization")
         return summarizer
     except ImportError:
-        logger.warning("⚠️ Transformers library not available. API or fallback method will be used.")
+        logger.warning("Transformers library not available. API or fallback method will be used.")
         return None
 
 def summarize_with_local_model(text, summarizer, max_length=15000):
@@ -370,25 +402,17 @@ def summarize_with_local_model(text, summarizer, max_length=15000):
             summary = summarizer(text, max_length=max_length, min_length=100, do_sample=False)
             return summary[0]['summary_text']
     except Exception as e:
-        logger.error(f"❌ Error with local summarization: {e}")
+        logger.error(f"Error with local summarization: {e}")
         return None
 
 if __name__ == "__main__":
     QUERY = "cases on rape and murder"
     PAGES = 2
     OUTPUT_CSV = "data/rape_murder_cases_summarized.csv"
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.FileHandler(os.path.join(LOG_DIR, "legal_scraper.log")),
-            logging.StreamHandler()
-        ]
-    )
     os.makedirs(os.path.dirname(OUTPUT_CSV) if os.path.dirname(OUTPUT_CSV) else '.', exist_ok=True)
 
     try:
-        logger.info(f"🚀 Starting legal case scraper for query: '{QUERY}'")
+        logger.info(f"Starting legal case scraper for query: '{QUERY}'")
         logger.info(f"Using Hugging Face model: {HUGGINGFACE_API_URL}")
         test_text = "This is a test to verify the Hugging Face API connection."
         try:
@@ -400,13 +424,13 @@ if __name__ == "__main__":
                 timeout=10
             )
             if response.status_code == 200:
-                logger.info("✅ Hugging Face API connection successful")
+                logger.info("Hugging Face API connection successful")
             else:
-                logger.warning(f"⚠️ Hugging Face API test failed: {response.status_code}, {response.text}")
+                logger.warning(f"Hugging Face API test failed: {response.status_code}, {response.text}")
         except Exception as e:
-            logger.warning(f"⚠️ Hugging Face API test failed: {e}")
+            logger.warning(f"Hugging Face API test failed: {e}")
 
         total_cases = create_dataset(QUERY, PAGES, OUTPUT_CSV)
-        logger.info(f"🏁 Scraping completed - {total_cases} cases processed")
+        logger.info(f"Scraping completed - {total_cases} cases processed")
     except Exception as e:
-        logger.error(f"❌ Fatal error: {e}")
+        logger.error(f"Fatal error: {e}")

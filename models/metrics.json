@@ -1,0 +1,69 @@
+{
+  "final_model": {
+    "train_f1_weighted": 0.9998846833254766,
+    "test_accuracy": 0.9178966789667896,
+    "cv_macro_f1_mean": 0.807133779608594,
+    "cv_macro_f1_std": 0.011850462833802287,
+    "num_classes": 3,
+    "classes": [
+      "Acquittal/Conviction Overturned",
+      "Relief Denied/Dismissed",
+      "Relief Granted/Convicted"
+    ],
+    "test_macro_f1": 0.8270246867865834,
+    "test_weighted_f1": 0.9097991414186438,
+    "per_class_f1": {
+      "Acquittal/Conviction Overturned": 0.6356589147286822,
+      "Relief Denied/Dismissed": 0.883495145631068,
+      "Relief Granted/Convicted": 0.96192
+    },
+    "ontology": {
+      "version": "fallback",
+      "num_leaves": 11,
+      "leaves": [
+        "Acquittal/Conviction Overturned",
+        "Conviction Upheld/Appeal Dismissed",
+        "Charge Sheet Quashed",
+        "Charges/Proceedings Quashed",
+        "Sentence Reduced/Modified",
+        "Bail Granted",
+        "Bail Denied",
+        "Relief Granted/Convicted",
+        "Relief Denied/Dismissed",
+        "Other",
+        "unrecognized"
+      ]
+    },
+    "model_selected": "boosted_rf",
+    "selection_reason": "default",
+    "boosted_macro_f1_pre_selection": 0.8270246867865834,
+    "baseline_macro_f1": 0.7889951350665688,
+    "head_macro_f1": 0.3300395256916996,
+    "tail_macro_f1": 0.5187441137175023,
+    "holdout": null,
+    "abstention": {
+      "prob_threshold": 0.35,
+      "margin_threshold": 0.1,
+      "abstain_rate": 0.0,
+      "coverage": 1.0,
+      "macro_f1_non_abstained": 0.8270246867865834
+    },
+    "slices": {
+      "error": "No module named 'evaluation'"
+    },
+    "temporal_eval": null
+  },
+  "baseline": {
+    "test_accuracy": 0.8680811808118081
+  },
+  "data": {
+    "duplicate_ratio": 0.0,
+    "total_cases": 10838,
+    "pre_upsampling_distribution": {
+      "Relief Granted/Convicted": 7663,
+      "Relief Denied/Dismissed": 1901,
+      "Acquittal/Conviction Overturned": 1274
+    },
+    "weak_label_applied_rows": 0
+  }
+}

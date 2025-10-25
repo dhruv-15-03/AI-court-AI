@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  api:
+    build:
+      context: .
+      args:
+        APP_VERSION: ${APP_VERSION:-0.1.0}
+        GIT_COMMIT: ${GIT_COMMIT:-dev}
+    image: ai-court:latest
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - MODEL_PATH=/app/models/legal_case_classifier.pkl
+    volumes:
+      - ./models:/app/models
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8000/api/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
