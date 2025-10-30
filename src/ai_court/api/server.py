@@ -711,21 +711,27 @@ def _record_agreement(classical_label: str, shadow_axes: dict | None):
             'multi_axis_procedural': shadow_axes.get('procedural_label')
         })
 
-# Optional semantic search index
+LOW_MEMORY = os.getenv("LOW_MEMORY", "0") == "1"
+# Optional semantic search index (can be disabled to reduce memory)
 SEARCH_INDEX_PATH = os.getenv("SEARCH_INDEX_PATH", os.path.join(PROJECT_ROOT, "models", "search_index.pkl"))
+DISABLE_SEARCH_INDEX = os.getenv("DISABLE_SEARCH_INDEX", "1" if LOW_MEMORY else "0") == "1"
 search_index: Optional[Dict[str, Any]] = None
-if os.path.exists(SEARCH_INDEX_PATH):
+if not DISABLE_SEARCH_INDEX and os.path.exists(SEARCH_INDEX_PATH):
     try:
         with open(SEARCH_INDEX_PATH, "rb") as f:
             search_index = dill.load(f)
         print(f"[api] Loaded search index from {SEARCH_INDEX_PATH} with {len(search_index.get('meta', []))} docs")
     except Exception as e:
         print(f"[api] Warning: failed to load search index: {e}")
+else:
+    if DISABLE_SEARCH_INDEX:
+        print("[api] Skipping search index load (DISABLE_SEARCH_INDEX=1 or LOW_MEMORY=1)")
 
-# Optional semantic (dense) search index
+# Optional semantic (dense) search index (can be disabled to reduce memory)
 SEMANTIC_INDEX_PATH = os.getenv("SEMANTIC_INDEX_PATH", os.path.join(PROJECT_ROOT, "models", "semantic_index.pkl"))
+DISABLE_SEMANTIC_INDEX = os.getenv("DISABLE_SEMANTIC_INDEX", "1" if LOW_MEMORY else "0") == "1"
 semantic_index: Optional[Dict[str, Any]] = None
-if os.path.exists(SEMANTIC_INDEX_PATH):
+if not DISABLE_SEMANTIC_INDEX and os.path.exists(SEMANTIC_INDEX_PATH):
     try:
         with open(SEMANTIC_INDEX_PATH, 'rb') as f:
             semantic_index = dill.load(f)
@@ -733,6 +739,9 @@ if os.path.exists(SEMANTIC_INDEX_PATH):
         print(f"[api] Loaded semantic index from {SEMANTIC_INDEX_PATH} with {emb_count} embeddings")
     except Exception as e:
         print(f"[api] Warning: failed to load semantic index: {e}")
+else:
+    if DISABLE_SEMANTIC_INDEX:
+        print("[api] Skipping semantic index load (DISABLE_SEMANTIC_INDEX=1 or LOW_MEMORY=1)")
 
 CASE_TYPES = {
     "initial": [

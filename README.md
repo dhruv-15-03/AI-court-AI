@@ -166,6 +166,23 @@ tail -f models/history.log
 
 ## 🌐 API Server
 
+### Deploy on Render (Free tier, 512MB)
+
+Set these environment variables in your Render service to keep memory within 512MB:
+
+```
+LOW_MEMORY=1
+DISABLE_SEARCH_INDEX=1
+DISABLE_SEMANTIC_INDEX=1
+GUNICORN_WORKERS=1
+GUNICORN_THREADS=1
+```
+
+Notes:
+- With LOW_MEMORY enabled, only the classifier model is loaded; `/api/search` returns 503 unless you ship `models/search_index.pkl` and enable it.
+- Gunicorn preloading is disabled and concurrency is minimal to avoid memory duplication.
+- The Docker build excludes heavy folders (`models/production`, `models/runs`, `mlruns`, `data/raw`, `data/processed`) via `.dockerignore`.
+
 ### Start Server
 
 ```powershell

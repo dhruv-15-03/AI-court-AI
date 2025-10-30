@@ -15,6 +15,15 @@ venv/
 .venv/
 *.ipynb
 notebooks/
+mlruns/
+models/production/**
+models/runs/**
+data/raw/**
+data/raw_enriched/**
+data/processed/**
+*.safetensors
+*.bin
+.env
 data/raw/docs/
 data/tmp/
 .cache/
