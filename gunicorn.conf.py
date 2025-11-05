@@ -1,4 +1,5 @@
-bind = "0.0.0.0:8000"
+import os
+bind = f"0.0.0.0:{os.environ.get('PORT', '8000')}"
 
 # Render free instances have 512MB RAM. Keep a single light worker to avoid OOM.
 # Override via env vars if you scale up.
