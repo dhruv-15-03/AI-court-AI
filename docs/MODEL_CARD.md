@@ -35,10 +35,10 @@ Assistive legal outcome insight & precedent retrieval; not a substitute for prof
 
 ## Limitations & Risks
 
-- Class imbalance (Other dominates).
+- Class imbalance ("Relief Granted/Convicted" is the majority class).
 - Possible label noise from heuristic normalization.
 - Domain / temporal drift (new laws, precedents).
-- Small minority classes may have unstable metrics.
+- Minority classes may have higher variance and unstable metrics.
 
 ## Ethical Considerations
 

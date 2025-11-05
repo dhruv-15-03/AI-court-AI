@@ -892,7 +892,6 @@ def _synthesize_text_from_answers(raw: Dict[str, Any]) -> str:
     summary = raw.get("summary")
     if isinstance(summary, str) and summary.strip():
         parts.append(summary.strip())
-    # Then include other fields
     for k, v in raw.items():
         if k in ("case_type", "summary"):
             continue
