@@ -3,10 +3,9 @@
 **AI-powered Indian legal case classifier and precedent search engine**
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.5.1-ee4c2c.svg)](https://pytorch.org/)
-[![Legal-BERT](https://img.shields.io/badge/Model-Legal--BERT-green.svg)](https://huggingface.co/nlpaueb/legal-bert-base-uncased)
-[![Cases](https://img.shields.io/badge/Cases-6.8K+-brightgreen.svg)](#current-metrics)
-[![Accuracy](https://img.shields.io/badge/Accuracy-60.24%25-yellow.svg)](#model-performance)
+[![Cases](https://img.shields.io/badge/Cases-10k%2B-brightgreen.svg)](#current-metrics)
+[![Model](https://img.shields.io/badge/Model-TFIDF%2B-AdaBoost-blue.svg)](#model-performance)
+[![Accuracy](https://img.shields.io/badge/Accuracy-91.8%25-green.svg)](#model-performance)
 
 > **Production-ready ML pipeline** for predicting Indian court case outcomes and retrieving similar legal precedents using Legal-BERT transformers and semantic search.
 
@@ -118,17 +117,18 @@ tail -f logs/legal_scraper.log
 
 ---
 
-## 🤖 Model Training
+## 🤖 Model
 
-### Model #1 (Current)
-- **Training Cases:** 413
-- **Accuracy:** 60.24% ⚠️
-- **F1 Weighted:** 45.29%
-- **F1 Macro:** 18.80%
-- **Device:** CUDA (RTX 4050 6GB)
-- **Model:** Legal-BERT (nlpaueb/legal-bert-base-uncased)
+This repository now ships a lightweight classical classifier (TF-IDF features + AdaBoost/RandomForest) trained on curated, normalized case outcomes. It's smaller, faster to load, and suitable for memory-constrained deployments (Render free tier).
 
-### Train Model #2 (Recommended at 10K cases)
+### Current production model
+- Training rows: 10,838
+- Classes: 3 (Relief Granted/Convicted; Relief Denied/Dismissed; Acquittal/Conviction Overturned)
+- Test accuracy: 0.918
+- Test macro-F1: 0.827
+- Artifact: `models/legal_case_classifier.pkl` (also `models/metrics.json`, `models/metadata.json`)
+
+If you want to train or experiment with transformer models (Legal-BERT), see the pipeline docs—but note transformers require more memory and are not recommended for the 512MB Render free tier.
 
 ```powershell
 # Train with 1,000 case batch
