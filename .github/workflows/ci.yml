@@ -8,6 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # Optional: set to deployed URL to run external smoke (e.g., Render) in CI
+      DEPLOY_URL: ""
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -68,11 +71,26 @@ jobs:
             --build-arg GIT_COMMIT=${{ github.sha }}
       - name: Docker smoke
         run: |
-          docker run -d --rm -p 8000:8000 --name ai-court-ci ai-court-ci
+          docker run -d --rm -p 8000:8000 --name ai-court-ci \
+            -e LOW_MEMORY=1 \
+            -e DISABLE_SEARCH_INDEX=1 \
+            -e DISABLE_SEMANTIC_INDEX=1 \
+            -e GUNICORN_WORKERS=1 \
+            -e GUNICORN_THREADS=1 \
+            -e MODEL_PATH=/app/models/legal_case_classifier.pkl \
+            ai-court-ci
           sleep 5
           curl -fsS http://127.0.0.1:8000/api/health
+          curl -fsS -X POST http://127.0.0.1:8000/api/analyze -H "Content-Type: application/json" \
+            -d '{"text":"The appeal is allowed. The conviction is set aside and the appellant is acquitted."}'
           docker logs ai-court-ci --since 2m || true
           docker rm -f ai-court-ci
+      - name: External smoke (optional)
+        if: env.DEPLOY_URL != ''
+        env:
+          SMOKE_URL: ${{ env.DEPLOY_URL }}
+        run: |
+          python scripts/smoke_client.py
       - name: Scan image (Trivy)
         continue-on-error: true
         run: |
