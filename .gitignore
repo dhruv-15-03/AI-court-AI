@@ -80,9 +80,17 @@ simple_scraper.log
 scraper.log
 legal_scraper.log
 
-# Model artifacts (keep only canonical path under models/)
+# Model artifacts: ignore pickles globally but allow specific model files
 *.pkl
-!models/**
+!models/legal_case_classifier.pkl
+!models/metrics.json
+!models/confusion_matrix.json
+!models/metadata.json
+!models/search_index.pkl
+
+# Keep heavy bundles out of git
+models/production/**
+models/runs/**
 
 # Data caches
 *.tmp
