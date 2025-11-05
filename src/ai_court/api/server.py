@@ -101,6 +101,7 @@ API_KEY = os.getenv("API_KEY", "")
 
 class AnalyzeRequest(BaseModel):
     case_type: Optional[str] = Field(default="Unknown", max_length=100)
+    summary: Optional[str] = Field(default=None, max_length=5000)
     parties: Optional[str] = Field(default=None, max_length=2000)
     violence_level: Optional[str] = Field(default=None, max_length=100)
     weapon: Optional[str] = Field(default=None, max_length=50)
@@ -117,14 +118,19 @@ class AnalyzeRequest(BaseModel):
     attempts_resolution: Optional[str] = Field(default=None, max_length=50)
 
     def combined_text(self) -> str:
+        # This legacy method only includes typed fields. We prefer synthesizing from raw.
         parts: List[str] = []
         data = self.model_dump()
         ct = data.get("case_type", "") or ""
+        # Put summary first if provided
+        if data.get("summary"):
+            parts.append(str(data.get("summary")))
         for k, v in data.items():
-            if k != "case_type" and v:
-                parts.append(f"{k}: {v}")
-        # Keep similar structure to previous implementation
-        return f"{ct} " + ". ".join(parts)
+            if k in ("case_type", "summary"):
+                continue
+            if v:
+                parts.append(f"{k.replace('_',' ')}: {v}")
+        return (f"{ct} " + ". ".join(parts)).strip()
 
 
 class SearchRequest(BaseModel):
@@ -162,7 +168,6 @@ limiter = Limiter(
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger("api")
 
-# Prometheus metrics (idempotent across repeated test imports)
 try:
     REQUEST_COUNT  # type: ignore[name-defined]
 except Exception:  # metrics not yet defined
@@ -171,7 +176,6 @@ except Exception:  # metrics not yet defined
         REQUEST_LATENCY = Histogram('ai_court_request_latency_seconds', 'Request latency in seconds', ['endpoint'])
         PREDICTIONS_TOTAL = Counter('ai_court_predictions_total', 'Total predictions served', ['endpoint', 'label'])
     except ValueError:
-        # Already registered in global REGISTRY (pytest re-import); ignore
         class _Dummy:
             def labels(self, *_, **__):
                 return self
@@ -872,6 +876,38 @@ def get_questions_by_type(case_type):
     return jsonify({"error": "Case type not found"}), 404
 
 
+def _synthesize_text_from_answers(raw: Dict[str, Any]) -> str:
+    """Build a classifier-friendly text from structured answers.
+
+    Heuristics:
+    - Prefer a free-text 'summary' if provided
+    - Include case_type as the first token
+    - Append key:value pairs for other short answers (snake_case -> spaces)
+    """
+    if not isinstance(raw, dict):
+        return ""
+    ct = str(raw.get("case_type") or "").strip()
+    parts: List[str] = []
+    # Summary first, if present
+    summary = raw.get("summary")
+    if isinstance(summary, str) and summary.strip():
+        parts.append(summary.strip())
+    # Then include other fields
+    for k, v in raw.items():
+        if k in ("case_type", "summary"):
+            continue
+        if v is None:
+            continue
+        sv = str(v).strip()
+        if not sv:
+            continue
+        kk = k.replace('_', ' ')
+        parts.append(f"{kk}: {sv}")
+    base = (ct + " ").strip()
+    body = ". ".join(parts)
+    return (base + " " + body).strip()
+
+
 @app.route("/api/analyze", methods=["POST"])
 @limiter.limit("30/minute")
 @swag_from({
@@ -911,7 +947,8 @@ def analyze_case():
     payload_str = __import__('json').dumps(raw)
     if len(payload_str) > 100_000:
         return jsonify({"error": "Payload too large"}), 413
-    processed = preprocess_fn(parsed.combined_text())
+    # Prefer synthesizing from the full raw payload so we don't drop fields like 'summary' or 'relief_requested'
+    processed = preprocess_fn(_synthesize_text_from_answers(raw))
     # Prediction with probability (classical model)
     proba = None
     try:
@@ -1183,7 +1220,7 @@ def analyze_and_search():
     except ValidationError as ve:
         return jsonify({"error": "validation_failed", "details": ve.errors()}), 400
     data = raw
-    processed = preprocess_fn(parsed.combined_text())
+    processed = preprocess_fn(_synthesize_text_from_answers(raw))
     try:
         proba = classifier_model.predict_proba([processed])[0]
         pred = int(proba.argmax())
