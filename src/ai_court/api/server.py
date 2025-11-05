@@ -568,9 +568,28 @@ def _after_request(response):
     return response
 
 # Model artifact path (classical)
-MODEL_PATH = os.getenv("MODEL_PATH", os.path.join(PROJECT_ROOT, "models", "legal_case_classifier.pkl"))
-if not os.path.exists(MODEL_PATH):
-    raise FileNotFoundError(f"Model file '{MODEL_PATH}' not found. Train it first.")
+# Resolve model path robustly for both Docker (/app/...) and non-Docker (PROJECT_ROOT) runtimes
+_default_model_path = os.path.join(PROJECT_ROOT, "models", "legal_case_classifier.pkl")
+_env_model_path = os.getenv("MODEL_PATH")
+if _env_model_path and os.path.isabs(_env_model_path) and os.path.exists(_env_model_path):
+    MODEL_PATH = _env_model_path
+elif _env_model_path and os.path.exists(_env_model_path):
+    # Relative env path that exists
+    MODEL_PATH = _env_model_path
+elif os.path.exists(_default_model_path):
+    MODEL_PATH = _default_model_path
+else:
+    # Last-chance fallback: common Docker path
+    _docker_path = "/app/models/legal_case_classifier.pkl"
+    if os.path.exists(_docker_path):
+        MODEL_PATH = _docker_path
+    else:
+        raise FileNotFoundError(
+            "Model file not found. Tried: "
+            f"env MODEL_PATH='{_env_model_path or ''}', "
+            f"default='{_default_model_path}', docker='{_docker_path}'. "
+            "Ensure the model artifact is present or set MODEL_PATH accordingly."
+        )
 
 with open(MODEL_PATH, "rb") as f:
     saved = dill.load(f)
