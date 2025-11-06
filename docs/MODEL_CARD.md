@@ -1,6 +1,6 @@
 # Model Card: Legal Case Outcome Classifier
 
-Last updated: 2025-11-05
+Last updated: 2025-11-06
 
 ## Overview
 
@@ -35,10 +35,10 @@ Assistive legal outcome insight & precedent retrieval; not a substitute for prof
 
 ## Limitations & Risks
 
-- Class imbalance ("Relief Granted/Convicted" is the majority class).
+- Class imbalance (Other dominates).
 - Possible label noise from heuristic normalization.
 - Domain / temporal drift (new laws, precedents).
-- Minority classes may have higher variance and unstable metrics.
+- Small minority classes may have unstable metrics.
 
 ## Ethical Considerations
 
