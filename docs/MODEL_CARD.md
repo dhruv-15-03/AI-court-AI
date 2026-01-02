@@ -1,6 +1,6 @@
 # Model Card: Legal Case Outcome Classifier
 
-Last updated: 2026-01-01
+Last updated: 2026-01-02
 
 ## Overview
 
