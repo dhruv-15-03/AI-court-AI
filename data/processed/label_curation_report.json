@@ -1,0 +1,40 @@
+{
+  "min_support": 5,
+  "protected_labels": [
+    "Acquittal",
+    "Bail Denied",
+    "Bail Granted",
+    "Charge Sheet Quashed",
+    "Other"
+  ],
+  "demoted_labels": {
+    "Bribery / Prevention of Corruption Act": 3,
+    "Domestic Violence Act": 2
+  },
+  "original_distribution": {
+    "Other": 1246,
+    "Acquittal": 12,
+    "Anticipatory Bail": 8,
+    "Labour / Wages / Termination": 15,
+    "Divorce / Custody": 10,
+    "Bail Granted": 16,
+    "Bail Denied": 1,
+    "Charge Sheet Quashed": 32,
+    "Bribery / Prevention of Corruption Act": 3,
+    "Contract Dispute": 15,
+    "Domestic Violence Act": 2,
+    "Injunction Suit": 8
+  },
+  "final_distribution": {
+    "Other": 1251,
+    "Acquittal": 12,
+    "Anticipatory Bail": 8,
+    "Labour / Wages / Termination": 15,
+    "Divorce / Custody": 10,
+    "Bail Granted": 16,
+    "Bail Denied": 1,
+    "Charge Sheet Quashed": 32,
+    "Contract Dispute": 15,
+    "Injunction Suit": 8
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "labels": [
+    "Acquittal/Conviction Overturned",
+    "Relief Denied/Dismissed",
+    "Relief Granted/Convicted"
+  ],
+  "matrix": [
+    [
+      123,
+      57,
+      75
+    ],
+    [
+      2,
+      364,
+      14
+    ],
+    [
+      7,
+      23,
+      1503
+    ]
+  ]
+}

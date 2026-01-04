@@ -1,0 +1,13 @@
+name: ai-court
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - MODEL_PATH=/app/models/legal_case_classifier.pkl
+      - SEARCH_INDEX_PATH=/app/models/search_index.pkl
+    volumes:
+      - ./models:/app/models
+      - ./logs:/app/logs
+    restart: unless-stopped

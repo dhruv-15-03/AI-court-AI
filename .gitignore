@@ -1,0 +1,127 @@
+# OS/Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage*
+
+# Environments
+.env
+.venv/
+venv/
+
+# Logs & temp
+logs/
+*.log
+tmp*/
+
+# Models (keep top-level artifacts, ignore runs and heavy bundles)
+models/runs/
+models/multi_axis/
+models/production/**
+*.safetensors
+models/legal_case_classifier.pkl
+!models/metrics.json
+!models/confusion_matrix.json
+!models/metadata.json
+!models/search_index.pkl
+
+# Data (ignore raw and large processed; allow small samples if added under data/samples)
+data/raw/**
+data/raw_enriched/**
+data/legal_cases_10M.db
+data/processed/*.parquet
+data/processed/*.arrow
+data/processed/*.feather
+data/processed/*.pkl
+data/processed/*.npy
+data/processed/*.npz
+# Exclude processed CSVs by default to keep repo lean (deployment builds from DB)
+data/processed/*.csv
+!data/samples/**
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Build & containers
+dist/
+build/
+*.egg-info/
+*.egg
+node_modules/
+
+# Docker compose local artifacts
+.docker/
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+.env/
+.env.local
+
+# Logs and debug artifacts
+*.log
+logs/
+debug_*.html
+debug_*.txt
+simple_scraper.log
+scraper.log
+legal_scraper.log
+
+# Model artifacts: ignore pickles globally but allow specific model files
+*.pkl
+!models/legal_case_classifier.pkl
+!models/metrics.json
+!models/confusion_matrix.json
+!models/metadata.json
+!models/search_index.pkl
+
+# Keep heavy bundles out of git
+models/production/**
+models/runs/**
+
+# Data caches
+*.tmp
+.temp_*
+
+# OS/editor
+.DS_Store
+.vscode/
+
+# Python cache directories
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.tox/
+.coverage
+htmlcov/
+
+# MLflow & experiment tracking
+mlruns/
+models/runs/
+models/hf_runs/
+models/checkpoints/
+
+# Temporary files
+*.tmp
+.temp_*
+harvest_checkpoint.json
+
+# Old/archive directories
+evaluation/
+ingestion/
+ontology/
+schemas/
+scripts/archive/

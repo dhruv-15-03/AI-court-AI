@@ -1,0 +1,39 @@
+{
+  "final_model": {
+    "train_f1_weighted": 0.99990585409333,
+    "test_accuracy": 0.8384789156626506,
+    "num_classes": 9,
+    "classes": [
+      "Acquittal/Conviction Overturned",
+      "Bail Denied",
+      "Bail Granted",
+      "Charge Sheet Quashed",
+      "Charges/Proceedings Quashed",
+      "Conviction Upheld/Appeal Dismissed",
+      "Relief Denied/Dismissed",
+      "Relief Granted/Convicted",
+      "Sentence Reduced/Modified"
+    ],
+    "ontology": {
+      "version": "fallback",
+      "num_leaves": 11,
+      "leaves": [
+        "Acquittal/Conviction Overturned",
+        "Conviction Upheld/Appeal Dismissed",
+        "Charge Sheet Quashed",
+        "Charges/Proceedings Quashed",
+        "Sentence Reduced/Modified",
+        "Bail Granted",
+        "Bail Denied",
+        "Relief Granted/Convicted",
+        "Relief Denied/Dismissed",
+        "Other",
+        "unrecognized"
+      ]
+    }
+  },
+  "data": {
+    "duplicate_ratio": 0.0,
+    "total_cases": 13276
+  }
+}

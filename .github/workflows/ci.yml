@@ -1,0 +1,99 @@
+name: ci
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # Optional: set to deployed URL to run external smoke (e.g., Render) in CI
+      DEPLOY_URL: ""
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f constraints.txt ]; then pip install -r requirements.txt -c constraints.txt; else pip install -r requirements.txt; fi
+      - name: Lint (ruff)
+        run: |
+          ruff --version
+          ruff check .
+      - name: Type check (mypy)
+        run: |
+          mypy --version
+          mypy src
+      - name: Lint syntax
+        run: |
+          python -m py_compile $(git ls-files '*.py')
+      - name: Run tests
+        run: |
+          python -m pip install pytest-cov
+          pytest -q --cov=src --cov-report=xml --cov-report=term --cov-fail-under=60
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml
+      - name: Train (quick) and evaluate
+        run: |
+          python scripts/train_model.py || true
+          python scripts/evaluate_saved_model.py || true
+      - name: API import smoke
+        run: |
+          python - <<'PY'
+          from src.ai_court.api.server import app
+          with app.test_client() as c:
+              r = c.get('/api/health')
+              print(r.status_code, r.get_json())
+          PY
+      - name: Dependency scan (pip-audit)
+        continue-on-error: true
+        run: |
+          python -m pip install pip-audit
+          pip-audit -r requirements.txt || true
+      - name: Docker build
+        run: |
+          docker build -t ai-court-ci . \
+            --build-arg APP_VERSION=${{ github.ref_name }} \
+            --build-arg GIT_COMMIT=${{ github.sha }}
+      - name: Docker smoke
+        run: |
+          docker run -d --rm -p 8000:8000 --name ai-court-ci \
+            -e LOW_MEMORY=1 \
+            -e DISABLE_SEARCH_INDEX=1 \
+            -e DISABLE_SEMANTIC_INDEX=1 \
+            -e GUNICORN_WORKERS=1 \
+            -e GUNICORN_THREADS=1 \
+            -e MODEL_PATH=/app/models/legal_case_classifier.pkl \
+            ai-court-ci
+          sleep 5
+          curl -fsS http://127.0.0.1:8000/api/health
+          curl -fsS -X POST http://127.0.0.1:8000/api/analyze -H "Content-Type: application/json" \
+            -d '{"text":"The appeal is allowed. The conviction is set aside and the appellant is acquitted."}'
+          docker logs ai-court-ci --since 2m || true
+          docker rm -f ai-court-ci
+      - name: External smoke (optional)
+        if: env.DEPLOY_URL != ''
+        env:
+          SMOKE_URL: ${{ env.DEPLOY_URL }}
+        run: |
+          python scripts/smoke_client.py
+      - name: Scan image (Trivy)
+        continue-on-error: true
+        run: |
+          curl -sSL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+          trivy version || true
+          trivy image --no-progress ai-court-ci || true
