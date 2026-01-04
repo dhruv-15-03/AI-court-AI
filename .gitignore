@@ -28,7 +28,7 @@ models/runs/
 models/multi_axis/
 models/production/**
 *.safetensors
-models/legal_case_classifier.pkl
+!models/legal_case_classifier.pkl
 !models/metrics.json
 !models/confusion_matrix.json
 !models/metadata.json
