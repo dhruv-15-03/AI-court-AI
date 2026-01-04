@@ -1,4 +1,9 @@
 import os
+import sys
+
+# Add src directory to Python path so 'ai_court' package can be found
+sys.path.append(os.path.join(os.getcwd(), 'src'))
+
 bind = f"0.0.0.0:{os.environ.get('PORT', '8000')}"
 
 # Render free instances have 512MB RAM. Keep a single light worker to avoid OOM.
