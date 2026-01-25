@@ -5,8 +5,19 @@ AI-powered Indian legal case classifier and precedent search (production-ready, 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![Model](https://img.shields.io/badge/Model-TFIDF%20%2B%20BoostedRF-blue.svg)](#current-model)
 [![Accuracy](https://img.shields.io/badge/Test%20Accuracy-91.8%25-green.svg)](#current-model)
+[![Deploy](https://img.shields.io/badge/Deploy-Render%20Free%20Tier-green.svg)](#deploy-on-render-free-tier)
 
-This project provides a Flask API that predicts court case outcomes and optionally retrieves similar precedents. It ships a small, fast scikit‑learn model (TF‑IDF + boosted random forest) suitable for 512MB deployments (e.g., Render free tier). Optional features include lexical/semantic search, drift monitoring, and a shadow transformer “multi‑axis” model.
+This project provides a Flask API that predicts court case outcomes and optionally retrieves similar precedents. It ships a small, fast scikit‑learn model (TF‑IDF + boosted random forest) suitable for 512MB deployments (e.g., Render free tier). Optional features include lexical/semantic search, drift monitoring, and a shadow transformer "multi‑axis" model.
+
+## ✨ Key Features
+
+- **🎯 Confidence-Based Predictions**: Returns confidence scores with automatic abstention for uncertain cases
+- **🔍 Explainable AI**: Returns key factors (TF-IDF features) that influenced each prediction
+- **📚 RAG-Style Search**: Retrieval-augmented responses using case precedent database
+- **🔄 Active Learning**: Auto-queues low-confidence predictions for human review
+- **💰 Zero API Cost**: Local extractive summarization (no HuggingFace API required)
+- **📊 Class Imbalance Handling**: Optional SMOTE oversampling for minority classes
+- **🏃 Memory Optimized**: Runs on Render free tier (512MB RAM)
 
 ---
 
@@ -58,14 +69,26 @@ pip install -r requirements.txt
 
 Copy `.env.example` to `.env`:
 ```bash
+# Core paths
 MODEL_PATH=models/legal_case_classifier.pkl
 SEARCH_INDEX_PATH=models/search_index.pkl
-SEMANTIC_INDEX_PATH=models/semantic_index.pkl
+
+# Memory optimization (for Render free tier 512MB)
 LOW_MEMORY=1
-DISABLE_SEARCH_INDEX=1
+DISABLE_SEARCH_INDEX=0
 DISABLE_SEMANTIC_INDEX=1
 GUNICORN_WORKERS=1
-GUNICORN_THREADS=1
+GUNICORN_THREADS=2
+
+# Confidence & Explainability
+CONFIDENCE_THRESHOLD=0.5          # Flag predictions below this
+AUTO_QUEUE_LOW_CONFIDENCE=1       # Auto-add to review queue
+EXPLAIN_TOP_K=5                   # Key factors in response
+
+# Summarization (zero API cost)
+USE_LOCAL_SUMMARY=1               # Use local extractive (no HF API)
+
+# Optional
 API_KEY=
 SENTRY_DSN=
 APP_VERSION=0.1.0

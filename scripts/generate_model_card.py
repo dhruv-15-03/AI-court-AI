@@ -56,7 +56,7 @@ def render(metadata: dict | None, metrics: dict | None) -> str:
     distribution_block = ("\n" + "\n".join(distribution_lines)) if distribution_lines else " (not available)"
 
     parts = [
-        f"# Model Card: Legal Case Outcome Classifier\n",
+        "# Model Card: Legal Case Outcome Classifier\n",
         f"Last updated: {now}\n",
         "## Overview\n",
         "- Task: Multi-class classification of judgment outcomes from Indian court case text.",

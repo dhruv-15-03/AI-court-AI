@@ -46,6 +46,53 @@ def health():
     except Exception as e:
         return jsonify({"status": "error", "detail": str(e)}), 500
 
+@monitoring_bp.route("/api/health/ready", methods=["GET"])
+def health_ready():
+    """Readiness probe - checks if model is loaded and ready to serve."""
+    checks = {
+        'model_loaded': state.classifier is not None,
+        'preprocessor_ready': state.preprocess_fn is not None,
+    }
+    all_ready = all(checks.values())
+    return jsonify({
+        "ready": all_ready,
+        "checks": checks
+    }), 200 if all_ready else 503
+
+@monitoring_bp.route("/api/health/live", methods=["GET"])
+def health_live():
+    """Liveness probe - minimal check that service is running."""
+    return jsonify({"alive": True}), 200
+
+@monitoring_bp.route("/api/stats/memory", methods=["GET"])
+def memory_stats():
+    """Return current memory usage statistics."""
+    memory_info = state.get_memory_usage()
+    return jsonify({
+        "memory": memory_info,
+        "search_index_loaded": state.search_index is not None,
+        "semantic_index_loaded": state.semantic_index is not None,
+        "multi_axis_loaded": state.multi_axis_bundle is not None,
+    })
+
+@monitoring_bp.route("/api/stats/predictions", methods=["GET"])
+def prediction_stats():
+    """Return prediction statistics for monitoring."""
+    stats = state.prediction_stats.copy()
+    # Remove internal tracking fields
+    stats.pop('_confidence_sum', None)
+    
+    # Add AL queue info
+    stats['al_queue_size'] = len(state.AL_QUEUE)
+    stats['agreement_stats'] = {
+        'total_compared': state.agreement_stats['total_compared'],
+        'agreements': state.agreement_stats['agreements'],
+        'rate': (state.agreement_stats['agreements'] / state.agreement_stats['total_compared']) 
+                if state.agreement_stats['total_compared'] > 0 else None
+    }
+    
+    return jsonify(stats)
+
 @monitoring_bp.route('/api/reload_multi_axis', methods=['POST'])
 def reload_multi_axis():
     """Reload the promoted multi-axis model bundle without restarting the server."""
@@ -74,7 +121,8 @@ def governance_status():
 def governance_refresh():
     """Force a refresh of governance_status.json by executing the script inline."""
     try:
-        import subprocess, sys
+        import subprocess
+        import sys
         cmd = [sys.executable, 'scripts/governance_status.py']
         rc = subprocess.run(cmd, capture_output=True, text=True)
         if rc.returncode != 0:

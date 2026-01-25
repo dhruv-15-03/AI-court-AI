@@ -9,7 +9,6 @@ Current status: placeholder forward interface & config dataclass.
 """
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import List, Dict, Any, Optional
 
 try:  # optional heavy dep
     import torch

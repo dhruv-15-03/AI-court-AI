@@ -2,7 +2,7 @@ import os
 import warnings
 import pandas as pd
 import numpy as np
-from typing import List, Dict, Tuple, Any
+from typing import List, Dict, Tuple
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from ai_court.model.preprocessor import TextPreprocessor

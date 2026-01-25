@@ -4,8 +4,8 @@ These pydantic models define the intermediate and normalized representations
 for Indian legal case ingestion and statute/section structures.
 """
 from __future__ import annotations
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict
+from pydantic import BaseModel
+from typing import Optional
 
 class CaseRaw(BaseModel):
     case_id: str

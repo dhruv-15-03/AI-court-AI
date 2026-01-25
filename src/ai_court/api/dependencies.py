@@ -1,11 +1,9 @@
 import os
 import json
 import dill
-import threading
 import logging
-import numpy as np
 from typing import Dict, Any, Optional, List
-from flask import current_app, request, jsonify
+from flask import request, jsonify
 from ai_court.api import config, state
 
 logger = logging.getLogger("api")
@@ -121,10 +119,10 @@ def require_api_key():
             return jsonify({"error": "Unauthorized"}), 401
     return None
 
-def synthesize_text_from_answers(raw: Dict[str, Any]) -> str:
+def synthesize_body_from_answers(raw: Dict[str, Any]) -> str:
+    """Extract case body text excluding case_type for cleaner API usage."""
     if not isinstance(raw, dict):
         return ""
-    ct = str(raw.get("case_type") or "").strip()
     parts: List[str] = []
     summary = raw.get("summary")
     if isinstance(summary, str) and summary.strip():
@@ -139,8 +137,14 @@ def synthesize_text_from_answers(raw: Dict[str, Any]) -> str:
             continue
         kk = k.replace('_', ' ')
         parts.append(f"{kk}: {sv}")
+    return ". ".join(parts).strip()
+
+def synthesize_text_from_answers(raw: Dict[str, Any]) -> str:
+    if not isinstance(raw, dict):
+        return ""
+    ct = str(raw.get("case_type") or "").strip()
+    body = synthesize_body_from_answers(raw)
     base = (ct + " ").strip()
-    body = ". ".join(parts)
     return (base + " " + body).strip()
 
 def multi_axis_predict_single(text: str):
@@ -235,7 +239,7 @@ def aggregate_hierarchical_f1(per_class_f1: Dict[str, float], class_counts: Dict
         return {}
     parent_map: Dict[str, Optional[str]] = {}
     build_parent_map(root, None, parent_map)
-    leaves = {l['id'] for l in flatten_leaves(ontology)} if ontology else set()
+    leaves = {leaf['id'] for leaf in flatten_leaves(ontology)} if ontology else set()
 
     leaf_f1: Dict[str, float] = {}
     for k, v in per_class_f1.items():
@@ -287,7 +291,8 @@ def js_divergence(p: List[float], q: List[float]) -> float:
     def kld(a, b):
         s = 0.0
         for ai, bi in zip(a, b):
-            ai = max(ai, eps); bi = max(bi, eps)
+            ai = max(ai, eps)
+            bi = max(bi, eps)
             s += ai * math.log(ai / bi)
         return s
     return float((kld(p, m) + kld(q, m)) / 2.0)

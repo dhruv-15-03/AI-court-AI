@@ -23,11 +23,15 @@ DENY_KEYS = {"denied", "refused", "rejected"}
 PRECEDENCE = ["acquittal", "grant", "dismiss", "deny", "other"]
 
 def _bucket(label: str) -> str:
-    l = (label or "").lower()
-    if any(k in l for k in ACQUITTAL_KEYS): return "acquittal"
-    if any(k in l for k in GRANT_KEYS): return "grant"
-    if any(k in l for k in DISMISS_KEYS): return "dismiss"
-    if any(k in l for k in DENY_KEYS): return "deny"
+    lbl = (label or "").lower()
+    if any(k in lbl for k in ACQUITTAL_KEYS):
+        return "acquittal"
+    if any(k in lbl for k in GRANT_KEYS):
+        return "grant"
+    if any(k in lbl for k in DISMISS_KEYS):
+        return "dismiss"
+    if any(k in lbl for k in DENY_KEYS):
+        return "deny"
     return "other"
 
 

@@ -18,9 +18,11 @@ Environment variables:
     MULTI_AXIS_EPOCHS, MULTI_AXIS_BATCH, MULTI_AXIS_LR, MULTI_AXIS_MAX_LEN (used by pipeline shim)
 """
 from __future__ import annotations
-import os, argparse, json, math
+import os
+import argparse
+import json
 from dataclasses import dataclass
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Optional
 import pandas as pd
 import torch
 from torch import nn
@@ -57,7 +59,6 @@ class RetrievalAugmentor:
         if self.top_k <= 0:
             return text
         vec = self.vectorizer.transform([text])
-        import numpy as np
         sims = (self.matrix @ vec.T).toarray().ravel()
         top_idx = sims.argsort()[::-1][:self.top_k]
         ctx = '\n'.join(self.corpus[i][:400] for i in top_idx if sims[i] > 0)
@@ -156,13 +157,11 @@ class SemanticRetriever:
             texts = texts[:max_corpus]
         self.model = SentenceTransformer(model_name)
         self.texts = texts
-        import numpy as np
         self.emb = self.model.encode(texts, convert_to_numpy=True, batch_size=64, show_progress_bar=False, normalize_embeddings=True)
         self.top_k = top_k
     def augment(self, text: str) -> str:
         if self.top_k <= 0:
             return text
-        import numpy as np
         q = self.model.encode([text], convert_to_numpy=True, normalize_embeddings=True)
         sims = (self.emb @ q.T).ravel()
         top = sims.argsort()[::-1][:self.top_k]
@@ -297,7 +296,9 @@ def train(args):
         eval_model = os.getenv('RETRIEVAL_EVAL_MODEL','sentence-transformers/all-MiniLM-L6-v2')
         index_dir = os.getenv('RETRIEVAL_EVAL_INDEX','retrieval_index/segments')
         if os.path.exists(queries_csv) and os.path.exists(os.path.join(index_dir,'embeddings.npy')):
-            import numpy as _np, pandas as _pd, json as _json
+            import numpy as _np
+            import pandas as _pd
+            import json as _json
             from sentence_transformers import SentenceTransformer as _ST
             emb = _np.load(os.path.join(index_dir,'embeddings.npy'))
             metas = []

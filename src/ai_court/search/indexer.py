@@ -3,7 +3,7 @@ import glob
 import dill
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
-from typing import List, Dict, Optional
+from typing import Optional
 import logging
 from ai_court.model.legal_case_classifier import LegalCaseClassifier
 

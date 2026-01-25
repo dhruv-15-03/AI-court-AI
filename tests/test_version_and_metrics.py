@@ -91,7 +91,7 @@ def test_drift_compare_endpoint_smoke():
 def test_drift_compare_validation_error():
     from ai_court.api.server import app
     with app.test_client() as c:
-        r = c.post('/api/drift/compare', json={"counts": {"A": -5}})
+        c.post('/api/drift/compare', json={"counts": {"A": -5}})
         # Negative treated as value but normalization yields distribution; we allow it here
         # so send malformed type to trigger validation
         r2 = c.post('/api/drift/compare', json={"counts": "not_a_dict"})
@@ -99,7 +99,8 @@ def test_drift_compare_validation_error():
 
 
 def test_per_class_metrics_presence():
-    import os, json
+    import os
+    import json
     metrics_path = os.path.join(PROJECT_ROOT, 'models', 'metrics.json')
     if not os.path.exists(metrics_path):
         import pytest

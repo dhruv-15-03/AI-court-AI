@@ -10,7 +10,8 @@ Future features:
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List, Dict, Any
-import heapq, time
+import heapq
+import time
 
 
 @dataclass(order=True)

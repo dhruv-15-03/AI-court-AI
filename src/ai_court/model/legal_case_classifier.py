@@ -1,16 +1,12 @@
 import os
-import re
 import warnings
-import json
 import dill
+import joblib
 import numpy as np
 import pandas as pd
 import argparse
-from typing import List, Tuple, Dict, Any, Optional
-from datetime import datetime
+from typing import List, Tuple, Dict, Any
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import classification_report, accuracy_score, f1_score, confusion_matrix
 
 import logging
 
@@ -22,7 +18,6 @@ except Exception:
 from ai_court.model.preprocessor import TextPreprocessor
 from ai_court.data.loader import DataLoader
 from ai_court.model.trainer import Trainer
-from ai_court.ontology import ontology_metadata
 
 warnings.filterwarnings('ignore')
 
@@ -95,13 +90,26 @@ class LegalCaseClassifier:
         self.trainer.save_model(filepath, self.label_encoder)
 
     def load_model(self, filepath: str):
-        with open(filepath, 'rb') as f:
-            saved = dill.load(f)
+        """Load model trying joblib first, falling back to dill."""
+        try:
+            # Try new joblib format first
+            saved = joblib.load(filepath)
             self.model = saved['model']
             self.label_encoder = saved['label_encoder']
-            # Ensure preprocessor is available
-            self.preprocessor = TextPreprocessor() 
-            # If saved has a preprocessor function, we could use it, but we prefer the class method
+            logger.info("Loaded model using joblib.")
+        except Exception as e_job:
+            # Fallback to legacy dill
+            try:
+                with open(filepath, 'rb') as f:
+                    saved = dill.load(f)
+                    self.model = saved['model']
+                    self.label_encoder = saved['label_encoder']
+                    logger.info("Loaded model using dill (legacy).")
+            except Exception as e_dill:
+                raise RuntimeError(f"Failed to load model: Joblib error: {e_job}; Dill error: {e_dill}")
+
+        # Ensure preprocessor is available
+        self.preprocessor = TextPreprocessor()
             
     def predict(self, case_data: str, case_type: str) -> Dict[str, Any]:
         """
@@ -126,7 +134,13 @@ class LegalCaseClassifier:
         
         # Check for empty input after processing
         if not processed.strip():
-            raise ValueError("Insufficient text data after preprocessing")
+            logger.warning(f"Input text '{text[:50]}...' reduced to empty string after preprocessing. Returning Abstained result.")
+            return {
+                "judgment": "Other",  # Fallback class
+                "confidence": 0.0,
+                "processed_text": "",
+                "status": "abstained_insufficient_data"
+            }
             
         try:
             # Try predict_proba first if available

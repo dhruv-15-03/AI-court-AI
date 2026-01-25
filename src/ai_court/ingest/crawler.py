@@ -17,7 +17,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Iterable, Dict, Any, Optional
-import hashlib, os, json, time
+import hashlib
+import os
+import json
+import time
 
 @dataclass
 class RawJudgment:

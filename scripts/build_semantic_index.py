@@ -20,7 +20,6 @@ import argparse
 import os
 import sys
 import dill
-import numpy as np
 import pandas as pd
 from typing import List, Dict
 
@@ -28,8 +27,8 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from scripts.build_search_index import load_cases  # reuse existing loader
-from src.ai_court.model.legal_case_classifier import LegalCaseClassifier  # type: ignore
+from scripts.build_search_index import load_cases  # reuse existing loader # noqa: E402
+from src.ai_court.model.legal_case_classifier import LegalCaseClassifier  # type: ignore # noqa: E402
 
 
 def encode_texts(texts: List[str], model_name: str, batch_size: int, device: str):

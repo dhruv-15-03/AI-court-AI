@@ -10,8 +10,11 @@ This is intentionally lightweight; advanced enrichment phases will replace
 heuristics with robust modules.
 """
 from __future__ import annotations
-import os, re, json, hashlib, time
-from typing import Iterator, Dict, Any, List
+import os
+import re
+import json
+import hashlib
+from typing import Iterator, List
 from .schemas import CaseRaw, CaseSegment, Citation, StatuteReference, NormalizedCase
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -52,7 +55,8 @@ def _iter_raw() -> Iterator[CaseRaw]:
     if not os.path.exists(RAW_STORE_DIR):
         return
     for fname in os.listdir(RAW_STORE_DIR):
-        if not fname.endswith('.json'): continue
+        if not fname.endswith('.json'):
+            continue
         path = os.path.join(RAW_STORE_DIR, fname)
         try:
             with open(path,'r',encoding='utf-8') as f:
@@ -99,7 +103,6 @@ def run_normalize():
             cid = raw.case_id if getattr(raw,'case_id', None) else hashlib.sha256(raw.source_url.encode('utf-8')).hexdigest()[:20]
             raw.case_id = cid
             segs = segment_case(raw)
-            all_text = '\n'.join(s.text for s in segs)
             cites: List[Citation] = []
             sections: List[StatuteReference] = []
             for s in segs:
@@ -131,7 +134,10 @@ def run_normalize():
             meta.append(norm)
             count += 1
     finally:
-        cases_out.close(); segments_out.close(); citations_out.close(); statutes_out.close()
+        cases_out.close()
+        segments_out.close()
+        citations_out.close()
+        statutes_out.close()
     # Write manifest
     manifest = {
         'cases': count,

@@ -3,7 +3,9 @@
 Stores embeddings + metadata; supports top-k similarity search.
 """
 from __future__ import annotations
-import os, json, hashlib
+import os
+import json
+import hashlib
 from dataclasses import dataclass
 from typing import List, Dict, Any, Tuple
 import numpy as np
@@ -16,7 +18,6 @@ except Exception:  # pragma: no cover
 
 
 def sha256_bytes(data: bytes) -> str:
-    import hashlib
     return hashlib.sha256(data).hexdigest()
 
 @dataclass

@@ -1,0 +1,73 @@
+[
+  {
+    "label": "Acquittal/Conviction Overturned",
+    "phrases": [
+      "acquitted", "acquittal", "conviction overturned", "set aside conviction", 
+      "set aside the conviction", "set aside", "reversal of conviction", 
+      "benefit of doubt", "give benefit of doubt", "acquit the accused", 
+      "appeal allowed and conviction set aside", "conviction quashed"
+    ]
+  },
+  {
+    "label": "Conviction Upheld/Appeal Dismissed",
+    "phrases": [
+      "appeal dismissed", "appeal is dismissed", "conviction upheld", 
+      "conviction affirmed", "convictions upheld", "life sentence upheld", 
+      "appeal fails", "dismissed on merits", "dismissed in limine", 
+      "leave refused", "revision dismissed", "petition dismissed as devoid of merit"
+    ]
+  },
+  {
+    "label": "Charge Sheet Quashed",
+    "phrases": [
+      "charge sheet quashed", "chargesheet quashed", "charge-sheet quashed", 
+      "quash the charge sheet", "quashing of charge sheet", 
+      "charge sheet is quashed", "charge-sheet is quashed"
+    ]
+  },
+  {
+    "label": "Charges/Proceedings Quashed",
+    "phrases": [
+      "quash", "quashed", "quashing", "fir quashed", "charges quashed", 
+      "proceedings quashed", "section 482 allowed", "u/s 482 allowed", 
+      "proceedings under section 482 are quashed"
+    ]
+  },
+  {
+    "label": "Sentence Reduced/Modified",
+    "phrases": [
+      "sentence reduced", "sentence modified", "reduced sentence", "commuted", 
+      "converted to", "altered sentence", "sentence altered", 
+      "imprisonment reduced", "fine reduced"
+    ]
+  },
+  {
+    "label": "Bail Granted",
+    "phrases": [
+      "bail granted", "anticipatory bail granted", "interim bail", 
+      "enlarged on bail", "released on bail"
+    ]
+  },
+  {
+    "label": "Bail Denied",
+    "phrases": [
+      "bail denied", "bail rejected", "bail refused"
+    ]
+  },
+  {
+    "label": "Relief Granted/Convicted",
+    "phrases": [
+      "petition allowed", "writ allowed", "relief granted", "granted protection", 
+      "mandated", "directed", "ordered", "convicted", "allowed in part", 
+      "partly allowed", "set aside order and remand"
+    ]
+  },
+  {
+    "label": "Relief Denied/Dismissed",
+    "phrases": [
+      "petition dismissed", "relief denied", "dismissed as infructuous", 
+      "dismissed on merits", "dismissed", "no interference called for", 
+      "no merit in the petition"
+    ]
+  }
+]

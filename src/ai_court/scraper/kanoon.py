@@ -230,6 +230,24 @@ def extract_judgment_section(text):
     return " ".join(last_lines)
 
 def get_case_summary(case_text, target_length=1500):
+    """Generate a summary of the case text.
+    
+    Uses local extractive summarization by default (USE_LOCAL_SUMMARY=1).
+    Falls back to HuggingFace API only if explicitly enabled and available.
+    """
+    # Import local summarization utility
+    try:
+        from ai_court.scraper.extractive_summary import create_extractive_summary
+        USE_LOCAL = os.getenv('USE_LOCAL_SUMMARY', '1') == '1'
+    except ImportError:
+        USE_LOCAL = False
+        create_extractive_summary = None
+    
+    # Prefer local summarization (zero API cost)
+    if USE_LOCAL and create_extractive_summary:
+        logger.debug("Using local extractive summarization")
+        return create_extractive_summary(case_text, target_length=target_length)
+    
     # Try Hugging Face API when token is available; otherwise quickly fall back.
     global _HF_AVAILABLE
     if HUGGINGFACE_API_TOKEN and not HUGGINGFACE_DISABLE and _HF_AVAILABLE:
@@ -271,11 +289,13 @@ def get_case_summary(case_text, target_length=1500):
         logger.info("HF summarization unavailable; using fallback")
     else:
         if not HUGGINGFACE_API_TOKEN:
-            logger.info("HF token not set; using fallback summarization")
+            logger.debug("HF token not set; using local fallback summarization")
         elif HUGGINGFACE_DISABLE:
-            logger.info("HF summarization disabled by env; using fallback")
+            logger.debug("HF summarization disabled by env; using local fallback")
         else:
             logger.debug("HF summarization previously disabled after failures; using fallback")
+    
+    # Final fallback: simple extractive approach
     sentences = re.split(r'(?<=[.!?]) +', case_text)
     intro = ' '.join(sentences[:5])
     judgment_section = extract_judgment_section(case_text)

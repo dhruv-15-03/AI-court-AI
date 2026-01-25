@@ -96,11 +96,13 @@ def search_cases():
             base = None
             for r in semantic_results:
                 if (r.get('url'), r.get('title')) == key:
-                    base = r; break
+                    base = r
+                    break
             if base is None:
                 for r in lexical_results:
                     if (r.get('url'), r.get('title')) == key:
-                        base = r; break
+                        base = r
+                        break
             if base is None:
                 continue
             fused.append({**base, 'fusion_score': sem_score + lex_score})

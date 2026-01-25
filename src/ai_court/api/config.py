@@ -17,3 +17,17 @@ APP_ENV = os.getenv("APP_ENV", "production")
 APP_VERSION = os.getenv("APP_VERSION", "0.1.0")
 MODEL_PATH = os.getenv("MODEL_PATH", "models/legal_case_classifier.pkl")
 SEARCH_INDEX_PATH = os.getenv("SEARCH_INDEX_PATH", "models/search_index.pkl")
+
+# Confidence & Abstention
+CONFIDENCE_THRESHOLD = float(os.getenv("CONFIDENCE_THRESHOLD", "0.5"))
+AUTO_QUEUE_LOW_CONFIDENCE = os.getenv("AUTO_QUEUE_LOW_CONFIDENCE", "1") == "1"
+
+# Explainability
+EXPLAIN_TOP_K = int(os.getenv("EXPLAIN_TOP_K", "5"))
+
+# Memory Optimization
+MAX_SEARCH_RESULTS = int(os.getenv("MAX_SEARCH_RESULTS", "10"))
+LAZY_LOAD_SEARCH = os.getenv("LAZY_LOAD_SEARCH", "0") == "1"
+
+# Local Summarization (no HF API)
+USE_LOCAL_SUMMARY = os.getenv("USE_LOCAL_SUMMARY", "1") == "1"

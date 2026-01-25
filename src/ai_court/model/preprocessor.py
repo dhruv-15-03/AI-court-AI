@@ -1,8 +1,37 @@
 import re
+import os
+import json
+import logging
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from ai_court.utils.nltk_setup import ensure_nltk_resources
+
+logger = logging.getLogger(__name__)
+
+# Cache for outcome rules
+_OUTCOME_RULES = None
+
+def _load_outcome_rules():
+    global _OUTCOME_RULES
+    if _OUTCOME_RULES is not None:
+        return
+    
+    try:
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        config_path = os.path.join(base_dir, '..', 'config', 'outcome_rules.json')
+        if os.path.exists(config_path):
+            with open(config_path, 'r', encoding='utf-8') as f:
+                _OUTCOME_RULES = json.load(f)
+            logger.info(f"Loaded {len(_OUTCOME_RULES)} outcome rules from {config_path}")
+        else:
+            logger.warning(f"Outcome rules config not found at {config_path}. Using empty fallback rules.")
+            _OUTCOME_RULES = []
+            # Log the expected path for debugging
+            logger.debug(f"Expected config at: {os.path.abspath(config_path)}")
+    except Exception as e:
+        logger.error(f"Failed to load outcome rules: {e}")
+        _OUTCOME_RULES = []
 
 # Ensure resources are available when this module is imported
 ensure_nltk_resources()
@@ -27,7 +56,7 @@ class TextPreprocessor:
         
         # Basic cleanup
         text = text.lower()
-        text = re.sub(r"[^a-z\s]", " ", text)  # Keep ASCII letters and spaces
+        text = re.sub(r"[^a-z0-9\s]", " ", text)  # Keep ASCII letters, digits and spaces
         text = re.sub(r"\s+", " ", text).strip()
 
         # Tokenize
@@ -44,57 +73,17 @@ class TextPreprocessor:
 
     @staticmethod
     def normalize_outcome(text: str) -> str:
-        """Map raw judgment text to a manageable set of outcome classes."""
+        """Map raw judgment text to a manageable set of outcome classes using configured rules."""
+        _load_outcome_rules()
+        
         t = (text or "").lower()
-        # Strong class indicators
-        # Acquittal / Conviction overturned
-        if any(k in t for k in [
-            "acquitted", "acquittal", "conviction overturned", "set aside conviction", "set aside the conviction",
-            "set aside", "reversal of conviction", "benefit of doubt", "give benefit of doubt", "acquit the accused",
-            "appeal allowed and conviction set aside", "conviction quashed"
-        ]):
-            return "Acquittal/Conviction Overturned"
-        # Conviction upheld / Appeal dismissed
-        if any(k in t for k in [
-            "appeal dismissed", "appeal is dismissed", "conviction upheld", "conviction affirmed", "convictions upheld",
-            "life sentence upheld", "appeal fails", "dismissed on merits", "dismissed in limine", "leave refused",
-            "revision dismissed", "petition dismissed as devoid of merit"
-        ]):
-            return "Conviction Upheld/Appeal Dismissed"
-        # Charges / Proceedings quashed
-        if any(k in t for k in [
-            "charge sheet quashed", "chargesheet quashed", "charge-sheet quashed", "quash the charge sheet",
-            "quashing of charge sheet", "charge sheet is quashed", "charge-sheet is quashed"
-        ]):
-            return "Charge Sheet Quashed"
-        if any(k in t for k in [
-            "quash", "quashed", "quashing", "fir quashed", "charges quashed", "proceedings quashed",
-            "section 482 allowed", "u/s 482 allowed", "proceedings under section 482 are quashed"
-        ]):
-            return "Charges/Proceedings Quashed"
-        # Sentence reduced / modified
-        if any(k in t for k in [
-            "sentence reduced", "sentence modified", "reduced sentence", "commuted", "converted to",
-            "altered sentence", "sentence altered", "imprisonment reduced", "fine reduced"
-        ]):
-            return "Sentence Reduced/Modified"
-        # Bail granted / denied
-        if any(k in t for k in [
-            "bail granted", "anticipatory bail granted", "interim bail", "enlarged on bail", "released on bail"
-        ]):
-            return "Bail Granted"
-        if any(k in t for k in ["bail denied", "bail rejected", "bail refused"]):
-            return "Bail Denied"
-        # Relief granted / convicted
-        if any(k in t for k in [
-            "petition allowed", "writ allowed", "relief granted", "granted protection", "mandated", "directed",
-            "ordered", "convicted", "allowed in part", "partly allowed", "set aside order and remand"
-        ]):
-            return "Relief Granted/Convicted"
-        # Relief denied / dismissed
-        if any(k in t for k in [
-            "petition dismissed", "relief denied", "dismissed as infructuous", "dismissed on merits", "dismissed",
-            "no interference called for", "no merit in the petition"
-        ]):
-            return "Relief Denied/Dismissed"
+        
+        if not _OUTCOME_RULES:
+            # Fallback for safety if config failed to load
+            return "Other"
+            
+        for rule in _OUTCOME_RULES:
+            if any(phrase in t for phrase in rule.get('phrases', [])):
+                return rule['label']
+                
         return "Other"

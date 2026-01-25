@@ -1,6 +1,3 @@
-import os
-import json
-import pytest
 
 from ai_court.api.server import app
 

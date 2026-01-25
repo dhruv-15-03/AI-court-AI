@@ -119,7 +119,7 @@ def ontology_metadata() -> Dict[str, Any]:
     return {
         'version': data.get('version', 'fallback'),
         'num_leaves': len(leaves),
-        'leaves': [l['id'] for l in leaves],
+        'leaves': [leaf['id'] for leaf in leaves],
     }
 
 

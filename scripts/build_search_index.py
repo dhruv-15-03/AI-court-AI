@@ -12,7 +12,7 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from ai_court.search.indexer import load_cases, build_index
+from ai_court.search.indexer import load_cases, build_index  # noqa: E402
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("build_search_index")

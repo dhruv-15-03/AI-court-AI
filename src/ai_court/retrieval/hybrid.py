@@ -7,7 +7,7 @@ Future Enhancements:
  - Caching layer
 """
 from __future__ import annotations
-from typing import List, Dict, Any, Sequence, Tuple
+from typing import List, Dict, Any, Sequence
 
 
 def reciprocal_rank_fusion(semantic: Sequence[Dict[str, Any]], lexical: Sequence[Dict[str, Any]], k: int = 10, K: int = 60) -> List[Dict[str, Any]]:
