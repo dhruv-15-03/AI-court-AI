@@ -38,7 +38,7 @@
     "phrases": [
       "sentence reduced", "sentence modified", "reduced sentence", "commuted", 
       "converted to", "altered sentence", "sentence altered", 
-      "imprisonment reduced", "fine reduced"
+      "imprisonment reduced", "fine reduced", "sentence commuted"
     ]
   },
   {
@@ -51,7 +51,7 @@
   {
     "label": "Bail Denied",
     "phrases": [
-      "bail denied", "bail rejected", "bail refused"
+      "bail denied", "bail rejected", "bail refused", "bail application dismissed"
     ]
   },
   {
@@ -68,6 +68,22 @@
       "petition dismissed", "relief denied", "dismissed as infructuous", 
       "dismissed on merits", "dismissed", "no interference called for", 
       "no merit in the petition"
+    ]
+  },
+  {
+    "label": "Case Remanded/Sent Back",
+    "phrases": [
+      "remanded", "remand", "sent back", "matter remitted", "remit to", 
+      "case remanded", "remanded back", "matter sent back", "fresh consideration",
+      "de novo trial", "retrial ordered"
+    ]
+  },
+  {
+    "label": "Petition Withdrawn/Dismissed as Withdrawn",
+    "phrases": [
+      "withdrawn", "dismissed as withdrawn", "petition withdrawn", 
+      "not pressed", "appeal withdrawn", "writ withdrawn", "matter withdrawn",
+      "disposed of as withdrawn"
     ]
   }
 ]

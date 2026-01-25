@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: ai-court
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: MODEL_PATH
+        value: /app/models/legal_case_classifier.pkl
+      - key: APP_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: PIP_NO_CACHE_DIR
+        value: "1"
+    # Force rebuild to clear cached packages
+    autoDeploy: true

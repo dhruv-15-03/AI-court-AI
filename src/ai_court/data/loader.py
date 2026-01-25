@@ -31,8 +31,10 @@ class DataLoader:
         if 'case_type' not in cols and 'type' in cols:
             df.rename(columns={cols['type']: 'case_type'}, inplace=True)
             
-        # Map label column
-        if 'judgement' not in cols and 'outcome' in cols:
+        # Map label column - prefer refined_label if available (AI-curated)
+        if 'refined_label' in df.columns:
+            df['judgement'] = df['refined_label']
+        elif 'judgement' not in cols and 'outcome' in cols:
             df.rename(columns={cols['outcome']: 'judgement'}, inplace=True)
         elif 'judgment' in cols:
             df.rename(columns={cols['judgment']: 'judgement'}, inplace=True)

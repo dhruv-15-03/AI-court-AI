@@ -65,6 +65,8 @@ def _default_fallback_ontology() -> Dict[str, Any]:
         'Bail Denied',
         'Relief Granted/Convicted',
         'Relief Denied/Dismissed',
+        'Case Remanded/Sent Back',
+        'Petition Withdrawn/Dismissed as Withdrawn',
         'Other',
     ]
     # Identity mapping: map coarse label -> same id

@@ -1,8 +1,14 @@
 # Production container for AI Court API (multi-stage)
 
 FROM python:3.12-slim AS builder
+
+# Build arg to bust Render's layer cache when needed
+ARG CACHE_BUST=1
+
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
     VENV_PATH=/opt/venv
 RUN python -m venv $VENV_PATH
 ENV PATH="$VENV_PATH/bin:$PATH"
