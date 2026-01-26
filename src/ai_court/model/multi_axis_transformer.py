@@ -22,7 +22,7 @@ import os
 import argparse
 import json
 from dataclasses import dataclass
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 import pandas as pd
 import torch
 from torch import nn
@@ -36,7 +36,7 @@ import uuid
 try:
     from .multi_axis_consistency import reconcile_axes  # type: ignore
 except Exception:  # pragma: no cover
-    def reconcile_axes(axis_preds: Dict[str,str]):  # fallback
+    def reconcile_axes(axis_preds: Dict[str, str]) -> Dict[str, Any]:  # fallback
         return {'unified_outcome': 'other', 'reason': {'buckets':{}, 'conflicts':[], 'precedence_order':[]}}
 
 BACKBONE = os.getenv('MULTI_AXIS_MODEL','distilbert-base-uncased')
@@ -65,7 +65,7 @@ class RetrievalAugmentor:
         return (text + '\n[CTX]\n' + ctx) if ctx else text
 
 class AxisDataset(Dataset):
-    def __init__(self, df: pd.DataFrame, tokenizer, max_len: int, label_maps: Dict[str, Dict[str,int]], augmentor: RetrievalAugmentor | None):
+    def __init__(self, df: pd.DataFrame, tokenizer: Any, max_len: int, label_maps: Dict[str, Dict[str,int]], augmentor: Any = None):
         self.rows: List[Row] = []
         for _, r in df.iterrows():
             base_text = (str(r.get('case_type','')) + ' ' + str(r.get('case_data','')))[:9000]
@@ -114,7 +114,7 @@ def evaluate(model: MultiAxisModel, loader: DataLoader, axes=AXES):
             pred = logits[ax].argmax(dim=1).cpu().tolist()
             preds_ax[ax].extend(pred)
             gold_ax[ax].extend(batch[ax].tolist())
-    metrics = {}
+    metrics: Dict[str, Any] = {}
     for ax in axes:
         correct = sum(int(a==b) for a,b in zip(preds_ax[ax], gold_ax[ax]))
         acc = correct/len(preds_ax[ax]) if preds_ax[ax] else 0.0

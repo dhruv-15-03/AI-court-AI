@@ -88,11 +88,12 @@ def _default_fallback_ontology() -> Dict[str, Any]:
 
 def _walk(node: Dict[str, Any], path: List[str], leaves: List[Dict[str, Any]]):
     children = node.get('children') or []
+    node_id = str(node.get('id') or '')
     if not children:
-        leaves.append({"id": node.get('id'), "name": node.get('name'), "path": path + [node.get('id')]})
+        leaves.append({"id": node_id, "name": node.get('name'), "path": path + [node_id]})
     else:
         for ch in children:
-            _walk(ch, path + [node.get('id')], leaves)
+            _walk(ch, path + [node_id], leaves)
 
 
 def flatten_leaves(data: Dict[str, Any]) -> List[Dict[str, Any]]:

@@ -7,7 +7,7 @@ import os
 import json
 import hashlib
 from dataclasses import dataclass
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 import numpy as np
 
 try:  # optional
@@ -75,9 +75,10 @@ class VectorIndex:
         mean_norm = float(np.linalg.norm(centroid))
         centroid_hash = sha256_bytes(centroid.tobytes())
         # Persist centroid vector for precise drift computations
-        centroid_path = os.path.join(out_dir, 'centroid.npy')
+        _centroid_filename = os.path.join(out_dir, 'centroid.npy')
+        centroid_path: Optional[str] = _centroid_filename
         try:
-            np.save(centroid_path, centroid.astype('float32'))
+            np.save(_centroid_filename, centroid.astype('float32'))
         except Exception:
             centroid_path = None
         meta_json = {

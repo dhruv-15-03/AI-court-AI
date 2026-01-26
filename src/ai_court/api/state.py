@@ -46,19 +46,19 @@ PREDICTIONS_TOTAL: Any = None
 
 def update_prediction_stats(confidence: float, abstained: bool = False):
     """Update prediction statistics for monitoring."""
-    prediction_stats['total_predictions'] += 1
+    total = int(prediction_stats.get('total_predictions') or 0) + 1
+    prediction_stats['total_predictions'] = total
     prediction_stats['last_prediction_time'] = time.time()
     
     if confidence is not None:
-        prediction_stats['_confidence_sum'] += confidence
-        prediction_stats['avg_confidence'] = (
-            prediction_stats['_confidence_sum'] / prediction_stats['total_predictions']
-        )
+        conf_sum = float(prediction_stats.get('_confidence_sum') or 0.0) + confidence
+        prediction_stats['_confidence_sum'] = conf_sum
+        prediction_stats['avg_confidence'] = conf_sum / total if total > 0 else 0.0
         if confidence < 0.5:  # Hardcoded threshold for stats
-            prediction_stats['low_confidence_count'] += 1
+            prediction_stats['low_confidence_count'] = int(prediction_stats.get('low_confidence_count') or 0) + 1
     
     if abstained:
-        prediction_stats['abstentions'] += 1
+        prediction_stats['abstentions'] = int(prediction_stats.get('abstentions') or 0) + 1
 
 
 def get_memory_usage() -> Dict[str, Any]:
@@ -73,10 +73,10 @@ def get_memory_usage() -> Dict[str, Any]:
             'percent': round(process.memory_percent(), 2),
         }
     except ImportError:
-        # psutil not available, use basic approach
-        import resource
+        # psutil not available, try resource module (Unix only)
         try:
-            usage = resource.getrusage(resource.RUSAGE_SELF)
+            import resource  # type: ignore[import-not-found]
+            usage = resource.getrusage(resource.RUSAGE_SELF)  # type: ignore[attr-defined]
             return {
                 'max_rss_mb': round(usage.ru_maxrss / 1024, 2),  # Linux reports in KB
             }

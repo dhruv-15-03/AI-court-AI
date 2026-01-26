@@ -11,7 +11,7 @@ Contract:
 from __future__ import annotations
 
 import logging
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Callable
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 def retrieve(
     query: str,
     search_index: Optional[Dict[str, Any]] = None,
-    preprocess_fn: Optional[callable] = None,
+    preprocess_fn: Optional[Callable[[str], str]] = None,
     k: int = 5
 ) -> List[Dict[str, Any]]:
     """Retrieve relevant documents using TF-IDF search index.
@@ -57,7 +57,7 @@ def retrieve(
         # Get top-k indices
         top_indices = np.argsort(-scores)[:k]
         
-        documents = []
+        documents: List[Dict[str, Any]] = []
         for idx in top_indices:
             if idx < len(meta) and scores[idx] > 0:
                 m = meta[idx]
@@ -153,8 +153,8 @@ def generate(
         }
     
     # Analyze retrieved documents for patterns
-    outcomes = [d.get('outcome') for d in documents if d.get('outcome')]
-    outcome_counts = {}
+    outcomes: List[str] = [str(d.get('outcome')) for d in documents if d.get('outcome')]
+    outcome_counts: Dict[str, int] = {}
     for o in outcomes:
         outcome_counts[o] = outcome_counts.get(o, 0) + 1
     
@@ -195,7 +195,7 @@ def generate(
 def rag_query(
     question: str,
     search_index: Optional[Dict[str, Any]] = None,
-    preprocess_fn: Optional[callable] = None,
+    preprocess_fn: Optional[Callable[[str], str]] = None,
     k: int = 5
 ) -> Dict[str, Any]:
     """Complete RAG pipeline: retrieve, augment, generate.

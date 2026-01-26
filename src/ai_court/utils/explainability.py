@@ -69,7 +69,10 @@ def extract_top_features(
                 })
         
         # Sort by absolute importance and take top-k
-        feature_scores.sort(key=lambda x: abs(x['importance']), reverse=True)
+        def _importance_key(item: Dict[str, Any]) -> float:
+            val = item.get('importance', 0)
+            return abs(float(val)) if val is not None else 0.0
+        feature_scores.sort(key=_importance_key, reverse=True)
         return feature_scores[:top_k]
         
     except Exception as e:

@@ -31,3 +31,18 @@ LAZY_LOAD_SEARCH = os.getenv("LAZY_LOAD_SEARCH", "0") == "1"
 
 # Local Summarization (no HF API)
 USE_LOCAL_SUMMARY = os.getenv("USE_LOCAL_SUMMARY", "1") == "1"
+
+# Performance Optimizations
+PREPROCESSING_CACHE_SIZE = int(os.getenv("PREPROCESSING_CACHE_SIZE", "512"))
+ENABLE_PREPROCESSING_CACHE = os.getenv("ENABLE_PREPROCESSING_CACHE", "1") == "1"
+BATCH_SIZE_LIMIT = int(os.getenv("BATCH_SIZE_LIMIT", "50"))
+
+# Customization Options
+INCLUDE_KEY_FACTORS = os.getenv("INCLUDE_KEY_FACTORS", "1") == "1"
+INCLUDE_EXPLANATION = os.getenv("INCLUDE_EXPLANATION", "1") == "1"
+INCLUDE_CONFIDENCE_LANGUAGE = os.getenv("INCLUDE_CONFIDENCE_LANGUAGE", "1") == "1"
+INCLUDE_SIMILAR_CASES = os.getenv("INCLUDE_SIMILAR_CASES", "1") == "1"
+SIMILAR_CASES_COUNT = int(os.getenv("SIMILAR_CASES_COUNT", "3"))
+
+# Response Format Customization
+RESPONSE_FORMAT = os.getenv("RESPONSE_FORMAT", "full")  # full, minimal, detailed

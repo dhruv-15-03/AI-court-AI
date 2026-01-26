@@ -244,7 +244,7 @@ def get_case_summary(case_text, target_length=1500):
         create_extractive_summary = None
     
     # Prefer local summarization (zero API cost)
-    if USE_LOCAL and create_extractive_summary:
+    if USE_LOCAL and create_extractive_summary is not None:
         logger.debug("Using local extractive summarization")
         return create_extractive_summary(case_text, target_length=target_length)
     

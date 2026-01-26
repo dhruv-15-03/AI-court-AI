@@ -16,10 +16,18 @@ try:
         map_coarse_label,
     )
 except Exception:
-    def ontology_metadata(): return {}
-    def load_ontology(): return {}
-    def flatten_leaves(_data): return []
-    def map_coarse_label(label: str): return label, False
+    # Fallback stubs when ontology module unavailable
+    def ontology_metadata() -> Dict[str, Any]:  # type: ignore[misc]
+        return {}
+
+    def load_ontology() -> Dict[str, Any]:  # type: ignore[misc]
+        return {}
+
+    def flatten_leaves(_data: Any) -> List[Any]:  # type: ignore[misc]
+        return []
+
+    def map_coarse_label(label: str) -> tuple[str, bool]:  # type: ignore[misc]
+        return (label, False)
 
 def load_model():
     _default_model_path = os.path.join(config.PROJECT_ROOT, "models", "legal_case_classifier.pkl")
@@ -163,26 +171,32 @@ def multi_axis_predict_single(text: str):
     main_judgment = pred_axes.get('relief_label') or pred_axes.get('substantive_label') or pred_axes.get('procedural_label')
     return {'axes': pred_axes, 'main_judgment': main_judgment}
 
-def record_agreement(classical_label: str, shadow_axes: Optional[Dict]):
+def record_agreement(classical_label: str, shadow_axes: Optional[Dict[str, Any]]) -> None:
     if not shadow_axes or not isinstance(shadow_axes, dict):
         return
     unified_candidate = shadow_axes.get('relief_label') or shadow_axes.get('substantive_label') or shadow_axes.get('procedural_label')
     if unified_candidate is None:
         return
-    state.agreement_stats['total_compared'] += 1
+    _prev_total = state.agreement_stats.get('total_compared', 0)
+    total_compared = (int(_prev_total) if isinstance(_prev_total, (int, float, str)) else 0) + 1
+    state.agreement_stats['total_compared'] = total_compared
     if classical_label == unified_candidate:
-        state.agreement_stats['agreements'] += 1
+        _prev_agree = state.agreement_stats.get('agreements', 0)
+        state.agreement_stats['agreements'] = (int(_prev_agree) if isinstance(_prev_agree, (int, float, str)) else 0) + 1
     else:
-        if len(state.agreement_stats['last_samples']) >= 10:
-            state.agreement_stats['last_samples'].pop(0)
-        state.agreement_stats['last_samples'].append({
-            'classical': classical_label,
-            'multi_axis_relief': shadow_axes.get('relief_label'),
-            'multi_axis_substantive': shadow_axes.get('substantive_label'),
-            'multi_axis_procedural': shadow_axes.get('procedural_label')
-        })
+        last_samples = state.agreement_stats.get('last_samples', [])
+        if isinstance(last_samples, list) and len(last_samples) >= 10:
+            last_samples.pop(0)
+        if isinstance(last_samples, list):
+            last_samples.append({
+                'classical': classical_label,
+                'multi_axis_relief': shadow_axes.get('relief_label'),
+                'multi_axis_substantive': shadow_axes.get('substantive_label'),
+                'multi_axis_procedural': shadow_axes.get('procedural_label')
+            })
+            state.agreement_stats['last_samples'] = last_samples
     
-    if state.agreement_stats['total_compared'] % 10 == 0:
+    if total_compared % 10 == 0:
         persist_agreement()
 
 def persist_agreement():
@@ -279,8 +293,9 @@ def aggregate_hierarchical_f1(per_class_f1: Dict[str, float], class_counts: Dict
         }
         return aggregated[nid]
 
-    visit(root.get('id'))
-    return aggregated.get(root.get('id'), {})
+    root_id = root.get('id') or ''
+    visit(root_id)
+    return aggregated.get(root_id, {})
 
 def js_divergence(p: List[float], q: List[float]) -> float:
     import math

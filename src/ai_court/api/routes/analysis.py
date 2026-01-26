@@ -2,6 +2,7 @@ import os
 import json
 import uuid
 import logging
+import time
 from datetime import datetime, timezone
 from flask import Blueprint, request, jsonify
 from flasgger import swag_from
@@ -11,12 +12,37 @@ import numpy as np
 
 from ai_court.api import state, dependencies, models, constants, config
 from ai_court.api.extensions import limiter
+from typing import Any, Callable, List, Dict, Optional
+
+# Type aliases for explainability functions
+ExtractTopFeaturesType = Callable[[Any, str, int, int], List[Dict[str, Any]]]
+FormatExplanationType = Callable[[List[Dict[str, Any]], str, Optional[float]], str]
+
+extract_top_features: Optional[ExtractTopFeaturesType] = None
+format_explanation: Optional[FormatExplanationType] = None
 
 try:
-    from ai_court.utils.explainability import extract_top_features, format_explanation
+    from ai_court.utils.explainability import extract_top_features as _extract, format_explanation as _format
+    extract_top_features = _extract
+    format_explanation = _format
 except ImportError:
-    extract_top_features = None
-    format_explanation = None
+    pass
+
+# Import performance utilities
+try:
+    from ai_court.utils.performance import (
+        get_confidence_language,
+        get_outcome_description,
+        format_minimal_response,
+        format_full_response,
+        format_detailed_response
+    )
+except ImportError:
+    get_confidence_language = None  # type: ignore[assignment]
+    get_outcome_description = None  # type: ignore[assignment]
+    format_minimal_response = None  # type: ignore[assignment]
+    format_full_response = None  # type: ignore[assignment]
+    format_detailed_response = None  # type: ignore[assignment]
 
 logger = logging.getLogger(__name__)
 analysis_bp = Blueprint('analysis', __name__)
@@ -143,9 +169,9 @@ def analyze_case():
         )
     
     # Extract explainability features
-    key_factors = []
-    explanation = None
-    if extract_top_features and state.classifier and state.classifier.model and pred_idx is not None:
+    key_factors: List[Dict[str, Any]] = []
+    explanation: Optional[str] = None
+    if extract_top_features is not None and state.classifier and state.classifier.model and pred_idx is not None:
         try:
             key_factors = extract_top_features(
                 state.classifier.model,
@@ -153,7 +179,7 @@ def analyze_case():
                 pred_idx,
                 top_k=config.EXPLAIN_TOP_K
             )
-            if format_explanation and key_factors:
+            if format_explanation is not None and key_factors:
                 explanation = format_explanation(key_factors, judgment, confidence)
         except Exception as e:
             logger.debug(f"Explainability extraction failed: {e}")
@@ -349,3 +375,258 @@ def analyze_and_search():
         "similar": search_results,
         "confidence": confidence,
     })
+
+
+# =============================================================================
+# Batch Prediction Endpoint (P1 Optimization)
+# =============================================================================
+
+@analysis_bp.route("/api/analyze/batch", methods=["POST"])
+@limiter.limit("10/minute")
+@swag_from({
+    'tags': ['analyze'],
+    'consumes': ['application/json'],
+    'parameters': [{
+        'name': 'body', 'in': 'body', 'required': True,
+        'schema': {
+            'type': 'object',
+            'properties': {
+                'cases': {
+                    'type': 'array',
+                    'items': {'type': 'object'},
+                    'description': 'Array of case objects to analyze'
+                },
+                'format': {
+                    'type': 'string',
+                    'enum': ['minimal', 'full', 'detailed'],
+                    'description': 'Response format level'
+                }
+            },
+            'required': ['cases']
+        }
+    }],
+    'responses': {
+        200: {'description': 'Batch analysis results'},
+        400: {'description': 'Invalid request'},
+        413: {'description': 'Too many cases in batch'}
+    }
+})
+def analyze_batch():
+    """
+    Analyze multiple cases in a single request.
+    
+    More efficient than making individual requests for bulk processing.
+    Returns predictions for all cases with timing information.
+    """
+    auth = dependencies.require_api_key()
+    if auth:
+        return auth
+    
+    raw = request.json
+    if raw is None or not isinstance(raw, dict):
+        return jsonify({"error": "Expected JSON object with 'cases' array"}), 400
+    
+    cases = raw.get('cases', [])
+    if not isinstance(cases, list):
+        return jsonify({"error": "'cases' must be an array"}), 400
+    
+    if len(cases) > config.BATCH_SIZE_LIMIT:
+        return jsonify({
+            "error": f"Batch size exceeds limit of {config.BATCH_SIZE_LIMIT}",
+            "submitted": len(cases),
+            "limit": config.BATCH_SIZE_LIMIT
+        }), 413
+    
+    if len(cases) == 0:
+        return jsonify({
+            "results": [],
+            "count": 0,
+            "timing_ms": 0
+        })
+    
+    response_format = raw.get('format', 'minimal')
+    if response_format not in ('minimal', 'full', 'detailed'):
+        response_format = 'minimal'
+    
+    start_time = time.perf_counter()
+    results: List[Dict[str, Any]] = []
+    errors: List[Dict[str, Any]] = []
+    
+    for idx, case in enumerate(cases):
+        if not isinstance(case, dict):
+            errors.append({"index": idx, "error": "Case must be a JSON object"})
+            continue
+        
+        try:
+            # Validate input
+            parsed = models.AnalyzeRequest(**case)
+            case_type = parsed.case_type or ""
+            case_body = dependencies.synthesize_body_from_answers(case)
+            
+            if state.classifier:
+                result = state.classifier.predict(case_body, case_type)
+                judgment = result["judgment"]
+                confidence = result["confidence"]
+                
+                # Infer case type if not provided
+                inferred_type = case_type or _infer_case_type(case)
+                
+                # Build response based on format
+                if response_format == 'minimal':
+                    results.append({
+                        "index": idx,
+                        "judgment": judgment,
+                        "confidence": round(confidence or 0, 3),
+                        "case_type": inferred_type
+                    })
+                elif response_format == 'full' and get_confidence_language is not None:
+                    results.append({
+                        "index": idx,
+                        "judgment": judgment,
+                        "confidence": round(confidence or 0, 3),
+                        "case_type": inferred_type,
+                        "confidence_info": get_confidence_language(confidence),
+                        "needs_review": (confidence or 0) < config.CONFIDENCE_THRESHOLD
+                    })
+                else:  # detailed or fallback
+                    results.append({
+                        "index": idx,
+                        "judgment": judgment,
+                        "confidence": round(confidence or 0, 3),
+                        "case_type": inferred_type,
+                        "confidence_info": get_confidence_language(confidence) if get_confidence_language is not None else None,
+                        "needs_review": (confidence or 0) < config.CONFIDENCE_THRESHOLD,
+                        "answers": case
+                    })
+            else:
+                errors.append({"index": idx, "error": "Model not initialized"})
+                
+        except ValidationError as ve:
+            errors.append({"index": idx, "error": "validation_failed", "details": ve.errors()})
+        except Exception as e:
+            errors.append({"index": idx, "error": str(e)})
+    
+    elapsed_ms = (time.perf_counter() - start_time) * 1000
+    
+    # Update metrics
+    try:
+        for r in results:
+            state.PREDICTIONS_TOTAL.labels('batch', r.get('judgment', 'Unknown')).inc()
+    except Exception:
+        pass
+    
+    return jsonify({
+        "results": results,
+        "errors": errors,
+        "count": len(results),
+        "error_count": len(errors),
+        "timing_ms": round(elapsed_ms, 2),
+        "avg_ms_per_case": round(elapsed_ms / len(cases), 2) if cases else 0
+    })
+
+
+def _infer_case_type(raw: Dict[str, Any]) -> str:
+    """Infer case type from input fields."""
+    if raw.get("violence_level", "None") != "None" or raw.get("police_report") == "Yes":
+        return "Criminal"
+    elif raw.get("employment_duration"):
+        return "Labor"
+    elif raw.get("children") or raw.get("marriage_duration"):
+        return "Family"
+    else:
+        return "Civil"
+
+
+# =============================================================================
+# Quick Analyze Endpoint (Minimal Response)
+# =============================================================================
+
+@analysis_bp.route("/api/analyze/quick", methods=["POST"])
+@limiter.limit("60/minute")
+@swag_from({
+    'tags': ['analyze'],
+    'consumes': ['application/json'],
+    'parameters': [{
+        'name': 'body', 'in': 'body', 'required': True,
+        'schema': {
+            'type': 'object',
+            'properties': {
+                'text': {'type': 'string', 'description': 'Case text to analyze'},
+                'case_type': {'type': 'string', 'description': 'Optional case type hint'}
+            },
+            'required': ['text']
+        }
+    }],
+    'responses': {200: {'description': 'Quick prediction result'}}
+})
+def analyze_quick():
+    """
+    Fast prediction endpoint with minimal processing.
+    
+    Use this for high-throughput scenarios where speed is critical.
+    Returns only: judgment, confidence, case_type.
+    """
+    auth = dependencies.require_api_key()
+    if auth:
+        return auth
+    
+    raw = request.json
+    if raw is None or not isinstance(raw, dict):
+        return jsonify({"error": "Expected JSON body"}), 400
+    
+    text = raw.get('text', '')
+    if not text:
+        return jsonify({"error": "Missing 'text' field"}), 400
+    
+    case_type = raw.get('case_type', '')
+    
+    start_time = time.perf_counter()
+    
+    try:
+        if state.classifier:
+            result = state.classifier.predict(text, case_type)
+            elapsed_ms = (time.perf_counter() - start_time) * 1000
+            
+            return jsonify({
+                "judgment": result["judgment"],
+                "confidence": round(result["confidence"] or 0, 3),
+                "case_type": case_type or "Unknown",
+                "timing_ms": round(elapsed_ms, 2)
+            })
+        else:
+            return jsonify({"error": "Model not initialized"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# =============================================================================
+# Outcome Info Endpoint
+# =============================================================================
+
+@analysis_bp.route("/api/outcomes", methods=["GET"])
+def get_outcomes():
+    """Get list of all possible outcomes with descriptions."""
+    if get_outcome_description is not None:
+        from ai_court.utils.performance import OUTCOME_DESCRIPTIONS
+        return jsonify({
+            "outcomes": list(OUTCOME_DESCRIPTIONS.keys()),
+            "descriptions": OUTCOME_DESCRIPTIONS
+        })
+    else:
+        # Fallback: return just the outcome labels
+        if state.classifier and hasattr(state.classifier, 'label_encoder'):
+            labels = list(state.classifier.label_encoder.classes_)
+            return jsonify({"outcomes": labels})
+        return jsonify({"outcomes": []})
+
+
+@analysis_bp.route("/api/outcomes/<outcome>", methods=["GET"])
+def get_outcome_info(outcome: str):
+    """Get detailed information about a specific outcome."""
+    if get_outcome_description is not None:
+        info = get_outcome_description(outcome)
+        return jsonify({
+            "outcome": outcome,
+            **info
+        })
+    return jsonify({"outcome": outcome, "meaning": "Information not available"})

@@ -13,7 +13,7 @@ import logging
 try:
     import mlflow
 except Exception:
-    mlflow = None
+    mlflow: Any = None  # type: ignore[no-redef]
 
 from ai_court.model.preprocessor import TextPreprocessor
 from ai_court.data.loader import DataLoader
