@@ -80,6 +80,214 @@ def _auto_queue_prediction(
     except Exception as e:
         logger.warning(f"Failed to auto-queue prediction: {e}")
 
+
+# =============================================================================
+# Response Generation Helpers
+# =============================================================================
+
+def _generate_basic_explanation(judgment: str, confidence: Optional[float]) -> str:
+    """Generate a basic explanation when key factors are unavailable."""
+    conf_str = f"{int((confidence or 0) * 100)}%" if confidence else "unknown"
+    
+    explanations = {
+        "Bail Granted": f"Based on the case details, bail appears likely to be granted. The model confidence is {conf_str}.",
+        "Bail Denied": f"Based on the case factors, bail may be denied. Review the evidence and prior record. Confidence: {conf_str}.",
+        "Conviction": f"The evidence patterns suggest a likely conviction. This prediction has {conf_str} confidence.",
+        "Acquittal": f"The case factors indicate potential acquittal. Model confidence: {conf_str}.",
+        "Charges Quashed": f"Based on procedural or evidentiary factors, charges may be quashed. Confidence: {conf_str}.",
+        "Compensation Awarded": f"The case merits suggest compensation will be awarded. Confidence: {conf_str}.",
+        "Petition Dismissed": f"The petition appears likely to be dismissed based on presented factors. Confidence: {conf_str}.",
+        "Injunction Granted": f"An injunction is likely based on the urgency and merits. Confidence: {conf_str}.",
+        "Maintenance Ordered": f"Maintenance order appears likely given the family circumstances. Confidence: {conf_str}.",
+    }
+    
+    return explanations.get(judgment, f"Predicted outcome: {judgment} with {conf_str} confidence.")
+
+
+def _get_similar_cases(
+    processed_text: str,
+    k: int = 3
+) -> List[Dict[str, Any]]:
+    """Retrieve similar cases using the search index."""
+    similar_cases = []
+    
+    try:
+        if state.search_index is not None:
+            vect = state.search_index['vectorizer']
+            matrix = state.search_index['matrix']
+            meta = state.search_index.get('meta', [])
+            
+            qv = vect.transform([processed_text])
+            scores = (matrix @ qv.T).toarray().ravel()
+            top_idx = np.argsort(-scores)[:k]
+            
+            for idx in top_idx:
+                if idx < len(meta) and scores[idx] > 0.1:  # Minimum relevance threshold
+                    m = meta[idx]
+                    similar_cases.append({
+                        "case_id": m.get('case_id', f"CASE_{idx}"),
+                        "title": m.get('title', 'Unknown Case'),
+                        "similarity_score": round(float(scores[idx]), 3),
+                        "outcome": m.get('outcome', m.get('judgment', 'Unknown')),
+                        "court": m.get('court', 'Unknown Court'),
+                        "year": m.get('year', None),
+                        "summary": m.get('snippet', m.get('summary', ''))[:300],
+                        "url": m.get('url'),
+                    })
+    except Exception as e:
+        logger.debug(f"Similar cases retrieval failed: {e}")
+    
+    return similar_cases
+
+
+def _generate_legal_analysis(
+    judgment: str,
+    case_type: str,
+    key_factors: List[Dict[str, Any]],
+    confidence: Optional[float]
+) -> Dict[str, Any]:
+    """Generate legal analysis section for UNLIMITED plan."""
+    
+    # Applicable sections based on case type
+    sections_map = {
+        "Criminal": [
+            {"section": "Section 437 CrPC", "relevance": "Bail in non-bailable offenses", "interpretation": "Courts consider flight risk, severity, and evidence"},
+            {"section": "Section 439 CrPC", "relevance": "Special powers of High Court/Sessions Court", "interpretation": "Wider discretion for bail"},
+        ],
+        "Civil": [
+            {"section": "Order 39 CPC", "relevance": "Temporary injunctions", "interpretation": "Prima facie case, balance of convenience, irreparable injury"},
+            {"section": "Section 9 CPC", "relevance": "Civil court jurisdiction", "interpretation": "Subject matter jurisdiction analysis"},
+        ],
+        "Labor": [
+            {"section": "Section 25F Industrial Disputes Act", "relevance": "Conditions for retrenchment", "interpretation": "Notice and compensation requirements"},
+            {"section": "Section 33C(2) ID Act", "relevance": "Recovery of money due", "interpretation": "Calculation and execution of dues"},
+        ],
+        "Family": [
+            {"section": "Section 125 CrPC", "relevance": "Maintenance of wives, children, parents", "interpretation": "Inability to maintain, reasonable provision"},
+            {"section": "Section 13 Hindu Marriage Act", "relevance": "Grounds for divorce", "interpretation": "Cruelty, desertion, adultery analysis"},
+        ],
+    }
+    
+    # Determine precedent strength from confidence
+    if confidence and confidence >= 0.85:
+        precedent_strength = "STRONG"
+    elif confidence and confidence >= 0.65:
+        precedent_strength = "MODERATE"
+    else:
+        precedent_strength = "WEAK"
+    
+    # Extract risk and mitigating factors from key_factors
+    risk_factors = [f.get('feature', '') for f in key_factors if f.get('direction') == 'negative'][:3]
+    mitigating_factors = [f.get('feature', '') for f in key_factors if f.get('direction') == 'positive'][:3]
+    
+    return {
+        "applicable_sections": sections_map.get(case_type, sections_map["Civil"]),
+        "precedent_strength": precedent_strength,
+        "jurisdiction_notes": f"Analysis based on {case_type} law precedents",
+        "risk_factors": risk_factors if risk_factors else ["No significant risk factors identified"],
+        "mitigating_factors": mitigating_factors if mitigating_factors else ["Standard case factors apply"],
+    }
+
+
+def _generate_full_report(
+    judgment: str,
+    case_type: str,
+    key_factors: List[Dict[str, Any]],
+    confidence: Optional[float],
+    explanation: Optional[str]
+) -> Dict[str, Any]:
+    """Generate full report section for UNLIMITED plan."""
+    
+    conf_pct = int((confidence or 0) * 100)
+    
+    # Generate argument points from key factors
+    args_for = [
+        f"{f.get('feature', 'Factor')}: {f.get('description', 'Supports outcome')}"
+        for f in key_factors if f.get('direction') == 'positive'
+    ][:5]
+    
+    args_against = [
+        f"{f.get('feature', 'Factor')}: {f.get('description', 'May affect outcome')}"
+        for f in key_factors if f.get('direction') == 'negative'
+    ][:5]
+    
+    # Alternative outcomes with estimated probabilities
+    alternative_outcomes = _get_alternative_outcomes(judgment, confidence)
+    
+    return {
+        "executive_summary": f"Based on analysis of the submitted {case_type} case, the predicted outcome "
+                            f"is **{judgment}** with {conf_pct}% confidence. "
+                            f"{explanation or 'Review key factors for detailed reasoning.'}",
+        "detailed_analysis": f"## Case Analysis\n\n"
+                            f"**Predicted Outcome:** {judgment}\n\n"
+                            f"**Confidence Level:** {conf_pct}%\n\n"
+                            f"**Case Type:** {case_type}\n\n"
+                            f"### Key Factors\n\n"
+                            + "\n".join([f"- {f.get('feature', 'N/A')}: {f.get('description', '')}" for f in key_factors[:5]]),
+        "argument_points_for": args_for if args_for else ["Case facts support the predicted outcome"],
+        "argument_points_against": args_against if args_against else ["No significant counter-arguments identified"],
+        "recommended_strategy": _get_strategy_recommendation(judgment, case_type),
+        "estimated_timeline": _get_timeline_estimate(case_type),
+        "alternative_outcomes": alternative_outcomes,
+    }
+
+
+def _get_alternative_outcomes(judgment: str, confidence: Optional[float]) -> List[Dict[str, Any]]:
+    """Generate alternative outcome possibilities."""
+    conf = confidence or 0.5
+    remaining = 1 - conf
+    
+    alternatives_map = {
+        "Bail Granted": [
+            {"outcome": "Conditional Bail", "probability": round(remaining * 0.6, 2), "conditions": "Surety, travel restrictions, regular reporting"},
+            {"outcome": "Bail Denied", "probability": round(remaining * 0.4, 2), "conditions": "Flight risk or evidence tampering concerns"},
+        ],
+        "Bail Denied": [
+            {"outcome": "Conditional Bail", "probability": round(remaining * 0.5, 2), "conditions": "With strict conditions on appeal"},
+            {"outcome": "Bail Granted", "probability": round(remaining * 0.5, 2), "conditions": "If additional evidence or circumstances presented"},
+        ],
+        "Conviction": [
+            {"outcome": "Reduced Sentence", "probability": round(remaining * 0.5, 2), "conditions": "Mitigating factors considered"},
+            {"outcome": "Acquittal on Appeal", "probability": round(remaining * 0.5, 2), "conditions": "If evidence challenged successfully"},
+        ],
+        "Acquittal": [
+            {"outcome": "Conviction on Appeal", "probability": round(remaining * 0.6, 2), "conditions": "If prosecution appeals successfully"},
+            {"outcome": "Partial Conviction", "probability": round(remaining * 0.4, 2), "conditions": "Lesser charges may apply"},
+        ],
+    }
+    
+    return alternatives_map.get(judgment, [
+        {"outcome": "Appeal/Review", "probability": round(remaining, 2), "conditions": "Standard appellate process"}
+    ])
+
+
+def _get_strategy_recommendation(judgment: str, case_type: str) -> str:
+    """Get recommended legal strategy."""
+    strategies = {
+        "Bail Granted": "Ensure compliance with all bail conditions. Prepare for trial proceedings.",
+        "Bail Denied": "Consider appeal to higher court. Strengthen grounds for bail application.",
+        "Conviction": "Evaluate grounds for appeal. Consider sentencing mitigation arguments.",
+        "Acquittal": "Monitor for prosecution appeal. Maintain documentation of proceedings.",
+        "Charges Quashed": "Document the quashing order. Monitor for any new proceedings.",
+        "Compensation Awarded": "Pursue execution of decree. Consider enhancement if applicable.",
+        "Petition Dismissed": "Analyze grounds for rejection. Consider appeal or fresh petition.",
+        "Injunction Granted": "Ensure compliance by opposite party. Prepare for main suit.",
+        "Maintenance Ordered": "Set up payment mechanism. Document compliance.",
+    }
+    return strategies.get(judgment, "Consult with legal counsel for case-specific strategy.")
+
+
+def _get_timeline_estimate(case_type: str) -> str:
+    """Estimate typical timeline for case type."""
+    timelines = {
+        "Criminal": "6-18 months (trial), 1-3 years (with appeals)",
+        "Civil": "2-5 years (typical civil suit)",
+        "Labor": "1-3 years (tribunal proceedings)",
+        "Family": "6 months - 3 years (depending on complexity)",
+    }
+    return timelines.get(case_type, "Variable based on court and case complexity")
+
+
 @analysis_bp.route("/api/questions", methods=["GET"])
 def get_questions():
     return jsonify(constants.CASE_TYPES)
@@ -113,6 +321,10 @@ def get_questions_by_type(case_type):
     'responses': {200: {'description': 'OK'}}
 })
 def analyze_case():
+    """Analyze a legal case and predict outcome."""
+    start_time = time.perf_counter()
+    request_id = str(uuid.uuid4())
+    
     auth = dependencies.require_api_key()
     if auth:
         return auth
@@ -128,6 +340,9 @@ def analyze_case():
     payload_str = json.dumps(raw)
     if len(payload_str) > 100_000:
         return jsonify({"error": "Payload too large"}), 413
+    
+    # Get plan from request (default to 'basic' for backwards compatibility)
+    plan = raw.get('_plan', 'basic').lower()  # free, basic, pro, unlimited
     
     try:
         if state.classifier:
@@ -221,25 +436,74 @@ def analyze_case():
     if state.agreement_stats['total_compared'] > 0:
         agreement_rate = state.agreement_stats['agreements'] / state.agreement_stats['total_compared']
     
-    response_data = {
-        "case_type": inferred_case_type,
+    # Determine judgment source
+    judgment_source = 'ML_MODEL'
+    if use_primary_multi and shadow:
+        judgment_source = 'HYBRID'
+    
+    # Calculate processing time
+    processing_time_ms = round((time.perf_counter() - start_time) * 1000, 2)
+    
+    # ==================== BUILD RESPONSE ====================
+    # Core fields (All Plans)
+    response_data: Dict[str, Any] = {
         "judgment": primary_judgment,
-        "judgment_classical": judgment,
-        "judgment_source": 'multi_axis' if use_primary_multi and shadow else 'classical',
-        "answers": data,
-        "confidence": confidence,
+        "confidence": round(confidence or 0, 4),
+        "case_type": inferred_case_type,
         "needs_review": needs_review,
-        "shadow_multi_axis": shadow,
-        "agreement_rate": agreement_rate,
+        "abstention_reason": abstention_reason,
     }
     
-    # Add explainability if available
-    if key_factors:
-        response_data["key_factors"] = key_factors
-    if explanation:
-        response_data["explanation"] = explanation
-    if abstention_reason:
-        response_data["abstention_reason"] = abstention_reason
+    # Basic Analysis (FREE + BASIC Plans)
+    if plan in ('free', 'basic', 'pro', 'unlimited'):
+        response_data["explanation"] = explanation or _generate_basic_explanation(primary_judgment, confidence)
+        response_data["judgment_source"] = judgment_source
+    
+    # Key Factors (PRO+ Plans)
+    if plan in ('pro', 'unlimited') and key_factors:
+        # Remove internal _raw field for API response
+        response_data["key_factors"] = [
+            {k: v for k, v in factor.items() if not k.startswith('_')}
+            for factor in key_factors
+        ]
+    
+    # Similar Cases (PRO+ Plans)
+    if plan in ('pro', 'unlimited') and config.INCLUDE_SIMILAR_CASES:
+        similar_cases = _get_similar_cases(processed, config.SIMILAR_CASES_COUNT)
+        if similar_cases:
+            response_data["similar_cases"] = similar_cases
+    
+    # Legal Analysis (UNLIMITED Plan)
+    if plan == 'unlimited':
+        response_data["legal_analysis"] = _generate_legal_analysis(
+            judgment=primary_judgment,
+            case_type=inferred_case_type,
+            key_factors=key_factors,
+            confidence=confidence
+        )
+    
+    # Full Report (UNLIMITED Plan)
+    if plan == 'unlimited':
+        response_data["full_report"] = _generate_full_report(
+            judgment=primary_judgment,
+            case_type=inferred_case_type,
+            key_factors=key_factors,
+            confidence=confidence,
+            explanation=explanation
+        )
+    
+    # Metadata (Always returned)
+    response_data["metadata"] = {
+        "model_version": config.APP_VERSION,
+        "request_id": request_id,
+        "processed_at": datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
+        "processing_time_ms": processing_time_ms,
+        "rag_sources_used": len(response_data.get("similar_cases", [])),
+        "tokens_used": len(processed.split()) if processed else 0,
+    }
+    
+    # Input Echo (For DB storage)
+    response_data["answers"] = data
     
     return jsonify(response_data)
 

@@ -30,6 +30,9 @@ COPY src ./src
 COPY README.md ./
 RUN pip install --no-cache-dir .
 
+# Pre-download NLTK data at build time (avoids runtime failures)
+RUN python -c "import nltk; nltk.download('punkt', quiet=True); nltk.download('punkt_tab', quiet=True); nltk.download('stopwords', quiet=True); nltk.download('wordnet', quiet=True); nltk.download('omw-1.4', quiet=True)"
+
 FROM python:3.12-slim AS runtime
 ARG APP_VERSION=0.1.0
 ARG GIT_COMMIT=dev
@@ -49,13 +52,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /opt/venv /opt/venv
+COPY --from=builder /root/nltk_data /home/appuser/nltk_data
 
 # Copy application code
 COPY . .
 
 # Create non-root user and set ownership
-RUN useradd -m appuser && chown -R appuser:appuser /app
+RUN useradd -m appuser && chown -R appuser:appuser /app /home/appuser/nltk_data
 USER appuser
+ENV NLTK_DATA=/home/appuser/nltk_data
 
 EXPOSE 8000
 

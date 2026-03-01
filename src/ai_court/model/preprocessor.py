@@ -14,11 +14,17 @@ import re
 import threading
 from typing import Any, FrozenSet, List, Optional
 
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
-from nltk.tokenize import word_tokenize
+# ── CRITICAL: download NLTK data BEFORE importing any corpus readers ──────
+# NLTK corpus readers capture their search paths at import time.
+# If data isn't downloaded yet (e.g. fresh CI runner), the readers
+# will fail with LookupError even though ensure_nltk_resources()
+# downloads the files later, because their path list is already frozen.
+from ai_court.utils.nltk_setup import ensure_nltk_resources  # noqa: E402
+ensure_nltk_resources()  # Must run BEFORE the nltk.corpus imports below
 
-from ai_court.utils.nltk_setup import ensure_nltk_resources
+from nltk.corpus import stopwords  # noqa: E402
+from nltk.stem import WordNetLemmatizer  # noqa: E402
+from nltk.tokenize import word_tokenize  # noqa: E402
 
 __all__ = ["TextPreprocessor"]
 
@@ -98,8 +104,7 @@ def _load_outcome_rules() -> None:
             logger.error("Invalid outcome rules structure in %s: %s", config_path, e)
             _OUTCOME_RULES = _FALLBACK_OUTCOME_RULES.copy()
 
-# Ensure resources are available when this module is imported
-ensure_nltk_resources()
+# Note: ensure_nltk_resources() is called above, before the corpus imports
 
 
 class TextPreprocessor:
