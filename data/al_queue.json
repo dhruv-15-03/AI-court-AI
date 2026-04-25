@@ -1,0 +1,143 @@
+[
+  {
+    "id": "87af90e1-3bae-4884-9fa8-22b76fc4ef4a",
+    "text": "criminal relief request bail anticipatory bail section ndps evidence type circumstantial injury severity minor weapon use fir delay delay witness hostile yes contradiction yes recovery weapon yes mitigate factor",
+    "predicted_label": "Sentence Reduced/Modified",
+    "confidence": 0.392490168092056,
+    "reason": "Low confidence (0.39 < 0.5)",
+    "case_type": "Criminal",
+    "added_at": "2026-03-07T05:17:49.046000Z",
+    "source": "auto_queue"
+  },
+  {
+    "id": "8e0cbb89-f581-4232-b53a-b8c6c4bc333d",
+    "text": "criminal relief request bail anticipatory bail section 302 evidence type circumstantial injury severity death weapon use yes fir delay delay witness hostile yes contradiction yes recovery weapon yes mitigate factor",
+    "predicted_label": "Sentence Reduced/Modified",
+    "confidence": 0.37264515843587953,
+    "reason": "Low confidence (0.37 < 0.5)",
+    "case_type": "Criminal",
+    "added_at": "2026-03-07T05:23:35.261025Z",
+    "source": "auto_queue"
+  },
+  {
+    "id": "12b6539b-697e-41ef-847c-91d977f53a61",
+    "text": "family relief request maintenance alimony marriage duration 3 child yes violence income asset yes settlement attempt yes",
+    "predicted_label": "Sentence Reduced/Modified",
+    "confidence": 0.4400519474566363,
+    "reason": "Low confidence (0.44 < 0.5)",
+    "case_type": "Family",
+    "added_at": "2026-03-07T05:28:54.899577Z",
+    "source": "auto_queue"
+  },
+  {
+    "id": "f0ae43a0-69d6-4767-adf3-c792caa4ceb9",
+    "text": "criminal text accuse find weapon scene witness testimony strong bail application",
+    "predicted_label": "Sentence Reduced/Modified",
+    "confidence": 0.3301743548191407,
+    "reason": "Low confidence (0.33 < 0.5)",
+    "case_type": "Criminal",
+    "added_at": "2026-03-07T20:01:41.384781Z",
+    "source": "auto_queue"
+  },
+  {
+    "id": "a53b31d2-7e14-425f-8a99-4a14e1fcddd1",
+    "text": "criminal text accuse find weapon scene witness testimony strong prior criminal record bail application section 439 crpc plan unlimited",
+    "predicted_label": "Charges/Proceedings Quashed",
+    "confidence": 0.26423698222326647,
+    "reason": "Low confidence (0.26 < 0.5)",
+    "case_type": "Criminal",
+    "added_at": "2026-03-07T20:09:29.086898Z",
+    "source": "auto_queue"
+  },
+  {
+    "id": "3be3f06d-93d2-4932-8182-6d4fa663ef64",
+    "text": "criminal case data accuse charge section 302 ipc murder two eyewitness saw incident weapon recover scene",
+    "predicted_label": "Acquittal/Conviction Overturned",
+    "confidence": 0.31714525490154366,
+    "uncertainty": 0.6829,
+    "uncertainty_method": "confidence",
+    "probabilities": {},
+    "reason": "Low confidence (0.32 < 0.5)",
+    "case_type": "Criminal",
+    "added_at": "2026-04-12T09:11:26.821367Z",
+    "source": "auto_queue"
+  },
+  {
+    "id": "d5c446ee-2329-4e68-a6b4-c36da3ee806d",
+    "text": "criminal case data accuse charge section 302 ipc murder two eyewitness saw incident weapon recover scene",
+    "predicted_label": "Acquittal/Conviction Overturned",
+    "confidence": 0.3171452549015436,
+    "uncertainty": 0.6829,
+    "uncertainty_method": "confidence",
+    "probabilities": {},
+    "reason": "Low confidence (0.32 < 0.5)",
+    "case_type": "Criminal",
+    "added_at": "2026-04-12T16:16:08.783371Z",
+    "source": "auto_queue"
+  },
+  {
+    "id": "57d12c77-843b-46ee-9e44-572e510afecd",
+    "text": "criminal case data murder charge ipc 302 2 witness",
+    "predicted_label": "Acquittal/Conviction Overturned",
+    "confidence": 0.26298400629878416,
+    "uncertainty": 0.737,
+    "uncertainty_method": "confidence",
+    "probabilities": {},
+    "reason": "Low confidence (0.26 < 0.5)",
+    "case_type": "Criminal",
+    "added_at": "2026-04-12T16:19:21.091962Z",
+    "source": "auto_queue"
+  },
+  {
+    "id": "0cb3e8d5-f41a-47ce-8432-721aeab8033a",
+    "text": "criminal case data murder ipc 302",
+    "predicted_label": "Acquittal/Conviction Overturned",
+    "confidence": 0.24760955998731532,
+    "uncertainty": 0.7524,
+    "uncertainty_method": "confidence",
+    "probabilities": {},
+    "reason": "Low confidence (0.25 < 0.5)",
+    "case_type": "Criminal",
+    "added_at": "2026-04-12T16:31:49.109515Z",
+    "source": "auto_queue"
+  },
+  {
+    "id": "0bcc6cf3-3eab-40c3-9176-7601544c75ed",
+    "text": "civil party v b",
+    "predicted_label": "Petition Withdrawn/Dismissed as Withdrawn",
+    "confidence": 0.19193891108399372,
+    "uncertainty": 0.8081,
+    "uncertainty_method": "confidence",
+    "probabilities": {},
+    "reason": "Low confidence (0.19 < 0.5)",
+    "case_type": "Civil",
+    "added_at": "2026-04-25T07:03:49.433311Z",
+    "source": "auto_queue"
+  },
+  {
+    "id": "a1a71d85-fedd-4821-b0b2-b89017859824",
+    "text": "civil party v b",
+    "predicted_label": "Petition Withdrawn/Dismissed as Withdrawn",
+    "confidence": 0.19193891108399372,
+    "uncertainty": 0.8081,
+    "uncertainty_method": "confidence",
+    "probabilities": {},
+    "reason": "Low confidence (0.19 < 0.5)",
+    "case_type": "Civil",
+    "added_at": "2026-04-25T07:05:13.667681Z",
+    "source": "auto_queue"
+  },
+  {
+    "id": "3b251171-f006-4892-b234-aca19dd7c75b",
+    "text": "civil party v b",
+    "predicted_label": "Petition Withdrawn/Dismissed as Withdrawn",
+    "confidence": 0.1919389110839937,
+    "uncertainty": 0.8081,
+    "uncertainty_method": "confidence",
+    "probabilities": {},
+    "reason": "Low confidence (0.19 < 0.5)",
+    "case_type": "Civil",
+    "added_at": "2026-04-25T07:15:19.249879Z",
+    "source": "auto_queue"
+  }
+]

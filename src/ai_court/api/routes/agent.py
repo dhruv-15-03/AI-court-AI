@@ -22,6 +22,7 @@ Tier system:
 from __future__ import annotations
 
 import logging
+import re
 import time
 from flask import Blueprint, request, jsonify, Response, stream_with_context
 
@@ -30,6 +31,51 @@ from ai_court.api.extensions import limiter
 
 logger = logging.getLogger(__name__)
 agent_bp = Blueprint("agent", __name__)
+
+# ── Legal Disclaimer (appended to EVERY AI response) ──────────────────
+LEGAL_DISCLAIMER = (
+    "DISCLAIMER: This AI-generated legal analysis is produced by an automated "
+    "system and does NOT constitute legal advice. It is intended as a supportive "
+    "research tool only. No attorney-client relationship is created by using this "
+    "service. Always consult a qualified legal professional before making any legal "
+    "decisions or taking action based on this output. The developers and operators "
+    "of this platform accept no liability for actions taken based on AI predictions."
+)
+
+# ── Input Validation Constants ─────────────────────────────────────────
+MAX_QUERY_LENGTH = 15000       # ~3000 words max
+MAX_MESSAGE_LENGTH = 5000
+MIN_QUERY_LENGTH = 10
+
+# Patterns that indicate prompt injection attempts
+_INJECTION_PATTERNS = [
+    r"ignore\s+(all\s+)?previous\s+instructions",
+    r"disregard\s+(all\s+)?(above|prior|previous)",
+    r"you\s+are\s+now\s+(a|an)\s+",
+    r"new\s+system\s+prompt",
+    r"override\s+system\s+prompt",
+    r"forget\s+(all\s+)?(your|previous)\s+instructions",
+    r"\bsystem:\s*",
+    r"act\s+as\s+if\s+you\s+have\s+no\s+restrictions",
+]
+_INJECTION_RE = re.compile("|".join(_INJECTION_PATTERNS), re.IGNORECASE)
+
+
+def _validate_query(text: str, max_len: int = MAX_QUERY_LENGTH) -> str | None:
+    """Return an error message if the query is invalid, else None."""
+    if not text or len(text.strip()) < MIN_QUERY_LENGTH:
+        return f"Query must be at least {MIN_QUERY_LENGTH} characters."
+    if len(text) > max_len:
+        return f"Query exceeds maximum length of {max_len} characters."
+    if _INJECTION_RE.search(text):
+        return "Query contains disallowed instructions. Please rephrase."
+    return None
+
+
+def _add_disclaimer(response: dict) -> dict:
+    """Inject legal disclaimer into every AI response dict."""
+    response["legal_disclaimer"] = LEGAL_DISCLAIMER
+    return response
 
 # Follow-up limits per tier
 TIER_FOLLOWUP_LIMITS = {
@@ -79,6 +125,9 @@ def agent_analyze():
     query = (raw.get("query") or "").strip()
     if not query:
         return jsonify({"error": "missing_query", "message": "Provide a 'query' field."}), 400
+    err = _validate_query(query)
+    if err:
+        return jsonify({"error": "invalid_query", "message": err}), 400
 
     tier = raw.get("tier", "free")
     user_id = raw.get("user_id")
@@ -91,7 +140,7 @@ def agent_analyze():
         if agent is None and tier != "free":
             result["warning"] = "LLM agent not available. Showing ML-only results."
         result["tier"] = tier
-        return jsonify(result)
+        return jsonify(_add_disclaimer(result))
 
     # ---------- Pro / Unlimited / Court: Full LLM agent ----------
     try:
@@ -106,7 +155,7 @@ def agent_analyze():
         result = _free_tier_analysis(query, k_cases)
         result["warning"] = f"LLM analysis failed ({type(exc).__name__}). Showing ML-only results."
         result["tier"] = tier
-        return jsonify(result)
+        return jsonify(_add_disclaimer(result))
 
     # Create a session for follow-up chat
     sm = _get_session_manager()
@@ -156,7 +205,7 @@ def agent_analyze():
         }
         response["court_document"] = _build_court_document(analysis)
 
-    return jsonify(response)
+    return jsonify(_add_disclaimer(response))
 
 
 # =========================================================================
@@ -189,6 +238,9 @@ def agent_chat():
 
     if not session_id or not message:
         return jsonify({"error": "missing_fields", "message": "Provide session_id and message."}), 400
+    err = _validate_query(message, MAX_MESSAGE_LENGTH)
+    if err:
+        return jsonify({"error": "invalid_message", "message": err}), 400
 
     session = sm.get_session(session_id)
     if session is None:
@@ -219,12 +271,12 @@ def agent_chat():
         logger.error("Agent follow-up failed: %s", exc)
         return jsonify({"error": "agent_error", "message": str(exc)}), 500
 
-    return jsonify({
+    return jsonify(_add_disclaimer({
         "session_id": session_id,
         "answer": answer,
         "followups_used": user_msgs + 1,
         "followups_remaining": max(0, followup_limit - user_msgs - 1),
-    })
+    }))
 
 
 # =========================================================================
@@ -245,6 +297,9 @@ def agent_rag():
     question = (raw.get("question") or "").strip()
     if not question:
         return jsonify({"error": "missing_question"}), 400
+    err = _validate_query(question)
+    if err:
+        return jsonify({"error": "invalid_question", "message": err}), 400
 
     k = min(int(raw.get("k", 5)), 10)
 
@@ -252,7 +307,7 @@ def agent_rag():
     if agent is not None:
         try:
             result = agent.rag_answer(question, k=k)
-            return jsonify(result)
+            return jsonify(_add_disclaimer(result))
         except Exception as exc:
             logger.warning("Agent RAG failed: %s", exc)
             # Fall through to retrieval-only
@@ -267,7 +322,7 @@ def agent_rag():
         llm_client=state.llm_client,
         statute_corpus=state.statute_corpus,
     )
-    return jsonify(result)
+    return jsonify(_add_disclaimer(result))
 
 
 # =========================================================================
@@ -716,6 +771,9 @@ def agent_stream():
     query = (raw.get("query") or "").strip()
     if not query:
         return jsonify({"error": "missing_query"}), 400
+    err = _validate_query(query)
+    if err:
+        return jsonify({"error": "invalid_query", "message": err}), 400
 
     k_cases = min(int(raw.get("k_cases", 5)), 10)
     k_statutes = min(int(raw.get("k_statutes", 5)), 10)
@@ -848,6 +906,7 @@ def agent_stream():
                 "provider": getattr(state.llm_client, "provider", "unknown"),
                 "citation_count": len(cases),
                 "session_id": session_id,
+                "legal_disclaimer": LEGAL_DISCLAIMER,
             }))
         except Exception as exc:
             logger.error("stream: unhandled: %s", exc, exc_info=True)

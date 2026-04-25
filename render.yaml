@@ -22,5 +22,7 @@ services:
         value: "1"
       - key: PIP_NO_CACHE_DIR
         value: "1"
+      - key: CORS_ORIGINS
+        value: "https://ai-court-room-iota.vercel.app,https://ai-courtroom.vercel.app,https://ai-courtroom-backend.onrender.com"
     # Force rebuild to clear cached packages
     autoDeploy: true
