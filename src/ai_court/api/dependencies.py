@@ -1,3 +1,4 @@
+import gc
 import os
 import json
 import dill
@@ -7,6 +8,25 @@ from flask import request, jsonify
 from ai_court.api import config, state
 
 logger = logging.getLogger("api")
+
+# Memory high-water mark in MB (for 512 MB Render free-tier)
+_MEMORY_WARN_MB = int(os.getenv('MEMORY_WARN_MB', '400'))
+
+
+def check_memory_pressure() -> bool:
+    """Return True if RSS exceeds the warning threshold."""
+    info = state.get_memory_usage()
+    rss = info.get('rss_mb', 0)
+    if rss and rss > _MEMORY_WARN_MB:
+        logger.warning('Memory pressure: RSS %.1f MB > %d MB threshold', rss, _MEMORY_WARN_MB)
+        return True
+    return False
+
+
+def relieve_memory_pressure() -> None:
+    """Best-effort attempt to free memory when under pressure."""
+    gc.collect()
+    logger.info('GC collect completed')
 
 try:
     from ai_court.ontology import (
@@ -56,6 +76,16 @@ def load_model():
         state.classifier_model = state.classifier.model
         state.label_encoder = state.classifier.label_encoder
         state.preprocess_fn = state.classifier.preprocess_text
+
+        # Attach run_id from metadata.json so it can be returned in responses
+        _meta_path = os.path.join(os.path.dirname(model_path), "metadata.json")
+        if os.path.exists(_meta_path):
+            try:
+                with open(_meta_path, "r", encoding="utf-8") as mf:
+                    _meta = json.load(mf)
+                state.classifier.run_id = _meta.get("run_id")
+            except Exception:
+                state.classifier.run_id = None
         
         logger.info(f"[api] Loaded model from {model_path}")
     except Exception as e:
@@ -64,17 +94,38 @@ def load_model():
 def load_search_index():
     low_memory = os.getenv("LOW_MEMORY", "0") == "1"
     disable_search = os.getenv("DISABLE_SEARCH_INDEX", "1" if low_memory else "0") == "1"
-    
-    if not disable_search and os.path.exists(config.SEARCH_INDEX_PATH):
-        try:
-            with open(config.SEARCH_INDEX_PATH, "rb") as f:
-                state.search_index = dill.load(f)
-            logger.info(f"[api] Loaded search index from {config.SEARCH_INDEX_PATH}")
-        except Exception as e:
-            logger.warning(f"[api] Failed to load search index: {e}")
-    else:
-        if disable_search:
-            logger.info("[api] Skipping search index load")
+
+    if disable_search:
+        logger.info("[api] Skipping search index load")
+        return
+
+    # Lazy-load: defer until first request when LAZY_LOAD_SEARCH=1
+    if config.LAZY_LOAD_SEARCH:
+        logger.info("[api] Search index will be lazy-loaded on first request")
+        return
+
+    _do_load_search_index()
+
+
+def _do_load_search_index() -> None:
+    """Actually load the search index from disk."""
+    if state.search_index is not None:
+        return  # already loaded
+    if not os.path.exists(config.SEARCH_INDEX_PATH):
+        logger.warning("[api] Search index file not found at %s", config.SEARCH_INDEX_PATH)
+        return
+    try:
+        with open(config.SEARCH_INDEX_PATH, "rb") as f:
+            state.search_index = dill.load(f)
+        logger.info("[api] Loaded search index from %s", config.SEARCH_INDEX_PATH)
+    except Exception as e:
+        logger.warning("[api] Failed to load search index: %s", e)
+
+
+def ensure_search_index() -> None:
+    """Ensure the search index is loaded (lazy-load on first call)."""
+    if state.search_index is None:
+        _do_load_search_index()
 
 def load_semantic_index():
     low_memory = os.getenv("LOW_MEMORY", "0") == "1"
@@ -226,6 +277,79 @@ def semantic_query_embeddings(query: str):
         return vec
     except Exception:
         return None
+
+
+def load_agent():
+    """Initialize the AI Legal Agent: LLM client, statute corpus, session manager, pipeline."""
+
+    # 1. LLM Client — supports GitHub Models (default) and Ollama
+    provider = os.getenv("LLM_PROVIDER", "github").lower().strip()
+    token = config.GITHUB_TOKEN if provider == "github" else os.getenv("OLLAMA_API_KEY", "ollama")
+    if provider == "github" and not token:
+        logger.warning("[agent] GITHUB_TOKEN not set — LLM agent will be unavailable")
+    else:
+        try:
+            from ai_court.llm.client import LLMClient
+            state.llm_client = LLMClient(
+                api_key=token or None,
+                provider=provider,
+                model=os.getenv("LLM_MODEL") or None,
+                base_url=os.getenv("LLM_BASE_URL") or None,
+            )
+            logger.info(
+                "[agent] LLM client initialized (provider=%s model=%s)",
+                state.llm_client.provider, state.llm_client.model,
+            )
+        except Exception as e:
+            logger.warning("[agent] Failed to init LLM client: %s", e)
+
+    # 2. Statute Corpus
+    try:
+        from ai_court.corpus.statutes import StatuteCorpus
+        corpus_dir = os.path.join(config.PROJECT_ROOT, "data", "statutes")
+        state.statute_corpus = StatuteCorpus(corpus_dir=corpus_dir)
+        state.statute_corpus.load()
+        if state.statute_corpus.loaded:
+            logger.info("[agent] Statute corpus loaded (%d acts)", len(state.statute_corpus._acts))
+            # Optionally attach a pre-built semantic vector store for hybrid search.
+            vec_path = os.getenv("STATUTE_VECTORS_PATH", "").strip()
+            if vec_path and os.path.isfile(vec_path):
+                try:
+                    from ai_court.retrieval.vector_store import VectorStore
+                    vs = VectorStore.load(vec_path)
+                    state.statute_corpus.attach_vector_store(vs)
+                    logger.info("[agent] Semantic vector store attached from %s", vec_path)
+                except Exception as ve:
+                    logger.warning("[agent] Failed to load vector store at %s: %s", vec_path, ve)
+        else:
+            logger.warning("[agent] Statute corpus directory empty or not found")
+    except Exception as e:
+        logger.warning("[agent] Failed to load statute corpus: %s", e)
+
+    # 3. Session Manager
+    try:
+        from ai_court.agent.session import SessionManager
+        state.session_manager = SessionManager()
+        logger.info("[agent] Session manager initialized")
+    except Exception as e:
+        logger.warning("[agent] Failed to init session manager: %s", e)
+
+    # 4. Agent Pipeline (needs LLM client)
+    if state.llm_client is not None:
+        try:
+            from ai_court.agent.pipeline import LegalAgentPipeline
+            state.agent_pipeline = LegalAgentPipeline(
+                llm_client=state.llm_client,
+                classifier=state.classifier,
+                search_index=state.search_index,
+                statute_corpus=state.statute_corpus,
+                preprocess_fn=state.preprocess_fn,
+            )
+            logger.info("[agent] Legal Agent Pipeline initialized and ready")
+        except Exception as e:
+            logger.warning("[agent] Failed to init agent pipeline: %s", e)
+    else:
+        logger.info("[agent] Agent pipeline skipped (no LLM client)")
 
 # Ontology helpers
 _ontology_cache = None

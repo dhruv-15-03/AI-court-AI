@@ -1,0 +1,255 @@
+{
+  "act_id": "BNSS",
+  "full_name": "Bharatiya Nagarik Suraksha Sanhita, 2023",
+  "short_name": "BNSS",
+  "year": 2023,
+  "sections": [
+    {
+      "section_number": "35",
+      "heading": "Arrest by Police Officer",
+      "body_text": "A police officer may arrest a person without a warrant if the person is involved in a cognizable offense or if there is a reasonable suspicion of their involvement. The officer must inform the person of the grounds of arrest and their rights.",
+      "chapter": "III - Powers of Police Officers"
+    },
+    {
+      "section_number": "36",
+      "heading": "Procedure for Arrest",
+      "body_text": "The arresting officer must ensure that the arrested person is not subjected to unnecessary restraint and is presented before a magistrate within 24 hours of arrest, excluding travel time.",
+      "chapter": "III - Powers of Police Officers"
+    },
+    {
+      "section_number": "37",
+      "heading": "Rights of Arrested Person",
+      "body_text": "An arrested person has the right to be informed of the grounds of arrest, the right to consult a legal practitioner, and the right to have a relative or friend informed of their arrest.",
+      "chapter": "III - Powers of Police Officers"
+    },
+    {
+      "section_number": "38",
+      "heading": "Medical Examination of Arrested Person",
+      "body_text": "A person arrested must undergo a medical examination by a registered medical practitioner to ensure their physical well-being and to document any injuries.",
+      "chapter": "III - Powers of Police Officers"
+    },
+    {
+      "section_number": "173",
+      "heading": "First Information Report (FIR)",
+      "body_text": "Every information relating to the commission of a cognizable offense, if given orally to an officer in charge of a police station, shall be reduced to writing and signed by the informant. A copy of the FIR must be provided to the informant free of cost.",
+      "chapter": "XII - Information to the Police and Their Powers to Investigate"
+    },
+    {
+      "section_number": "187",
+      "heading": "Default Bail",
+      "body_text": "If the investigation is not completed within the prescribed time limit (60 or 90 days, depending on the offense), the accused is entitled to be released on bail, provided they furnish the required bond.",
+      "chapter": "XXXIII - Provisions as to Bail and Bonds"
+    },
+    {
+      "section_number": "478",
+      "heading": "Regular Bail",
+      "body_text": "An accused person may apply for bail before a magistrate or court, which may grant bail based on the nature of the offense, the evidence available, and the likelihood of the accused absconding or tampering with evidence.",
+      "chapter": "XXXIII - Provisions as to Bail and Bonds"
+    },
+    {
+      "section_number": "482",
+      "heading": "Anticipatory Bail",
+      "body_text": "Any person who apprehends arrest on an accusation of having committed a non-bailable offense may apply for anticipatory bail. The court may grant such bail after considering the nature of the accusation and the applicant's antecedents.",
+      "chapter": "XXXIII - Provisions as to Bail and Bonds"
+    },
+    {
+      "section_number": "528",
+      "heading": "Quashing of Proceedings",
+      "body_text": "The High Court has the inherent power to quash criminal proceedings to prevent abuse of the process of law or to secure the ends of justice.",
+      "chapter": "XXXV - Inherent Powers of the High Court"
+    },
+    {
+      "section_number": "100",
+      "heading": "Search and Seizure",
+      "body_text": "A police officer conducting a search must do so in the presence of independent witnesses and prepare a list of all items seized. The list must be signed by the witnesses and the person from whom the items are seized.",
+      "chapter": "VII - Processes to Compel the Production of Things"
+    },
+    {
+      "section_number": "154",
+      "heading": "Investigation Procedure",
+      "body_text": "The officer in charge of a police station must investigate cognizable offenses and collect evidence. The investigation must be completed within the prescribed time frame unless an extension is granted by a magistrate.",
+      "chapter": "XII - Information to the Police and Their Powers to Investigate"
+    },
+    {
+      "section_number": "211",
+      "heading": "Framing of Charge",
+      "body_text": "The court shall frame charges against the accused based on the evidence collected during the investigation. The charges must be read and explained to the accused.",
+      "chapter": "XIX - Trial of Warrant Cases by Magistrates"
+    },
+    {
+      "section_number": "230",
+      "heading": "Commencement of Trial",
+      "body_text": "The trial shall commence with the prosecution presenting its evidence. The accused shall be given an opportunity to cross-examine witnesses and present their defense.",
+      "chapter": "XX - Trial Before a Court of Session"
+    },
+    {
+      "section_number": "235",
+      "heading": "Judgment",
+      "body_text": "After hearing the arguments and examining the evidence, the court shall pronounce its judgment, either acquitting or convicting the accused.",
+      "chapter": "XX - Trial Before a Court of Session"
+    },
+    {
+      "section_number": "248",
+      "heading": "Sentence",
+      "body_text": "If the accused is convicted, the court shall pass a sentence in accordance with the law, considering the nature and gravity of the offense.",
+      "chapter": "XX - Trial Before a Court of Session"
+    },
+    {
+      "section_number": "374",
+      "heading": "Appeal",
+      "body_text": "Any person convicted by a court may appeal to a higher court against the conviction or sentence, subject to the provisions of this Code.",
+      "chapter": "XXIX - Appeals"
+    },
+    {
+      "section_number": "397",
+      "heading": "Revision",
+      "body_text": "The High Court or Sessions Court may call for the record of any proceeding before a subordinate court to examine the correctness, legality, or propriety of any order passed.",
+      "chapter": "XXX - Revision"
+    },
+    {
+      "section_number": "154A",
+      "heading": "Zero FIR",
+      "body_text": "A Zero FIR can be filed at any police station, irrespective of the jurisdiction where the offense occurred. It must be transferred to the appropriate jurisdiction for further investigation.",
+      "chapter": "XII - Information to the Police and Their Powers to Investigate"
+    },
+    {
+      "section_number": "65B",
+      "heading": "Admissibility of Electronic Evidence",
+      "body_text": "Electronic records are admissible as evidence in court, provided they are accompanied by a certificate under Section 65B of the Indian Evidence Act, 1872, certifying their authenticity.",
+      "chapter": "XXIII - Evidence in Inquiries and Trials"
+    },
+    {
+      "section_number": "167",
+      "heading": "Timelines for Investigation",
+      "body_text": "The investigation of an offense must be completed within 60 days for offenses punishable with imprisonment of less than 10 years and within 90 days for offenses punishable with imprisonment of 10 years or more.",
+      "chapter": "XII - Information to the Police and Their Powers to Investigate"
+    },
+    {
+      "section_number": "432",
+      "heading": "Mercy Petitions",
+      "body_text": "The President or Governor may suspend, remit, or commute the sentence of a convicted person on receiving a mercy petition, subject to the provisions of this Code.",
+      "chapter": "XXXII - Execution, Suspension, Remission, and Commutation of Sentences"
+    },
+    {
+      "section_number": "50",
+      "heading": "Summons to Witnesses",
+      "body_text": "The court may issue a summons to any person whose attendance is required for giving evidence or producing a document in a trial or inquiry.",
+      "chapter": "VI - Processes to Compel Appearance"
+    },
+    {
+      "section_number": "91",
+      "heading": "Summons to Produce Documents",
+      "body_text": "The court may issue a summons to any person to produce any document or thing necessary for the purpose of investigation, inquiry, trial, or other proceedings.",
+      "chapter": "VII - Processes to Compel the Production of Things"
+    },
+    {
+      "section_number": "164",
+      "heading": "Recording of Confessions and Statements",
+      "body_text": "A magistrate may record any confession or statement made to them during the course of an investigation, ensuring that it is made voluntarily and without coercion.",
+      "chapter": "XII - Information to the Police and Their Powers to Investigate"
+    },
+    {
+      "section_number": "207",
+      "heading": "Supply of Copies to the Accused",
+      "body_text": "The magistrate shall furnish the accused with copies of the police report, FIR, statements, and other relevant documents free of cost before the commencement of the trial.",
+      "chapter": "XVI - Commencement of Proceedings Before Magistrates"
+    },
+    {
+      "section_number": "313",
+      "heading": "Examination of the Accused",
+      "body_text": "The court shall question the accused generally on the case after the prosecution evidence is closed, to enable the accused to explain any circumstances appearing in the evidence against them.",
+      "chapter": "XXIV - General Provisions as to Inquiries and Trials"
+    },
+    {
+      "section_number": "320",
+      "heading": "Compounding of Offenses",
+      "body_text": "Certain offenses may be compounded by the parties involved, with or without the permission of the court, as specified in the Code.",
+      "chapter": "XXIV - General Provisions as to Inquiries and Trials"
+    },
+    {
+      "section_number": "321",
+      "heading": "Withdrawal of Prosecution",
+      "body_text": "The Public Prosecutor or Assistant Public Prosecutor may, with the consent of the court, withdraw from the prosecution of any person at any stage before the judgment is pronounced.",
+      "chapter": "XXIV - General Provisions as to Inquiries and Trials"
+    },
+    {
+      "section_number": "300",
+      "heading": "Trial Once Convicted or Acquitted",
+      "body_text": "A person who has been tried by a court of competent jurisdiction for an offense and convicted or acquitted shall not be tried again for the same offense.",
+      "chapter": "XXIV - General Provisions as to Inquiries and Trials"
+    },
+    {
+      "section_number": "372",
+      "heading": "Appeal by Victim",
+      "body_text": "The victim of a crime has the right to appeal against any order of acquittal or conviction for a lesser offense or inadequate compensation, subject to the provisions of this Code.",
+      "chapter": "XXIX - Appeals"
+    },
+    {
+      "section_number": "439",
+      "heading": "Special Powers of High Court or Court of Session Regarding Bail",
+      "body_text": "The High Court or Court of Session may direct that any person accused of an offense and in custody be released on bail, and may impose conditions as deemed necessary.",
+      "chapter": "XXXIII - Provisions as to Bail and Bonds"
+    },
+    {
+      "section_number": "451",
+      "heading": "Order for Custody and Disposal of Property Pending Trial",
+      "body_text": "The court may make orders for the proper custody of property pending the conclusion of a trial and may also order its disposal if necessary.",
+      "chapter": "XXXIV - Disposal of Property"
+    },
+    {
+      "section_number": "457",
+      "heading": "Procedure by Police Upon Seizure of Property",
+      "body_text": "When property is seized by the police and no person is entitled to its possession, the magistrate may make an order for its disposal after due inquiry.",
+      "chapter": "XXXIV - Disposal of Property"
+    },
+    {
+      "section_number": "265A",
+      "heading": "Plea Bargaining",
+      "body_text": "An accused person may file an application for plea bargaining in cases where the offense is punishable with imprisonment of less than seven years and does not affect the socio-economic condition of the country.",
+      "chapter": "XXI-A - Plea Bargaining"
+    },
+    {
+      "section_number": "167A",
+      "heading": "Timelines for Trial",
+      "body_text": "Trials for offenses punishable with imprisonment of less than 10 years must be completed within two years, and trials for offenses punishable with imprisonment of 10 years or more must be completed within three years.",
+      "chapter": "XXIV - General Provisions as to Inquiries and Trials"
+    },
+    {
+      "section_number": "144",
+      "heading": "Power to Issue Orders in Urgent Cases of Nuisance or Apprehended Danger",
+      "body_text": "A magistrate may issue orders to prevent obstruction, annoyance, or injury to any person lawfully employed, or danger to human life, health, or safety.",
+      "chapter": "X - Maintenance of Public Order and Tranquility"
+    },
+    {
+      "section_number": "151",
+      "heading": "Arrest to Prevent the Commission of Cognizable Offenses",
+      "body_text": "A police officer may arrest a person without a warrant if it is necessary to prevent the commission of a cognizable offense.",
+      "chapter": "X - Maintenance of Public Order and Tranquility"
+    },
+    {
+      "section_number": "164A",
+      "heading": "Medical Examination of Victim of Rape",
+      "body_text": "In cases of rape, the victim must undergo a medical examination within 24 hours of the police receiving information about the offense.",
+      "chapter": "XII - Information to the Police and Their Powers to Investigate"
+    },
+    {
+      "section_number": "195",
+      "heading": "Prosecution for Contempt of Lawful Authority of Public Servants",
+      "body_text": "No court shall take cognizance of certain offenses against public servants except on a complaint in writing by the public servant concerned.",
+      "chapter": "XIV - Conditions Requisite for Initiation of Proceedings"
+    },
+    {
+      "section_number": "197",
+      "heading": "Prosecution of Judges and Public Servants",
+      "body_text": "No court shall take cognizance of offenses alleged to have been committed by judges or public servants while acting in the discharge of their official duties, except with prior sanction from the appropriate government.",
+      "chapter": "XIV - Conditions Requisite for Initiation of Proceedings"
+    },
+    {
+      "section_number": "202",
+      "heading": "Postponement of Issue of Process",
+      "body_text": "A magistrate may postpone the issue of process against the accused and direct an inquiry or investigation to determine whether there is sufficient ground for proceeding.",
+      "chapter": "XVI - Commencement of Proceedings Before Magistrates"
+    }
+  ],
+  "replaces": "CrPC"
+}

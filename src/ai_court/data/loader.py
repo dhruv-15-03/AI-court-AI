@@ -21,15 +21,23 @@ class DataLoader:
         # Normalize columns
         cols = {c.lower(): c for c in df.columns}
         
-        # Map text column
-        if 'case_data' not in cols and 'text' in cols:
-            df.rename(columns={cols['text']: 'case_data'}, inplace=True)
-        elif 'summary' in cols:
-            df.rename(columns={cols['summary']: 'case_data'}, inplace=True)
+        # Map text column — handle various column names from different sources
+        if 'case_data' not in cols:
+            for alt in ['case_summary', 'text', 'summary', 'doc', 'case_text']:
+                if alt in cols:
+                    df.rename(columns={cols[alt]: 'case_data'}, inplace=True)
+                    break
             
-        # Map type column
-        if 'case_type' not in cols and 'type' in cols:
-            df.rename(columns={cols['type']: 'case_type'}, inplace=True)
+        # Map type column — handle various column names
+        if 'case_type' not in cols:
+            for alt in ['type', 'category', 'case_category']:
+                if alt in cols:
+                    df.rename(columns={cols[alt]: 'case_type'}, inplace=True)
+                    break
+            else:
+                # If no type column exists, derive from filename
+                basename = os.path.splitext(os.path.basename(path))[0]
+                df['case_type'] = basename.replace('kanoon_', '').replace('_bulk', '')
             
         # Map label column - prefer refined_label if available (AI-curated)
         if 'refined_label' in df.columns:
@@ -63,7 +71,56 @@ class DataLoader:
             df['coarse_judgement'] = df['judgement'].astype(str).apply(self.preprocessor.normalize_outcome)
             df['judgement'] = df['coarse_judgement'].apply(lambda x: map_coarse_label(x)[0])
             
+            # For rows that landed in "Other", try to infer label from the filename
+            # e.g. kanoon_bail_granted.csv -> "Bail Granted"
+            #      kanoon_murder_IPC_302_conviction.csv -> "Relief Granted/Convicted"
+            basename = os.path.splitext(os.path.basename(path))[0].lower()
+            other_mask = df['judgement'] == 'Other'
+            if other_mask.any():
+                inferred = self._infer_label_from_filename(basename)
+                if inferred and inferred != 'Other':
+                    df.loc[other_mask, 'judgement'] = inferred
+                elif 'query_source' in df.columns:
+                    # For bulk harvest data, also try inferring from the query_source column
+                    for idx in df.index[other_mask]:
+                        qs = str(df.at[idx, 'query_source']).lower()
+                        qs_label = self._infer_label_from_filename(qs.replace(' ', '_'))
+                        if qs_label and qs_label != 'Other':
+                            df.at[idx, 'judgement'] = qs_label
+            
         return df
+
+    @staticmethod
+    def _infer_label_from_filename(basename: str) -> str:
+        """Infer an outcome label from the CSV filename when text-based normalization fails."""
+        # Map filename patterns to known outcome classes
+        FILENAME_LABEL_MAP = [
+            # Bail
+            (["bail_granted", "bail_allowed", "anticipatory_bail"], "Bail Granted"),
+            (["bail_denied", "bail_rejected", "bail_refused"], "Bail Denied"),
+            # Criminal outcomes
+            (["acquittal", "acquitted", "conviction_overturned"], "Acquittal/Conviction Overturned"),
+            (["conviction_upheld", "conviction_confirmed", "appeal_dismissed"], "Conviction Upheld/Appeal Dismissed"),
+            (["conviction", "convicted", "ipc_302_conviction", "ipc_376_conviction", "pocso_conviction"], "Relief Granted/Convicted"),
+            # Quashing
+            (["quashed", "quashing", "charges_quashed", "fir_quashed", "section_482"], "Charges/Proceedings Quashed"),
+            (["chargesheet_quashed", "charge_sheet_quashed"], "Charge Sheet Quashed"),
+            # Sentencing
+            (["sentence_reduced", "sentence_modified", "commuted"], "Sentence Reduced/Modified"),
+            # Remand
+            (["remanded", "sent_back", "remand"], "Case Remanded/Sent Back"),
+            # Withdrawn
+            (["withdrawn", "not_pressed"], "Petition Withdrawn/Dismissed as Withdrawn"),
+            # Civil outcomes — based on query category
+            (["allowed", "relief_granted", "writ_allowed", "petition_allowed"], "Relief Granted/Convicted"),
+            (["dismissed", "relief_denied", "petition_dismissed"], "Relief Denied/Dismissed"),
+        ]
+        
+        for patterns, label in FILENAME_LABEL_MAP:
+            for pattern in patterns:
+                if pattern in basename:
+                    return label
+        return "Other"
 
     def load_data(self, file_paths: List[str]) -> pd.DataFrame:
         """Load and concatenate datasets from multiple CSVs."""
@@ -118,6 +175,34 @@ class DataLoader:
         df['processed_text'] = df['legal_features'].apply(self.preprocessor.preprocess)
 
         y = self.label_encoder.fit_transform(df['judgement'].astype(str))
+
+        # Filter ultra-rare classes (less than MIN_CLASS_SAMPLES) to "Other"
+        # This prevents stratified split failures while preserving as many classes as possible
+        min_class_samples = int(os.getenv('MIN_CLASS_SAMPLES', '5'))
+        value_counts = pd.Series(y).value_counts()
+        rare_classes = value_counts[value_counts < min_class_samples].index.tolist()
+        if rare_classes:
+            # Map rare classes to the 'Other' label
+            other_label = None
+            for label_str in self.label_encoder.classes_:
+                if label_str == 'Other':
+                    other_label = self.label_encoder.transform(['Other'])[0]
+                    break
+            if other_label is not None:
+                for rc in rare_classes:
+                    y[y == rc] = other_label
+                # Re-fit label encoder to remove empty classes
+                present_labels = [self.label_encoder.inverse_transform([v])[0] for v in sorted(set(y))]
+                self.label_encoder = LabelEncoder()
+                label_map = {old: new for new, old in enumerate(sorted(set(y)))}
+                inv_map = {old: present_labels[i] for i, old in enumerate(sorted(set(y)))}
+                y = np.array([label_map[v] for v in y])
+                self.label_encoder.fit(present_labels)
+                import logging
+                logging.getLogger(__name__).info(
+                    "Merged %d rare classes (<%d samples) into 'Other'. Remaining classes: %d",
+                    len(rare_classes), min_class_samples, len(present_labels),
+                )
 
         weights = None
         if '__sample_weight' in df.columns:

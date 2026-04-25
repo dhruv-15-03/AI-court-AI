@@ -1,0 +1,104 @@
+{
+  "act_id": "RTI",
+  "full_name": "Right to Information Act, 2005",
+  "short_name": "RTI",
+  "year": 2005,
+  "sections": [
+    {
+      "section_number": "3",
+      "heading": "Right to information",
+      "body_text": "Subject to the provisions of this Act, all citizens shall have the right to information.",
+      "chapter": null
+    },
+    {
+      "section_number": "4",
+      "heading": "Obligations of public authorities",
+      "body_text": "Every public authority shall maintain records duly catalogued and indexed, publish certain categories of information, and proactively disclose information to the public to promote transparency and accountability.",
+      "chapter": null
+    },
+    {
+      "section_number": "6",
+      "heading": "Application for obtaining information",
+      "body_text": "A person who desires to obtain any information under this Act shall make a request in writing or electronically to the Public Information Officer, specifying the particulars of the information sought.",
+      "chapter": null
+    },
+    {
+      "section_number": "7",
+      "heading": "Disposal of request",
+      "body_text": "The Public Information Officer shall provide the information within 30 days of the receipt of the request. If the information concerns the life or liberty of a person, it shall be provided within 48 hours.",
+      "chapter": null
+    },
+    {
+      "section_number": "8",
+      "heading": "Exemptions from disclosure of information",
+      "body_text": "Certain categories of information are exempt from disclosure, including information prejudicial to the sovereignty and integrity of India, information forbidden by court, trade secrets, and personal information without public interest.",
+      "chapter": null
+    },
+    {
+      "section_number": "10",
+      "heading": "Severability",
+      "body_text": "If a request for information is partially exempt, access may still be provided to the non-exempt portions, provided they can be reasonably severed from the exempt portions.",
+      "chapter": null
+    },
+    {
+      "section_number": "11",
+      "heading": "Third party information",
+      "body_text": "If the information sought pertains to a third party and is treated as confidential, the Public Information Officer shall give the third party an opportunity to make a representation before disclosing the information.",
+      "chapter": null
+    },
+    {
+      "section_number": "12",
+      "heading": "Constitution of Central Information Commission",
+      "body_text": "The Central Government shall constitute a Central Information Commission to exercise the powers and perform the functions assigned under this Act.",
+      "chapter": null
+    },
+    {
+      "section_number": "13",
+      "heading": "Term of office and conditions of service of Chief Information Commissioner and Information Commissioners",
+      "body_text": "The Chief Information Commissioner and Information Commissioners shall hold office for a term of three years or until they attain the age of 65 years, whichever is earlier.",
+      "chapter": null
+    },
+    {
+      "section_number": "14",
+      "heading": "Removal of Chief Information Commissioner or Information Commissioners",
+      "body_text": "The Chief Information Commissioner or an Information Commissioner may be removed from office only by an order of the President on grounds of proved misbehavior or incapacity.",
+      "chapter": null
+    },
+    {
+      "section_number": "15",
+      "heading": "Constitution of State Information Commission",
+      "body_text": "Every State Government shall constitute a State Information Commission to exercise the powers and perform the functions assigned under this Act.",
+      "chapter": null
+    },
+    {
+      "section_number": "16",
+      "heading": "Term of office and conditions of service of State Chief Information Commissioner and State Information Commissioners",
+      "body_text": "The State Chief Information Commissioner and State Information Commissioners shall hold office for a term of three years or until they attain the age of 65 years, whichever is earlier.",
+      "chapter": null
+    },
+    {
+      "section_number": "17",
+      "heading": "Removal of State Chief Information Commissioner or State Information Commissioners",
+      "body_text": "The State Chief Information Commissioner or a State Information Commissioner may be removed from office only by an order of the Governor on grounds of proved misbehavior or incapacity.",
+      "chapter": null
+    },
+    {
+      "section_number": "19",
+      "heading": "Appeals",
+      "body_text": "Any person who does not receive a decision within the specified time or is aggrieved by a decision of the Public Information Officer may file an appeal to the first appellate authority and subsequently to the Central or State Information Commission.",
+      "chapter": null
+    },
+    {
+      "section_number": "20",
+      "heading": "Penalties",
+      "body_text": "If the Public Information Officer fails to provide information without reasonable cause, a penalty of Rs. 250 per day may be imposed, subject to a maximum of Rs. 25,000.",
+      "chapter": null
+    },
+    {
+      "section_number": "Whistleblower Protection",
+      "heading": "Protection for whistleblowers",
+      "body_text": "The Act provides protection to individuals who disclose information in good faith regarding corruption or wrongdoing in public authorities, ensuring they are not victimized for their actions.",
+      "chapter": null
+    }
+  ]
+}

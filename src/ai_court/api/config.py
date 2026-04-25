@@ -37,6 +37,15 @@ PREPROCESSING_CACHE_SIZE = int(os.getenv("PREPROCESSING_CACHE_SIZE", "512"))
 ENABLE_PREPROCESSING_CACHE = os.getenv("ENABLE_PREPROCESSING_CACHE", "1") == "1"
 BATCH_SIZE_LIMIT = int(os.getenv("BATCH_SIZE_LIMIT", "50"))
 
+# CORS
+# Comma-separated list of allowed origins, e.g.:
+#   CORS_ORIGINS=http://localhost:3000,https://your-frontend.vercel.app
+# Set to * to allow all origins (not recommended in production).
+# In production, default to rejecting cross-origin requests unless explicitly configured.
+_cors_default = "*" if os.getenv("APP_ENV", "production") != "production" else ""
+_raw_cors = os.getenv("CORS_ORIGINS", _cors_default)
+CORS_ORIGINS: list[str] = [o.strip() for o in _raw_cors.split(",") if o.strip()] or []
+
 # Customization Options
 INCLUDE_KEY_FACTORS = os.getenv("INCLUDE_KEY_FACTORS", "1") == "1"
 INCLUDE_EXPLANATION = os.getenv("INCLUDE_EXPLANATION", "1") == "1"
@@ -46,3 +55,14 @@ SIMILAR_CASES_COUNT = int(os.getenv("SIMILAR_CASES_COUNT", "3"))
 
 # Response Format Customization
 RESPONSE_FORMAT = os.getenv("RESPONSE_FORMAT", "full")  # full, minimal, detailed
+
+# LLM / Agent Configuration
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
+LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o")
+LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://models.inference.ai.azure.com")
+LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.3"))
+LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "4096"))
+LLM_TIMEOUT = float(os.getenv("LLM_TIMEOUT", "120.0"))
+AGENT_MAX_CONTEXT_CASES = int(os.getenv("AGENT_MAX_CONTEXT_CASES", "5"))
+AGENT_MAX_CASE_TEXT_LENGTH = int(os.getenv("AGENT_MAX_CASE_TEXT_LENGTH", "3000"))
+STATUTE_CORPUS_DIR = os.getenv("STATUTE_CORPUS_DIR", os.path.join(PROJECT_ROOT, "data", "statutes"))

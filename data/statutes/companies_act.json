@@ -1,0 +1,146 @@
+{
+  "act_id": "COMPANIES ACT",
+  "full_name": "Companies Act, 2013",
+  "short_name": "Companies Act",
+  "year": 2013,
+  "sections": [
+    {
+      "section_number": "2(20)",
+      "heading": "Definition of Company",
+      "body_text": "Defines a 'company' as a company incorporated under the Companies Act, 2013 or under any previous company law.",
+      "chapter": "I - Preliminary"
+    },
+    {
+      "section_number": "3",
+      "heading": "Formation of Company",
+      "body_text": "Specifies the requirements for forming a company, including the minimum number of members for private, public, and one-person companies.",
+      "chapter": "II - Incorporation of Company and Matters Incidental Thereto"
+    },
+    {
+      "section_number": "4",
+      "heading": "Memorandum of Association",
+      "body_text": "Details the requirements for the memorandum of association, including its contents and the procedure for alteration.",
+      "chapter": "II - Incorporation of Company and Matters Incidental Thereto"
+    },
+    {
+      "section_number": "5",
+      "heading": "Articles of Association",
+      "body_text": "Specifies the contents of the articles of association and the procedure for their alteration.",
+      "chapter": "II - Incorporation of Company and Matters Incidental Thereto"
+    },
+    {
+      "section_number": "135",
+      "heading": "Corporate Social Responsibility",
+      "body_text": "Mandates certain companies to constitute a Corporate Social Responsibility (CSR) Committee and spend at least 2% of their average net profits on CSR activities.",
+      "chapter": "IX - Accounts of Companies"
+    },
+    {
+      "section_number": "188",
+      "heading": "Related Party Transactions",
+      "body_text": "Regulates transactions between a company and its related parties, requiring board or shareholder approval for specified transactions.",
+      "chapter": "XII - Meetings of Board and its Powers"
+    },
+    {
+      "section_number": "241",
+      "heading": "Application to Tribunal for Relief in Cases of Oppression, etc.",
+      "body_text": "Allows members to apply to the Tribunal for relief if the company's affairs are being conducted in a manner prejudicial to public interest or oppressive to any member.",
+      "chapter": "XVI - Prevention of Oppression and Mismanagement"
+    },
+    {
+      "section_number": "242",
+      "heading": "Powers of Tribunal",
+      "body_text": "Empowers the Tribunal to pass orders to regulate the conduct of the company's affairs, including the removal of directors or alteration of the memorandum or articles.",
+      "chapter": "XVI - Prevention of Oppression and Mismanagement"
+    },
+    {
+      "section_number": "243",
+      "heading": "Consequences of Termination or Modification of Certain Agreements",
+      "body_text": "Specifies the consequences of orders passed by the Tribunal under Section 242, including the termination or modification of agreements.",
+      "chapter": "XVI - Prevention of Oppression and Mismanagement"
+    },
+    {
+      "section_number": "244",
+      "heading": "Right to Apply under Section 241",
+      "body_text": "Specifies the eligibility criteria for members to apply to the Tribunal under Section 241, including the minimum shareholding or membership requirements.",
+      "chapter": "XVI - Prevention of Oppression and Mismanagement"
+    },
+    {
+      "section_number": "245",
+      "heading": "Class Action",
+      "body_text": "Empowers members or depositors to file a class action suit against the company, its directors, or auditors for any fraudulent or wrongful act.",
+      "chapter": "XVI - Prevention of Oppression and Mismanagement"
+    },
+    {
+      "section_number": "246",
+      "heading": "Application of Certain Provisions to Proceedings under Section 241 or Section 245",
+      "body_text": "Specifies the application of certain provisions of the Code of Civil Procedure to proceedings under Sections 241 and 245.",
+      "chapter": "XVI - Prevention of Oppression and Mismanagement"
+    },
+    {
+      "section_number": "271",
+      "heading": "Circumstances in which Company may be Wound Up by Tribunal",
+      "body_text": "Lists the circumstances under which a company may be wound up by the Tribunal, including inability to pay debts or acting against public interest.",
+      "chapter": "XX - Winding Up"
+    },
+    {
+      "section_number": "272",
+      "heading": "Petition for Winding Up",
+      "body_text": "Specifies who may file a petition for winding up of a company, including the company itself, creditors, or the Registrar.",
+      "chapter": "XX - Winding Up"
+    },
+    {
+      "section_number": "447",
+      "heading": "Punishment for Fraud",
+      "body_text": "Prescribes punishment for fraud, including imprisonment for a term which may extend to 10 years and a fine not less than the amount involved in the fraud.",
+      "chapter": "XXIX - Miscellaneous"
+    },
+    {
+      "section_number": "448",
+      "heading": "Punishment for False Statements",
+      "body_text": "Provides for punishment for making false statements in any return, report, certificate, or other document required under the Act.",
+      "chapter": "XXIX - Miscellaneous"
+    },
+    {
+      "section_number": "449",
+      "heading": "Punishment for False Evidence",
+      "body_text": "Prescribes punishment for giving false evidence in any investigation or inquiry under the Act, including imprisonment for a term which may extend to 7 years.",
+      "chapter": "XXIX - Miscellaneous"
+    },
+    {
+      "section_number": "212",
+      "heading": "Investigation into Affairs of Company by Serious Fraud Investigation Office",
+      "body_text": "Empowers the central government to assign the investigation of a company to the Serious Fraud Investigation Office (SFIO) in cases of fraud.",
+      "chapter": "XIV - Inspection, Inquiry and Investigation"
+    },
+    {
+      "section_number": "149",
+      "heading": "Company to have Board of Directors",
+      "body_text": "Mandates every company to have a board of directors, specifying the minimum and maximum number of directors and the requirement for independent directors.",
+      "chapter": "XI - Appointment and Qualifications of Directors"
+    },
+    {
+      "section_number": "166",
+      "heading": "Duties of Directors",
+      "body_text": "Specifies the fiduciary duties of directors, including acting in good faith, avoiding conflicts of interest, and exercising due diligence.",
+      "chapter": "XI - Appointment and Qualifications of Directors"
+    },
+    {
+      "section_number": "213",
+      "heading": "Investigation into Company’s Affairs in Other Cases",
+      "body_text": "Empowers the Tribunal to order an investigation into the affairs of a company if it is in the public interest or if there is evidence of fraud or mismanagement.",
+      "chapter": "XIV - Inspection, Inquiry and Investigation"
+    },
+    {
+      "section_number": "421",
+      "heading": "Appeal from Orders of Tribunal",
+      "body_text": "Provides for appeals to the National Company Law Appellate Tribunal (NCLAT) against orders of the National Company Law Tribunal (NCLT).",
+      "chapter": "XXVII - National Company Law Tribunal and Appellate Tribunal"
+    },
+    {
+      "section_number": "452",
+      "heading": "Punishment for Wrongful Withholding of Property",
+      "body_text": "Prescribes punishment for any officer or employee of a company who wrongfully withholds property of the company, including imprisonment and fines.",
+      "chapter": "XXIX - Miscellaneous"
+    }
+  ]
+}

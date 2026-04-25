@@ -1,39 +1,110 @@
 {
-  "final_model": {
-    "train_f1_weighted": 0.845362419825868,
-    "test_accuracy": 0.8452560240963856,
-    "num_classes": 9,
-    "classes": [
-      "Acquittal/Conviction Overturned",
-      "Bail Denied",
-      "Bail Granted",
-      "Charge Sheet Quashed",
-      "Charges/Proceedings Quashed",
-      "Conviction Upheld/Appeal Dismissed",
-      "Relief Denied/Dismissed",
-      "Relief Granted/Convicted",
-      "Sentence Reduced/Modified"
-    ],
-    "ontology": {
-      "version": "fallback",
-      "num_leaves": 11,
-      "leaves": [
+  "trained_at": "2026-04-12T14:27:36",
+  "total_cases": 814634,
+  "labeled_cases": 43145,
+  "models": {
+    "bert": {
+      "model": "distilbert-base-uncased",
+      "accuracy": 0.81721260815822,
+      "macro_f1": 0.7940955178972707,
+      "weighted_f1": 0.8200487260220398,
+      "epochs": 3,
+      "batch_size": 16,
+      "max_len": 256,
+      "lr": 2e-05,
+      "num_classes": 11,
+      "classes": [
         "Acquittal/Conviction Overturned",
-        "Conviction Upheld/Appeal Dismissed",
+        "Bail Denied",
+        "Bail Granted",
+        "Case Remanded/Sent Back",
         "Charge Sheet Quashed",
         "Charges/Proceedings Quashed",
-        "Sentence Reduced/Modified",
-        "Bail Granted",
-        "Bail Denied",
-        "Relief Granted/Convicted",
+        "Conviction Upheld/Appeal Dismissed",
+        "Petition Withdrawn/Dismissed as Withdrawn",
         "Relief Denied/Dismissed",
-        "Other",
-        "unrecognized"
-      ]
+        "Relief Granted/Convicted",
+        "Sentence Reduced/Modified"
+      ],
+      "train_size": 36673,
+      "test_size": 6472,
+      "per_class": {
+        "Acquittal/Conviction Overturned": {
+          "f1": 0.8334728033472804,
+          "precision": 0.7494356659142212,
+          "recall": 0.9387370405278039,
+          "support": 1061.0
+        },
+        "Bail Denied": {
+          "f1": 0.967741935483871,
+          "precision": 0.9375,
+          "recall": 1.0,
+          "support": 15.0
+        },
+        "Bail Granted": {
+          "f1": 0.8028169014084507,
+          "precision": 0.8142857142857143,
+          "recall": 0.7916666666666666,
+          "support": 144.0
+        },
+        "Case Remanded/Sent Back": {
+          "f1": 0.7065217391304348,
+          "precision": 0.6605691056910569,
+          "recall": 0.7593457943925234,
+          "support": 428.0
+        },
+        "Charge Sheet Quashed": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 0.0
+        },
+        "Charges/Proceedings Quashed": {
+          "f1": 0.8154241645244216,
+          "precision": 0.8018200202224469,
+          "recall": 0.8294979079497908,
+          "support": 956.0
+        },
+        "Conviction Upheld/Appeal Dismissed": {
+          "f1": 0.5698324022346368,
+          "precision": 0.4967532467532468,
+          "recall": 0.6681222707423581,
+          "support": 229.0
+        },
+        "Petition Withdrawn/Dismissed as Withdrawn": {
+          "f1": 0.8179959100204499,
+          "precision": 0.8583690987124464,
+          "recall": 0.78125,
+          "support": 256.0
+        },
+        "Relief Denied/Dismissed": {
+          "f1": 0.7074829931972789,
+          "precision": 0.7027027027027027,
+          "recall": 0.7123287671232876,
+          "support": 73.0
+        },
+        "Relief Granted/Convicted": {
+          "f1": 0.8514492753623188,
+          "precision": 0.9134275618374559,
+          "recall": 0.797347316471314,
+          "support": 3242.0
+        },
+        "Sentence Reduced/Modified": {
+          "f1": 0.8682170542635659,
+          "precision": 0.9180327868852459,
+          "recall": 0.8235294117647058,
+          "support": 68.0
+        }
+      },
+      "trained_at": "2026-04-12T14:27:36",
+      "device": "cuda"
+    },
+    "rf": {
+      "accuracy": 0.8826,
+      "macro_f1": 0.7614,
+      "weighted_f1": 0.8844,
+      "num_classes": 11,
+      "training_data": 43145
     }
-  },
-  "data": {
-    "duplicate_ratio": 0.0,
-    "total_cases": 13276
   }
 }

@@ -6,6 +6,7 @@ from pydantic import ValidationError
 
 from ai_court.api import state, dependencies, models
 from ai_court.api.extensions import limiter
+from ai_court.retrieval.hybrid import reciprocal_rank_fusion
 
 search_bp = Blueprint('search', __name__)
 
@@ -24,6 +25,8 @@ def search_cases():
     auth = dependencies.require_api_key()
     if auth:
         return auth
+    # Lazy-load search index on first request if configured
+    dependencies.ensure_search_index()
     if state.search_index is None and state.semantic_index is None:
         return jsonify({"error": "No search index available. Build TF-IDF or semantic index."}), 503
 
@@ -83,31 +86,18 @@ def search_cases():
                     })
     
     fused: list = []
+    outcome_filter = raw.get('outcome_filter')
     if semantic_results and lexical_results:
-        k_sem = { (r.get('url'), r.get('title')): i for i,r in enumerate(semantic_results) }
-        k_lex = { (r.get('url'), r.get('title')): i for i,r in enumerate(lexical_results) }
-        all_keys = set(k_sem.keys()) | set(k_lex.keys())
-        K = 60
-        for key in all_keys:
-            sem_rank = k_sem.get(key, 10**6)
-            lex_rank = k_lex.get(key, 10**6)
-            sem_score = 1.0 / (K + sem_rank)
-            lex_score = 1.0 / (K + lex_rank)
-            base = None
-            for r in semantic_results:
-                if (r.get('url'), r.get('title')) == key:
-                    base = r
-                    break
-            if base is None:
-                for r in lexical_results:
-                    if (r.get('url'), r.get('title')) == key:
-                        base = r
-                        break
-            if base is None:
-                continue
-            fused.append({**base, 'fusion_score': sem_score + lex_score})
-        fused.sort(key=lambda x: -x['fusion_score'])
-        results = fused[:k]
+        fused = reciprocal_rank_fusion(
+            semantic=semantic_results,
+            lexical=lexical_results,
+            k=k,
+            outcome_filter=outcome_filter,
+        )
+        results = fused
     else:
         results = (semantic_results or lexical_results)[:k]
+        if outcome_filter:
+            needle = outcome_filter.lower()
+            results = [r for r in results if needle in (r.get('outcome') or '').lower()]
     return jsonify({"results": results})

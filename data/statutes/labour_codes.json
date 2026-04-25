@@ -1,0 +1,128 @@
+{
+  "act_id": "LABOUR CODES",
+  "full_name": "Labour Codes (Consolidated), 2019-2020",
+  "short_name": "Labour Codes",
+  "year": 2020,
+  "sections": [
+    {
+      "section_number": "6",
+      "heading": "Payment of Minimum Wages",
+      "body_text": "The appropriate government shall fix the minimum rates of wages payable to employees in scheduled employments, ensuring that no worker is paid less than the minimum wage. The rates may be fixed for time work, piece work, or overtime.",
+      "chapter": "Chapter II - Minimum Wages"
+    },
+    {
+      "section_number": "15",
+      "heading": "Payment of Wages",
+      "body_text": "Every employer shall be responsible for the payment of wages to employees employed by them. Wages must be paid without unauthorized deductions and within the prescribed time limits.",
+      "chapter": "Chapter III - Payment of Wages"
+    },
+    {
+      "section_number": "26",
+      "heading": "Payment of Bonus",
+      "body_text": "Every employer shall pay an annual bonus to employees who have worked for at least 30 days in an accounting year, provided the establishment meets the eligibility criteria for bonus payment.",
+      "chapter": "Chapter IV - Payment of Bonus"
+    },
+    {
+      "section_number": "70",
+      "heading": "Retrenchment Compensation",
+      "body_text": "An employer shall provide compensation to a workman who has been in continuous service for not less than one year before retrenchment. The compensation shall be equivalent to 15 days' average pay for every completed year of service.",
+      "chapter": "Chapter X - Lay-Off, Retrenchment, and Closure"
+    },
+    {
+      "section_number": "62",
+      "heading": "Resolution of Industrial Disputes",
+      "body_text": "Industrial disputes shall be resolved through conciliation, arbitration, or adjudication by the appropriate authorities, including conciliation officers, tribunals, and national tribunals.",
+      "chapter": "Chapter IX - Dispute Resolution"
+    },
+    {
+      "section_number": "62(1)",
+      "heading": "Prohibition of Strikes and Lockouts",
+      "body_text": "No person employed in an industrial establishment shall go on strike, and no employer shall declare a lockout without giving prior notice as prescribed under the Code.",
+      "chapter": "Chapter IX - Dispute Resolution"
+    },
+    {
+      "section_number": "109",
+      "heading": "Social Security Benefits - Provident Fund",
+      "body_text": "The Code mandates the establishment of a provident fund for employees, requiring contributions from both employers and employees, to provide financial security post-retirement.",
+      "chapter": "Chapter IV - Social Security and Provident Fund"
+    },
+    {
+      "section_number": "112",
+      "heading": "Social Security Benefits - Employees' State Insurance",
+      "body_text": "The Code provides for the establishment of the Employees' State Insurance Corporation to administer benefits such as medical care, sickness benefits, and maternity benefits to insured employees.",
+      "chapter": "Chapter V - Employees' State Insurance"
+    },
+    {
+      "section_number": "53",
+      "heading": "Gratuity",
+      "body_text": "Gratuity shall be payable to an employee who has rendered continuous service for not less than five years, upon termination of employment due to superannuation, retirement, resignation, or death.",
+      "chapter": "Chapter VI - Gratuity"
+    },
+    {
+      "section_number": "6",
+      "heading": "Duties of Employers",
+      "body_text": "Employers are required to ensure a safe working environment, provide necessary safety equipment, and comply with prescribed safety standards to protect workers from occupational hazards.",
+      "chapter": "Chapter II - Duties of Employers and Employees"
+    },
+    {
+      "section_number": "22",
+      "heading": "Occupational Safety and Health Standards",
+      "body_text": "The Code mandates the formulation and implementation of occupational safety and health standards to ensure the safety, health, and welfare of workers in various industries.",
+      "chapter": "Chapter IV - Safety and Working Conditions"
+    },
+    {
+      "section_number": "29",
+      "heading": "Health and Working Conditions",
+      "body_text": "Employers must ensure adequate ventilation, lighting, cleanliness, and other health and safety measures in the workplace to protect workers' well-being.",
+      "chapter": "Chapter IV - Safety and Working Conditions"
+    },
+    {
+      "section_number": "56",
+      "heading": "Fixed Term Employment",
+      "body_text": "The Code allows for fixed-term employment contracts, ensuring that fixed-term employees receive the same benefits as permanent employees, including gratuity, if they complete one year of service.",
+      "chapter": "Chapter V - Terms and Conditions of Employment"
+    },
+    {
+      "section_number": "14",
+      "heading": "Timely Payment of Wages",
+      "body_text": "Wages must be paid in a timely manner, as prescribed by the appropriate government, and no deductions shall be made except as authorized by the Code.",
+      "chapter": "Chapter III - Payment of Wages"
+    },
+    {
+      "section_number": "77",
+      "heading": "Notice of Change in Employment Conditions",
+      "body_text": "Employers must provide notice to workers before making any changes to employment conditions, such as wages, hours of work, or other terms of service.",
+      "chapter": "Chapter XI - Miscellaneous Provisions"
+    },
+    {
+      "section_number": "104",
+      "heading": "Maternity Benefits",
+      "body_text": "The Code provides for maternity benefits, including paid leave, medical bonus, and nursing breaks, to female employees who meet the eligibility criteria.",
+      "chapter": "Chapter VII - Maternity Benefits"
+    },
+    {
+      "section_number": "113",
+      "heading": "Unorganized Workers' Social Security",
+      "body_text": "The Code mandates the formulation of schemes to provide social security benefits to unorganized workers, including life and disability cover, health benefits, and old-age protection.",
+      "chapter": "Chapter VIII - Social Security for Unorganized Workers"
+    },
+    {
+      "section_number": "40",
+      "heading": "Welfare Provisions",
+      "body_text": "Employers are required to provide welfare facilities such as canteens, restrooms, and first-aid facilities to ensure the well-being of workers.",
+      "chapter": "Chapter IV - Safety and Working Conditions"
+    },
+    {
+      "section_number": "66",
+      "heading": "Prohibition of Sexual Harassment",
+      "body_text": "Employers must ensure that the workplace is free from sexual harassment and must implement measures to prevent and address complaints of harassment.",
+      "chapter": "Chapter V - Terms and Conditions of Employment"
+    },
+    {
+      "section_number": "99",
+      "heading": "Penalties for Non-Compliance",
+      "body_text": "The Code prescribes penalties for employers who fail to comply with its provisions, including fines and imprisonment, depending on the nature and severity of the violation.",
+      "chapter": "Chapter XII - Offences and Penalties"
+    }
+  ]
+}

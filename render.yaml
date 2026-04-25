@@ -4,7 +4,7 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free
-    healthCheckPath: /health
+    healthCheckPath: /api/health
     envVars:
       - key: MODEL_PATH
         value: /app/models/legal_case_classifier.pkl
@@ -12,6 +12,14 @@ services:
         value: production
       - key: LOG_LEVEL
         value: INFO
+      - key: LOW_MEMORY
+        value: "1"
+      - key: GUNICORN_WORKERS
+        value: "1"
+      - key: GUNICORN_THREADS
+        value: "2"
+      - key: DISABLE_SEMANTIC_INDEX
+        value: "1"
       - key: PIP_NO_CACHE_DIR
         value: "1"
     # Force rebuild to clear cached packages

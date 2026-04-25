@@ -1,0 +1,128 @@
+{
+  "act_id": "NI ACT",
+  "full_name": "Negotiable Instruments Act, 1881",
+  "short_name": "NI Act",
+  "year": 1881,
+  "sections": [
+    {
+      "section_number": "4",
+      "heading": "Definition of 'Promissory Note'",
+      "body_text": "A 'promissory note' is an instrument in writing (not being a bank-note or a currency-note) containing an unconditional undertaking signed by the maker, to pay a certain sum of money to, or to the order of, a certain person, or to the bearer of the instrument.",
+      "chapter": "I - Preliminary"
+    },
+    {
+      "section_number": "5",
+      "heading": "Definition of 'Bill of Exchange'",
+      "body_text": "A 'bill of exchange' is an instrument in writing containing an unconditional order, signed by the maker, directing a certain person to pay a certain sum of money only to, or to the order of, a certain person or to the bearer of the instrument.",
+      "chapter": "I - Preliminary"
+    },
+    {
+      "section_number": "6",
+      "heading": "Definition of 'Cheque'",
+      "body_text": "A 'cheque' is a bill of exchange drawn on a specified banker and not expressed to be payable otherwise than on demand. It includes the electronic image of a truncated cheque and a cheque in electronic form.",
+      "chapter": "I - Preliminary"
+    },
+    {
+      "section_number": "13",
+      "heading": "Definition of 'Negotiable Instrument'",
+      "body_text": "A 'negotiable instrument' means a promissory note, bill of exchange or cheque payable either to order or to bearer. It includes instruments payable to bearer on demand or after a specified time.",
+      "chapter": "II - Negotiable Instruments"
+    },
+    {
+      "section_number": "138",
+      "heading": "Dishonour of cheque for insufficiency of funds",
+      "body_text": "Where any cheque drawn by a person on an account maintained by him with a banker is returned unpaid due to insufficient funds or exceeds the amount arranged to be paid, the drawer shall be deemed to have committed an offence and shall be punishable with imprisonment for up to two years, or with fine which may extend to twice the amount of the cheque, or with both.",
+      "chapter": "XVII - Penalties in case of dishonour of certain cheques for insufficiency of funds"
+    },
+    {
+      "section_number": "139",
+      "heading": "Presumption in favour of holder",
+      "body_text": "It shall be presumed, unless the contrary is proved, that the holder of a cheque received the cheque for the discharge, in whole or in part, of any debt or other liability.",
+      "chapter": "XVII - Penalties in case of dishonour of certain cheques for insufficiency of funds"
+    },
+    {
+      "section_number": "141",
+      "heading": "Offences by companies",
+      "body_text": "If the person committing an offence under Section 138 is a company, every person who was in charge of and responsible for the conduct of the business of the company at the time of the offence shall be deemed guilty of the offence and liable to punishment.",
+      "chapter": "XVII - Penalties in case of dishonour of certain cheques for insufficiency of funds"
+    },
+    {
+      "section_number": "142",
+      "heading": "Cognizance of offences",
+      "body_text": "No court shall take cognizance of an offence under Section 138 except upon a complaint in writing made by the payee or holder in due course of the cheque, and such complaint must be made within one month of the cause of action arising.",
+      "chapter": "XVII - Penalties in case of dishonour of certain cheques for insufficiency of funds"
+    },
+    {
+      "section_number": "143",
+      "heading": "Power of court to try cases summarily",
+      "body_text": "Notwithstanding anything contained in the Code of Criminal Procedure, offences under Section 138 shall be tried summarily, and the Magistrate may pass a sentence of imprisonment for a term not exceeding one year or a fine not exceeding five thousand rupees.",
+      "chapter": "XVII - Penalties in case of dishonour of certain cheques for insufficiency of funds"
+    },
+    {
+      "section_number": "144",
+      "heading": "Mode of service of summons",
+      "body_text": "Summons may be served by speed post or courier service approved by the court, or by electronic means, to ensure prompt delivery to the accused or witness.",
+      "chapter": "XVII - Penalties in case of dishonour of certain cheques for insufficiency of funds"
+    },
+    {
+      "section_number": "145",
+      "heading": "Evidence on affidavit",
+      "body_text": "The complainant may give evidence on affidavit in any proceeding under Section 138, and the court may summon the complainant for cross-examination if necessary.",
+      "chapter": "XVII - Penalties in case of dishonour of certain cheques for insufficiency of funds"
+    },
+    {
+      "section_number": "146",
+      "heading": "Bank's slip as prima facie evidence",
+      "body_text": "The bank's slip or memo stating that the cheque has been dishonoured shall be prima facie evidence of the fact of dishonour, unless the contrary is proved.",
+      "chapter": "XVII - Penalties in case of dishonour of certain cheques for insufficiency of funds"
+    },
+    {
+      "section_number": "147",
+      "heading": "Offences to be compoundable",
+      "body_text": "Notwithstanding anything contained in the Code of Criminal Procedure, offences under this Act shall be compoundable.",
+      "chapter": "XVII - Penalties in case of dishonour of certain cheques for insufficiency of funds"
+    },
+    {
+      "section_number": "148",
+      "heading": "Power of court to order interim compensation",
+      "body_text": "In an appeal against conviction under Section 138, the appellate court may direct the appellant to deposit a minimum of 20% of the fine or compensation awarded by the trial court within a specified time.",
+      "chapter": "XVII - Penalties in case of dishonour of certain cheques for insufficiency of funds"
+    },
+    {
+      "section_number": "20",
+      "heading": "Inchoate instruments",
+      "body_text": "Where a person signs and delivers a negotiable instrument without specifying the amount, he thereby gives authority to the holder to fill up the amount, provided it does not exceed the amount intended.",
+      "chapter": "II - Negotiable Instruments"
+    },
+    {
+      "section_number": "22",
+      "heading": "When maturity is calculated",
+      "body_text": "The maturity of a promissory note or bill of exchange is calculated based on the date it is payable, including days of grace unless otherwise specified.",
+      "chapter": "II - Negotiable Instruments"
+    },
+    {
+      "section_number": "31",
+      "heading": "Liability of drawee of cheque",
+      "body_text": "The drawee of a cheque is bound to pay the amount of the cheque when duly required to do so, provided the cheque is properly drawn and there are sufficient funds.",
+      "chapter": "III - Parties to Negotiable Instruments"
+    },
+    {
+      "section_number": "87",
+      "heading": "Effect of material alteration",
+      "body_text": "Any material alteration of a negotiable instrument renders it void, except against a party who made, authorized, or consented to the alteration.",
+      "chapter": "VIII - Of Discharge from Liability on Notes, Bills and Cheques"
+    },
+    {
+      "section_number": "118",
+      "heading": "Presumptions as to negotiable instruments",
+      "body_text": "Until the contrary is proved, certain presumptions apply to negotiable instruments, such as consideration, date, time of acceptance, and endorsement.",
+      "chapter": "X - Of Rules of Evidence"
+    },
+    {
+      "section_number": "120",
+      "heading": "Estoppel against denying original validity",
+      "body_text": "No maker, drawer, acceptor, or endorser of a negotiable instrument shall be permitted to deny the validity of the instrument as originally made or drawn.",
+      "chapter": "X - Of Rules of Evidence"
+    }
+  ]
+}

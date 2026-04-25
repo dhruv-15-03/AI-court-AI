@@ -1,0 +1,152 @@
+{
+  "act_id": "IT ACT",
+  "full_name": "Information Technology Act, 2000",
+  "short_name": "IT Act",
+  "year": 2000,
+  "sections": [
+    {
+      "section_number": "4",
+      "heading": "Legal recognition of electronic records",
+      "body_text": "Where any law provides that information or any other matter shall be in writing or in the typewritten or printed form, then, notwithstanding anything contained in such law, such requirement shall be deemed to have been satisfied if such information or matter is rendered or made available in an electronic form and is accessible so as to be usable for a subsequent reference.",
+      "chapter": "II - Legal Recognition of Electronic Records"
+    },
+    {
+      "section_number": "5",
+      "heading": "Legal recognition of digital signatures",
+      "body_text": "Where any law provides that information or any other matter shall be authenticated by affixing the signature or any document shall be signed or bear the signature of any person, then, notwithstanding anything contained in such law, such requirement shall be deemed to have been satisfied if such information or matter is authenticated by means of a digital signature affixed in such manner as may be prescribed by the Central Government.",
+      "chapter": "II - Legal Recognition of Electronic Records"
+    },
+    {
+      "section_number": "43",
+      "heading": "Penalty for unauthorized access and damage to computer systems",
+      "body_text": "If any person without permission of the owner or any other person who is in charge of a computer, computer system, or computer network accesses such system and causes damage, he shall be liable to pay damages by way of compensation to the person affected.",
+      "chapter": "IX - Penalties, Compensation and Adjudication"
+    },
+    {
+      "section_number": "43A",
+      "heading": "Compensation for failure to protect data",
+      "body_text": "Where a body corporate, possessing, dealing, or handling any sensitive personal data or information, is negligent in implementing and maintaining reasonable security practices and procedures, and thereby causes wrongful loss or wrongful gain to any person, such body corporate shall be liable to pay damages by way of compensation.",
+      "chapter": "IX - Penalties, Compensation and Adjudication"
+    },
+    {
+      "section_number": "65",
+      "heading": "Tampering with computer source documents",
+      "body_text": "Whoever knowingly or intentionally conceals, destroys, or alters any computer source code used for a computer, computer program, computer system, or computer network, shall be punishable with imprisonment up to three years, or with fine which may extend to two lakh rupees, or with both.",
+      "chapter": "XI - Offences"
+    },
+    {
+      "section_number": "66",
+      "heading": "Hacking with computer system",
+      "body_text": "Whoever, with the intent to cause or knowing that he is likely to cause wrongful loss or damage to the public or any person, destroys, deletes, or alters any information residing in a computer resource or diminishes its value or utility, shall be punishable with imprisonment up to three years, or with fine which may extend to five lakh rupees, or with both.",
+      "chapter": "XI - Offences"
+    },
+    {
+      "section_number": "66C",
+      "heading": "Punishment for identity theft",
+      "body_text": "Whoever, fraudulently or dishonestly, makes use of the electronic signature, password, or any other unique identification feature of any other person shall be punishable with imprisonment up to three years and shall also be liable to fine which may extend to one lakh rupees.",
+      "chapter": "XI - Offences"
+    },
+    {
+      "section_number": "66D",
+      "heading": "Punishment for cheating by personation using computer resource",
+      "body_text": "Whoever, by means of any communication device or computer resource, cheats by personation shall be punishable with imprisonment up to three years and shall also be liable to fine which may extend to one lakh rupees.",
+      "chapter": "XI - Offences"
+    },
+    {
+      "section_number": "66E",
+      "heading": "Punishment for violation of privacy",
+      "body_text": "Whoever, intentionally or knowingly, captures, publishes, or transmits the image of a private area of any person without his or her consent, under circumstances violating privacy, shall be punishable with imprisonment up to three years or with fine not exceeding two lakh rupees, or with both.",
+      "chapter": "XI - Offences"
+    },
+    {
+      "section_number": "66F",
+      "heading": "Punishment for cyber terrorism",
+      "body_text": "Whoever commits or conspires to commit cyber terrorism shall be punishable with imprisonment which may extend to imprisonment for life.",
+      "chapter": "XI - Offences"
+    },
+    {
+      "section_number": "67",
+      "heading": "Punishment for publishing obscene material in electronic form",
+      "body_text": "Whoever publishes or transmits or causes to be published or transmitted in the electronic form any material which is lascivious or appeals to the prurient interest shall be punishable with imprisonment up to three years and with fine which may extend to five lakh rupees on first conviction, and in the event of second or subsequent conviction, with imprisonment up to five years and with fine which may extend to ten lakh rupees.",
+      "chapter": "XI - Offences"
+    },
+    {
+      "section_number": "67A",
+      "heading": "Punishment for publishing sexually explicit material",
+      "body_text": "Whoever publishes or transmits or causes to be published or transmitted in the electronic form any material which contains sexually explicit act or conduct shall be punishable with imprisonment up to five years and with fine which may extend to ten lakh rupees on first conviction, and in the event of second or subsequent conviction, with imprisonment up to seven years and with fine which may extend to ten lakh rupees.",
+      "chapter": "XI - Offences"
+    },
+    {
+      "section_number": "67B",
+      "heading": "Punishment for publishing child pornography",
+      "body_text": "Whoever publishes or transmits or causes to be published or transmitted material depicting children in sexually explicit acts or conduct shall be punishable with imprisonment up to five years and with fine which may extend to ten lakh rupees on first conviction, and in the event of second or subsequent conviction, with imprisonment up to seven years and with fine which may extend to ten lakh rupees.",
+      "chapter": "XI - Offences"
+    },
+    {
+      "section_number": "68",
+      "heading": "Power of Controller to give directions",
+      "body_text": "The Controller may, by order, direct a Certifying Authority or any employee of such Authority to take such measures or cease carrying on such activities as specified in the order, if those activities are contrary to the provisions of this Act.",
+      "chapter": "VII - Certifying Authorities"
+    },
+    {
+      "section_number": "69",
+      "heading": "Power to issue directions for interception or monitoring of information",
+      "body_text": "The Central Government or a State Government may direct any agency to intercept, monitor, or decrypt any information generated, transmitted, received, or stored in any computer resource if it is necessary or expedient to do so in the interest of sovereignty, integrity, defense, security of India, friendly relations with foreign states, or public order.",
+      "chapter": "XI - Offences"
+    },
+    {
+      "section_number": "69A",
+      "heading": "Power to block public access to information",
+      "body_text": "The Central Government may direct any agency or intermediary to block access by the public to any information generated, transmitted, received, or stored in any computer resource if it is necessary to do so in the interest of sovereignty, integrity, defense, security of India, friendly relations with foreign states, or public order.",
+      "chapter": "XI - Offences"
+    },
+    {
+      "section_number": "70",
+      "heading": "Protected systems",
+      "body_text": "The appropriate Government may, by notification in the Official Gazette, declare any computer resource which directly or indirectly affects the facility of Critical Information Infrastructure to be a protected system. Unauthorized access to such systems is punishable with imprisonment up to ten years and fine.",
+      "chapter": "XI - Offences"
+    },
+    {
+      "section_number": "72",
+      "heading": "Breach of confidentiality and privacy",
+      "body_text": "Any person who has secured access to any electronic record, book, register, correspondence, information, document, or other material without the consent of the person concerned and discloses such information shall be punishable with imprisonment up to two years, or with fine which may extend to one lakh rupees, or with both.",
+      "chapter": "XI - Offences"
+    },
+    {
+      "section_number": "72A",
+      "heading": "Punishment for disclosure of information in breach of lawful contract",
+      "body_text": "Any person who has access to personal information under a lawful contract and discloses it without consent or in breach of the contract shall be punishable with imprisonment up to three years, or with fine which may extend to five lakh rupees, or with both.",
+      "chapter": "XI - Offences"
+    },
+    {
+      "section_number": "73",
+      "heading": "Publication of false digital signature certificates",
+      "body_text": "No person shall publish a digital signature certificate or otherwise make it available to any other person with the knowledge that the Certifying Authority listed in the certificate has not issued it or the subscriber listed in the certificate has not accepted it.",
+      "chapter": "VII - Certifying Authorities"
+    },
+    {
+      "section_number": "74",
+      "heading": "Publication for fraudulent purpose",
+      "body_text": "Whoever knowingly creates, publishes, or otherwise makes available a digital signature certificate for any fraudulent or unlawful purpose shall be punishable with imprisonment up to two years, or with fine which may extend to one lakh rupees, or with both.",
+      "chapter": "VII - Certifying Authorities"
+    },
+    {
+      "section_number": "79",
+      "heading": "Liability of intermediaries",
+      "body_text": "An intermediary shall not be liable for any third-party information, data, or communication link made available or hosted by him if he observes due diligence and follows guidelines prescribed by the Central Government. However, this exemption does not apply if the intermediary has conspired or abetted the commission of an unlawful act.",
+      "chapter": "XI - Offences"
+    },
+    {
+      "section_number": "85",
+      "heading": "Offences by companies",
+      "body_text": "Where an offence under this Act has been committed by a company, every person who was in charge of and responsible for the conduct of the business of the company shall be deemed guilty of the offence and shall be liable to be proceeded against and punished accordingly.",
+      "chapter": "XI - Offences"
+    },
+    {
+      "section_number": "65B",
+      "heading": "Admissibility of electronic records",
+      "body_text": "Electronic records shall be admissible as evidence in any legal proceeding if they meet certain conditions, including the integrity of the record, the reliability of the system used to produce the record, and certification by a person in charge of the system. The certificate must identify the electronic record and describe the manner in which it was produced.",
+      "chapter": "II - Legal Recognition of Electronic Records"
+    }
+  ]
+}

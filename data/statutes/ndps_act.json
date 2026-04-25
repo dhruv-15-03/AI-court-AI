@@ -1,0 +1,152 @@
+{
+  "act_id": "NDPS",
+  "full_name": "Narcotic Drugs and Psychotropic Substances Act, 1985",
+  "short_name": "NDPS",
+  "year": 1985,
+  "sections": [
+    {
+      "section_number": "2",
+      "heading": "Definitions",
+      "body_text": "This section provides definitions for key terms used in the Act, including 'addict', 'cannabis', 'commercial quantity', 'small quantity', 'manufacture', 'narcotic drug', 'psychotropic substance', and others.",
+      "chapter": "Chapter I - Preliminary"
+    },
+    {
+      "section_number": "8",
+      "heading": "Prohibition of certain operations",
+      "body_text": "No person shall produce, manufacture, possess, sell, purchase, transport, warehouse, use, consume, import inter-State, export inter-State, import into India, export from India, or transship any narcotic drug or psychotropic substance except as provided under the Act.",
+      "chapter": "Chapter II - Prohibition, Control, and Regulation"
+    },
+    {
+      "section_number": "20",
+      "heading": "Punishment for contravention in relation to cannabis plant and cannabis",
+      "body_text": "Punishment for contravention involving cannabis ranges from rigorous imprisonment up to 10 years and fine up to Rs. 1 lakh for small quantities, and rigorous imprisonment up to 20 years and fine up to Rs. 2 lakh for commercial quantities.",
+      "chapter": "Chapter IV - Offences and Penalties"
+    },
+    {
+      "section_number": "21",
+      "heading": "Punishment for contravention in relation to manufactured drugs and preparations",
+      "body_text": "Punishment for contravention involving manufactured drugs ranges from rigorous imprisonment up to 10 years and fine up to Rs. 1 lakh for small quantities, and rigorous imprisonment up to 20 years and fine up to Rs. 2 lakh for commercial quantities.",
+      "chapter": "Chapter IV - Offences and Penalties"
+    },
+    {
+      "section_number": "22",
+      "heading": "Punishment for contravention in relation to psychotropic substances",
+      "body_text": "Punishment for contravention involving psychotropic substances ranges from rigorous imprisonment up to 10 years and fine up to Rs. 1 lakh for small quantities, and rigorous imprisonment up to 20 years and fine up to Rs. 2 lakh for commercial quantities.",
+      "chapter": "Chapter IV - Offences and Penalties"
+    },
+    {
+      "section_number": "27",
+      "heading": "Punishment for consumption of any narcotic drug or psychotropic substance",
+      "body_text": "Consumption of narcotic drugs or psychotropic substances is punishable with imprisonment up to 1 year or fine up to Rs. 20,000, or both. For certain drugs like cocaine, morphine, or heroin, the punishment may extend to 2 years imprisonment or fine up to Rs. 50,000, or both.",
+      "chapter": "Chapter IV - Offences and Penalties"
+    },
+    {
+      "section_number": "35",
+      "heading": "Presumption of culpable mental state",
+      "body_text": "In any prosecution under the Act, the court shall presume the existence of a culpable mental state on the part of the accused unless proven otherwise.",
+      "chapter": "Chapter IV - Offences and Penalties"
+    },
+    {
+      "section_number": "37",
+      "heading": "Offences to be cognizable and non-bailable",
+      "body_text": "All offences under the Act are cognizable and non-bailable. Bail can only be granted if the court is satisfied that there are reasonable grounds for believing the accused is not guilty and is not likely to commit any offence while on bail.",
+      "chapter": "Chapter IV - Offences and Penalties"
+    },
+    {
+      "section_number": "54",
+      "heading": "Presumption from possession of illicit articles",
+      "body_text": "The court shall presume that a person found in possession of illicit narcotic drugs or psychotropic substances had knowledge of the nature of the substance unless proven otherwise.",
+      "chapter": "Chapter IV - Offences and Penalties"
+    },
+    {
+      "section_number": "64A",
+      "heading": "Immunity from prosecution to addicts volunteering for treatment",
+      "body_text": "An addict who voluntarily seeks medical treatment for de-addiction shall not be liable to prosecution for offences involving consumption of narcotic drugs or psychotropic substances.",
+      "chapter": "Chapter IV - Offences and Penalties"
+    },
+    {
+      "section_number": "68A",
+      "heading": "Definitions related to forfeiture of property",
+      "body_text": "This section defines terms related to forfeiture, including 'illegally acquired property', 'person', and 'proceeds of narcotic drugs and psychotropic substances'.",
+      "chapter": "Chapter V - Forfeiture of Illegally Acquired Property"
+    },
+    {
+      "section_number": "68B",
+      "heading": "Prohibition of holding illegally acquired property",
+      "body_text": "No person shall hold any illegally acquired property, and such property shall be liable to forfeiture under the Act.",
+      "chapter": "Chapter V - Forfeiture of Illegally Acquired Property"
+    },
+    {
+      "section_number": "68C",
+      "heading": "Identification of illegally acquired property",
+      "body_text": "The government may identify property believed to be illegally acquired and initiate proceedings for its forfeiture.",
+      "chapter": "Chapter V - Forfeiture of Illegally Acquired Property"
+    },
+    {
+      "section_number": "68E",
+      "heading": "Forfeiture of property of persons convicted under the Act",
+      "body_text": "Property of persons convicted under the Act may be forfeited if it is determined to be illegally acquired.",
+      "chapter": "Chapter V - Forfeiture of Illegally Acquired Property"
+    },
+    {
+      "section_number": "42",
+      "heading": "Power of entry, search, seizure, and arrest without warrant",
+      "body_text": "Authorized officers can enter, search, seize, and arrest without a warrant if they have reason to believe that an offence under the Act is being committed.",
+      "chapter": "Chapter V - Procedure"
+    },
+    {
+      "section_number": "43",
+      "heading": "Power of seizure and arrest in public places",
+      "body_text": "Authorized officers can seize narcotic drugs or psychotropic substances and arrest persons in public places if they have reason to believe an offence under the Act is being committed.",
+      "chapter": "Chapter V - Procedure"
+    },
+    {
+      "section_number": "50",
+      "heading": "Conditions under which search of persons shall be conducted",
+      "body_text": "Search of persons must be conducted in the presence of a Gazetted Officer or a Magistrate, and the person being searched has the right to request the presence of such an officer.",
+      "chapter": "Chapter V - Procedure"
+    },
+    {
+      "section_number": "51",
+      "heading": "Provisions of the Code of Criminal Procedure to apply",
+      "body_text": "The provisions of the Code of Criminal Procedure, 1973, shall apply to proceedings under the Act unless otherwise specified.",
+      "chapter": "Chapter V - Procedure"
+    },
+    {
+      "section_number": "52",
+      "heading": "Disposal of persons arrested and articles seized",
+      "body_text": "Persons arrested and articles seized under the Act must be forwarded to the officer-in-charge of the nearest police station or the Narcotics Control Bureau.",
+      "chapter": "Chapter V - Procedure"
+    },
+    {
+      "section_number": "53",
+      "heading": "Power to invest officers with powers of an officer-in-charge of a police station",
+      "body_text": "The government may authorize certain officers to exercise the powers of an officer-in-charge of a police station for the purposes of the Act.",
+      "chapter": "Chapter V - Procedure"
+    },
+    {
+      "section_number": "31A",
+      "heading": "Death penalty for certain offences after previous conviction",
+      "body_text": "A person convicted for a second time for certain offences involving commercial quantities of narcotic drugs or psychotropic substances may be punished with the death penalty.",
+      "chapter": "Chapter IV - Offences and Penalties"
+    },
+    {
+      "section_number": "27A",
+      "heading": "Punishment for financing illicit traffic and harboring offenders",
+      "body_text": "Any person financing illicit trafficking or harboring offenders shall be punished with rigorous imprisonment for a term not less than 10 years, which may extend to 20 years, and a fine not less than Rs. 1 lakh, which may extend to Rs. 2 lakh.",
+      "chapter": "Chapter IV - Offences and Penalties"
+    },
+    {
+      "section_number": "29",
+      "heading": "Punishment for abetment and criminal conspiracy",
+      "body_text": "Any person who abets or is part of a criminal conspiracy to commit an offence under the Act shall be liable for the same punishment as the offence itself.",
+      "chapter": "Chapter IV - Offences and Penalties"
+    },
+    {
+      "section_number": "67",
+      "heading": "Power to call for information and to record statements",
+      "body_text": "Authorized officers have the power to call for information from any person and record statements in connection with investigations under the Act.",
+      "chapter": "Chapter V - Procedure"
+    }
+  ]
+}

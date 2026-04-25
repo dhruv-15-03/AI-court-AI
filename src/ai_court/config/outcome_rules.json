@@ -3,9 +3,12 @@
     "label": "Acquittal/Conviction Overturned",
     "phrases": [
       "acquitted", "acquittal", "conviction overturned", "set aside conviction", 
-      "set aside the conviction", "set aside", "reversal of conviction", 
+      "set aside the conviction", "reversal of conviction", 
       "benefit of doubt", "give benefit of doubt", "acquit the accused", 
-      "appeal allowed and conviction set aside", "conviction quashed"
+      "appeal allowed and conviction set aside", "conviction quashed",
+      "accused is acquitted", "hereby acquitted", "accused are acquitted",
+      "accused stands acquitted", "entitled to acquittal",
+      "prosecution has failed", "prosecution failed to prove"
     ]
   },
   {
@@ -14,7 +17,11 @@
       "appeal dismissed", "appeal is dismissed", "conviction upheld", 
       "conviction affirmed", "convictions upheld", "life sentence upheld", 
       "appeal fails", "dismissed on merits", "dismissed in limine", 
-      "leave refused", "revision dismissed", "petition dismissed as devoid of merit"
+      "leave refused", "revision dismissed", "petition dismissed as devoid of merit",
+      "appeal is without merit", "appeal lacks merit", "appeal deserves to be dismissed",
+      "conviction is confirmed", "conviction and sentence confirmed",
+      "criminal appeal is dismissed", "conviction is maintained",
+      "no merit in the appeal", "we find no reason to interfere"
     ]
   },
   {
@@ -30,7 +37,9 @@
     "phrases": [
       "quash", "quashed", "quashing", "fir quashed", "charges quashed", 
       "proceedings quashed", "section 482 allowed", "u/s 482 allowed", 
-      "proceedings under section 482 are quashed"
+      "proceedings under section 482 are quashed",
+      "fir is hereby quashed", "complaint is quashed",
+      "proceedings are quashed", "entire proceedings quashed"
     ]
   },
   {
@@ -38,36 +47,55 @@
     "phrases": [
       "sentence reduced", "sentence modified", "reduced sentence", "commuted", 
       "converted to", "altered sentence", "sentence altered", 
-      "imprisonment reduced", "fine reduced", "sentence commuted"
+      "imprisonment reduced", "fine reduced", "sentence commuted",
+      "sentence of life imprisonment is reduced", "sentence is modified",
+      "punishment is reduced", "sentence is commuted",
+      "death sentence commuted to life"
     ]
   },
   {
     "label": "Bail Granted",
     "phrases": [
       "bail granted", "anticipatory bail granted", "interim bail", 
-      "enlarged on bail", "released on bail"
+      "enlarged on bail", "released on bail",
+      "bail is granted", "bail application is allowed",
+      "applicant is directed to be released on bail",
+      "bail is allowed", "accused be released on bail",
+      "prayer for bail is allowed", "application for bail is granted"
     ]
   },
   {
     "label": "Bail Denied",
     "phrases": [
-      "bail denied", "bail rejected", "bail refused", "bail application dismissed"
+      "bail denied", "bail rejected", "bail refused", "bail application dismissed",
+      "bail is rejected", "bail is denied", "bail application is rejected",
+      "bail is refused", "bail prayer rejected", "bail prayer is rejected",
+      "not entitled to bail", "bail application is dismissed",
+      "application for bail is rejected"
     ]
   },
   {
     "label": "Relief Granted/Convicted",
     "phrases": [
       "petition allowed", "writ allowed", "relief granted", "granted protection", 
-      "mandated", "directed", "ordered", "convicted", "allowed in part", 
-      "partly allowed", "set aside order and remand"
+      "mandated", "directed", "convicted", "allowed in part", 
+      "partly allowed", "set aside order and remand",
+      "writ petition is allowed", "petition is allowed",
+      "appeal is allowed", "appeal allowed", "suit decreed",
+      "decree is passed", "prayer is allowed", "relief is granted",
+      "judgment and order is set aside", "impugned order is set aside"
     ]
   },
   {
     "label": "Relief Denied/Dismissed",
     "phrases": [
       "petition dismissed", "relief denied", "dismissed as infructuous", 
-      "dismissed on merits", "dismissed", "no interference called for", 
-      "no merit in the petition"
+      "no interference called for", "no merit in the petition",
+      "writ petition is dismissed", "petition is dismissed",
+      "petition stands dismissed", "suit dismissed", "suit is dismissed",
+      "prayer is rejected", "relief is denied", "no relief",
+      "we find no merit", "petition is devoid of merit",
+      "petition is liable to be dismissed"
     ]
   },
   {
@@ -75,7 +103,9 @@
     "phrases": [
       "remanded", "remand", "sent back", "matter remitted", "remit to", 
       "case remanded", "remanded back", "matter sent back", "fresh consideration",
-      "de novo trial", "retrial ordered"
+      "de novo trial", "retrial ordered",
+      "remanded for fresh consideration", "matter is remitted",
+      "case is sent back", "directed to decide afresh"
     ]
   },
   {
@@ -83,7 +113,8 @@
     "phrases": [
       "withdrawn", "dismissed as withdrawn", "petition withdrawn", 
       "not pressed", "appeal withdrawn", "writ withdrawn", "matter withdrawn",
-      "disposed of as withdrawn"
+      "disposed of as withdrawn", "petition is withdrawn",
+      "appellant has withdrawn", "party withdraws"
     ]
   }
 ]

@@ -1,0 +1,152 @@
+{
+  "act_id": "CPA",
+  "full_name": "Consumer Protection Act, 2019",
+  "short_name": "CPA",
+  "year": 2019,
+  "sections": [
+    {
+      "section_number": "2(7)",
+      "heading": "Definition of Consumer",
+      "body_text": "A consumer is defined as any person who buys goods or avails services for consideration, including offline and online transactions, but does not include a person who obtains goods for resale or commercial purposes.",
+      "chapter": "I - Preliminary"
+    },
+    {
+      "section_number": "2(10)",
+      "heading": "Definition of Deficiency",
+      "body_text": "Deficiency means any fault, imperfection, shortcoming, or inadequacy in the quality, nature, or manner of performance of a service that is required to be maintained under any law or contract.",
+      "chapter": "I - Preliminary"
+    },
+    {
+      "section_number": "2(11)",
+      "heading": "Definition of Defect",
+      "body_text": "Defect means any fault, imperfection, or shortcoming in the quality, quantity, potency, purity, or standard of goods, which is required to be maintained under any law or contract.",
+      "chapter": "I - Preliminary"
+    },
+    {
+      "section_number": "2(47)",
+      "heading": "Definition of Unfair Trade Practice",
+      "body_text": "Unfair trade practice includes any deceptive or unfair method or practice such as false representation, misleading advertisements, or false warranties, which mislead consumers.",
+      "chapter": "I - Preliminary"
+    },
+    {
+      "section_number": "2(41)",
+      "heading": "Definition of Restrictive Trade Practice",
+      "body_text": "Restrictive trade practice refers to any trade practice that manipulates the price or supply of goods or services, or imposes unjustified costs or restrictions on consumers.",
+      "chapter": "I - Preliminary"
+    },
+    {
+      "section_number": "2(9)",
+      "heading": "Consumer Rights",
+      "body_text": "Consumer rights include the right to safety, information, choice, redressal, consumer education, and the right to be heard in appropriate forums.",
+      "chapter": "I - Preliminary"
+    },
+    {
+      "section_number": "34",
+      "heading": "Jurisdiction of District Commission",
+      "body_text": "The District Commission has jurisdiction to entertain complaints where the value of goods or services paid as consideration does not exceed one crore rupees.",
+      "chapter": "IV - Consumer Disputes Redressal Commission"
+    },
+    {
+      "section_number": "47",
+      "heading": "Jurisdiction of State Commission",
+      "body_text": "The State Commission has jurisdiction to entertain complaints where the value of goods or services paid as consideration exceeds one crore rupees but does not exceed ten crore rupees.",
+      "chapter": "IV - Consumer Disputes Redressal Commission"
+    },
+    {
+      "section_number": "58",
+      "heading": "Jurisdiction of National Commission",
+      "body_text": "The National Commission has jurisdiction to entertain complaints where the value of goods or services paid as consideration exceeds ten crore rupees.",
+      "chapter": "IV - Consumer Disputes Redressal Commission"
+    },
+    {
+      "section_number": "49",
+      "heading": "Appeals to State Commission",
+      "body_text": "Any person aggrieved by an order of the District Commission may prefer an appeal to the State Commission within 45 days from the date of the order.",
+      "chapter": "IV - Consumer Disputes Redressal Commission"
+    },
+    {
+      "section_number": "59",
+      "heading": "Appeals to National Commission",
+      "body_text": "Any person aggrieved by an order of the State Commission may prefer an appeal to the National Commission within 30 days from the date of the order.",
+      "chapter": "IV - Consumer Disputes Redressal Commission"
+    },
+    {
+      "section_number": "67",
+      "heading": "Appeals to Supreme Court",
+      "body_text": "Any person aggrieved by an order of the National Commission may prefer an appeal to the Supreme Court within 30 days from the date of the order.",
+      "chapter": "IV - Consumer Disputes Redressal Commission"
+    },
+    {
+      "section_number": "74",
+      "heading": "Establishment of Mediation Cells",
+      "body_text": "Mediation cells shall be established in each District, State, and National Commission to facilitate the resolution of disputes through mediation.",
+      "chapter": "V - Mediation"
+    },
+    {
+      "section_number": "75",
+      "heading": "Reference to Mediation",
+      "body_text": "A consumer dispute may be referred to mediation if both parties consent, and the mediation process shall be completed within 30 days.",
+      "chapter": "V - Mediation"
+    },
+    {
+      "section_number": "82",
+      "heading": "Product Liability",
+      "body_text": "A product manufacturer, service provider, or seller shall be liable to compensate for harm caused to a consumer due to defective goods or deficient services.",
+      "chapter": "VI - Product Liability"
+    },
+    {
+      "section_number": "83",
+      "heading": "Liability of Product Manufacturer",
+      "body_text": "A product manufacturer shall be liable if the product has a manufacturing defect, is defective in design, or does not conform to express warranties.",
+      "chapter": "VI - Product Liability"
+    },
+    {
+      "section_number": "84",
+      "heading": "Liability of Product Service Provider",
+      "body_text": "A product service provider shall be liable if the service provided is deficient, does not meet safety standards, or causes harm to the consumer.",
+      "chapter": "VI - Product Liability"
+    },
+    {
+      "section_number": "85",
+      "heading": "Liability of Product Seller",
+      "body_text": "A product seller shall be liable if the seller has exercised substantial control over the product, altered it, or failed to provide adequate instructions or warnings.",
+      "chapter": "VI - Product Liability"
+    },
+    {
+      "section_number": "90",
+      "heading": "Penalties for Non-Compliance",
+      "body_text": "Any person who fails to comply with the orders of the District, State, or National Commission shall be punishable with imprisonment up to three years or a fine up to one lakh rupees, or both.",
+      "chapter": "VII - Miscellaneous"
+    },
+    {
+      "section_number": "94",
+      "heading": "Measures to Prevent Unfair Trade Practices in E-Commerce",
+      "body_text": "The Central Government may take measures to prevent unfair trade practices in e-commerce, including ensuring transparency and consumer protection.",
+      "chapter": "VII - Miscellaneous"
+    },
+    {
+      "section_number": "96",
+      "heading": "Limitation Period for Filing Complaints",
+      "body_text": "A complaint shall be filed within two years from the date on which the cause of action arises, subject to the discretion of the Commission to condone delays.",
+      "chapter": "VII - Miscellaneous"
+    },
+    {
+      "section_number": "101",
+      "heading": "Penalty for False or Misleading Advertisement",
+      "body_text": "Any manufacturer or service provider who publishes a false or misleading advertisement shall be liable to a penalty of up to ten lakh rupees and imprisonment up to two years.",
+      "chapter": "VII - Miscellaneous"
+    },
+    {
+      "section_number": "103",
+      "heading": "Cognizance of Offences",
+      "body_text": "No court shall take cognizance of an offence under this Act except on a complaint made by the Central Authority or any officer authorized by it.",
+      "chapter": "VII - Miscellaneous"
+    },
+    {
+      "section_number": "107",
+      "heading": "Power to Make Rules",
+      "body_text": "The Central Government may, by notification, make rules for carrying out the provisions of this Act.",
+      "chapter": "VII - Miscellaneous"
+    }
+  ]
+}

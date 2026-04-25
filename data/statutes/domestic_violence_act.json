@@ -1,0 +1,128 @@
+{
+  "act_id": "DV ACT",
+  "full_name": "Protection of Women from Domestic Violence Act, 2005",
+  "short_name": "DV Act",
+  "year": 2005,
+  "sections": [
+    {
+      "section_number": "2(a)",
+      "heading": "Definition of Aggrieved Person",
+      "body_text": "An 'aggrieved person' means any woman who is, or has been, in a domestic relationship with the respondent and who alleges to have been subjected to any act of domestic violence by the respondent.",
+      "chapter": "I - Preliminary"
+    },
+    {
+      "section_number": "2(q)",
+      "heading": "Definition of Respondent",
+      "body_text": "A 'respondent' means any adult male person who is, or has been, in a domestic relationship with the aggrieved person and against whom the aggrieved person has sought any relief under this Act. However, an aggrieved wife or female living in a relationship in the nature of marriage may also file a complaint against a relative of the husband or male partner.",
+      "chapter": "I - Preliminary"
+    },
+    {
+      "section_number": "2(s)",
+      "heading": "Definition of Shared Household",
+      "body_text": "A 'shared household' means a household where the aggrieved person lives or has lived in a domestic relationship, either singly or along with the respondent, and includes such a household whether owned or tenanted, or jointly or singly owned by the respondent.",
+      "chapter": "I - Preliminary"
+    },
+    {
+      "section_number": "3",
+      "heading": "Definition of Domestic Violence",
+      "body_text": "Domestic violence includes any act, omission, or commission or conduct of the respondent that harms or injures the aggrieved person physically, sexually, verbally, emotionally, or economically. It also includes harassment for dowry, unlawful demands, or threats to cause harm.",
+      "chapter": "II - Domestic Violence"
+    },
+    {
+      "section_number": "4",
+      "heading": "Information to Protection Officer and Police",
+      "body_text": "Any person who has reason to believe that an act of domestic violence has been, or is being, committed may give information about it to the concerned Protection Officer or police officer.",
+      "chapter": "III - Duties of Protection Officers, Service Providers, etc."
+    },
+    {
+      "section_number": "5",
+      "heading": "Duties of Police Officers, Service Providers, and Magistrates",
+      "body_text": "It shall be the duty of police officers, Protection Officers, and Magistrates to inform the aggrieved person of her rights under this Act, including the right to file a complaint, seek protection orders, and access legal aid.",
+      "chapter": "III - Duties of Protection Officers, Service Providers, etc."
+    },
+    {
+      "section_number": "6",
+      "heading": "Duties of Shelter Homes",
+      "body_text": "If an aggrieved person requires shelter, the person in charge of a shelter home shall provide shelter to her upon request or upon the direction of the Protection Officer or Magistrate.",
+      "chapter": "III - Duties of Protection Officers, Service Providers, etc."
+    },
+    {
+      "section_number": "7",
+      "heading": "Duties of Medical Facilities",
+      "body_text": "Medical facilities are required to provide medical aid to the aggrieved person upon request or upon the direction of the Protection Officer or Magistrate.",
+      "chapter": "III - Duties of Protection Officers, Service Providers, etc."
+    },
+    {
+      "section_number": "8",
+      "heading": "Appointment of Protection Officers",
+      "body_text": "The State Government shall appoint Protection Officers in each district to assist the Magistrate in the discharge of his functions under this Act.",
+      "chapter": "III - Duties of Protection Officers, Service Providers, etc."
+    },
+    {
+      "section_number": "9",
+      "heading": "Duties and Functions of Protection Officers",
+      "body_text": "Protection Officers are responsible for assisting the aggrieved person in filing complaints, ensuring compliance with protection orders, and providing information on available services.",
+      "chapter": "III - Duties of Protection Officers, Service Providers, etc."
+    },
+    {
+      "section_number": "10",
+      "heading": "Service Providers",
+      "body_text": "The State Government may notify voluntary associations or companies registered under the law to act as service providers to assist aggrieved persons.",
+      "chapter": "III - Duties of Protection Officers, Service Providers, etc."
+    },
+    {
+      "section_number": "12",
+      "heading": "Application to Magistrate",
+      "body_text": "An aggrieved person, Protection Officer, or any other person on behalf of the aggrieved person may present an application to the Magistrate seeking relief under this Act.",
+      "chapter": "IV - Procedure for Obtaining Orders of Reliefs"
+    },
+    {
+      "section_number": "18",
+      "heading": "Protection Orders",
+      "body_text": "The Magistrate may pass a protection order to prohibit the respondent from committing any act of domestic violence, entering the aggrieved person's place of residence, or communicating with her in any manner.",
+      "chapter": "IV - Procedure for Obtaining Orders of Reliefs"
+    },
+    {
+      "section_number": "19",
+      "heading": "Residence Orders",
+      "body_text": "The Magistrate may pass a residence order restraining the respondent from dispossessing the aggrieved person from the shared household or directing the respondent to remove himself from the shared household.",
+      "chapter": "IV - Procedure for Obtaining Orders of Reliefs"
+    },
+    {
+      "section_number": "20",
+      "heading": "Monetary Reliefs",
+      "body_text": "The Magistrate may direct the respondent to pay monetary relief to meet the expenses incurred by the aggrieved person and her children, including medical expenses, loss of earnings, and maintenance.",
+      "chapter": "IV - Procedure for Obtaining Orders of Reliefs"
+    },
+    {
+      "section_number": "21",
+      "heading": "Custody Orders",
+      "body_text": "The Magistrate may grant temporary custody of any child or children to the aggrieved person or the person making an application on her behalf, and may specify the arrangements for visitation by the respondent.",
+      "chapter": "IV - Procedure for Obtaining Orders of Reliefs"
+    },
+    {
+      "section_number": "22",
+      "heading": "Compensation Orders",
+      "body_text": "The Magistrate may direct the respondent to pay compensation or damages for the injuries, including mental torture and emotional distress, caused by acts of domestic violence.",
+      "chapter": "IV - Procedure for Obtaining Orders of Reliefs"
+    },
+    {
+      "section_number": "23",
+      "heading": "Power to Grant Interim and Ex-Parte Orders",
+      "body_text": "The Magistrate may pass interim or ex-parte orders as deemed necessary to ensure the safety and protection of the aggrieved person, including orders under Sections 18, 19, 20, 21, and 22.",
+      "chapter": "IV - Procedure for Obtaining Orders of Reliefs"
+    },
+    {
+      "section_number": "31",
+      "heading": "Penalty for Breach of Protection Order",
+      "body_text": "Any breach of a protection order or an interim protection order by the respondent shall be an offence punishable with imprisonment of either description for a term which may extend to one year, or with fine which may extend to twenty thousand rupees, or with both.",
+      "chapter": "V - Miscellaneous"
+    },
+    {
+      "section_number": "32",
+      "heading": "Cognizance and Proof",
+      "body_text": "The offence under Section 31 shall be cognizable and non-bailable. The Magistrate may take cognizance of the offence upon receiving a complaint or a report from the Protection Officer or police officer.",
+      "chapter": "V - Miscellaneous"
+    }
+  ]
+}

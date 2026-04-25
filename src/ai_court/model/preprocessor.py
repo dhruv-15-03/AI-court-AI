@@ -211,27 +211,19 @@ class TextPreprocessor:
         """
         Map raw judgment text to a standardized outcome class.
         
-        Uses a configuration-driven rule system to classify legal case outcomes
-        into a manageable set of categories. Rules are loaded from
-        `config/outcome_rules.json` and cached for performance.
+        Uses a configuration-driven rule system to classify legal case outcomes.
+        For long texts (full judgments), focuses on the concluding portion and
+        uses weighted scoring across all rules rather than first-match.
         
         Args:
             text: Raw judgment or outcome text from case data.
-                  None or empty values are handled gracefully.
                   
         Returns:
             A standardized outcome label string. Returns "Other" if no
             matching rule is found or if input is empty/invalid.
-            
-        Example:
-            >>> TextPreprocessor.normalize_outcome("Appeal dismissed on merits")
-            'Conviction Upheld/Appeal Dismissed'
-            >>> TextPreprocessor.normalize_outcome("bail granted")
-            'Bail Granted'
         """
         _load_outcome_rules()
         
-        # Handle None/empty input
         if not text:
             return "Other"
             
@@ -240,12 +232,38 @@ class TextPreprocessor:
         if not normalized_text:
             return "Other"
         
-        # _OUTCOME_RULES is guaranteed to be non-None after _load_outcome_rules()
         assert _OUTCOME_RULES is not None
         
+        # For short text (labels, headings), use simple first-match
+        if len(normalized_text) < 200:
+            for rule in _OUTCOME_RULES:
+                phrases = rule.get('phrases', [])
+                if any(phrase in normalized_text for phrase in phrases):
+                    return rule['label']
+            return "Other"
+        
+        # For long text (full judgments), use weighted scoring on the conclusion
+        # Focus on last 25% of text (where operative orders typically appear)
+        cutoff = max(200, len(normalized_text) * 3 // 4)
+        conclusion = normalized_text[cutoff:]
+        
+        # Also check the full text but weight conclusion matches higher
+        scores: dict[str, float] = {}
         for rule in _OUTCOME_RULES:
+            label = rule['label']
+            score = 0.0
             phrases = rule.get('phrases', [])
-            if any(phrase in normalized_text for phrase in phrases):
-                return rule['label']
+            for phrase in phrases:
+                # Count matches in conclusion (weight=3) vs full text (weight=1)
+                if phrase in conclusion:
+                    score += 3.0
+                elif phrase in normalized_text:
+                    score += 1.0
+            if score > 0:
+                scores[label] = score
+        
+        if scores:
+            # Return the highest-scoring label
+            return max(scores, key=scores.get)  # type: ignore[arg-type]
                 
         return "Other"

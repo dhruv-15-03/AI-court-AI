@@ -1,0 +1,128 @@
+{
+  "act_id": "IBC",
+  "full_name": "Insolvency and Bankruptcy Code, 2016",
+  "short_name": "IBC",
+  "year": 2016,
+  "sections": [
+    {
+      "section_number": "4",
+      "heading": "Threshold for filing application",
+      "body_text": "This section specifies the minimum amount of default required to initiate the corporate insolvency resolution process (CIRP). As per the Act, the default threshold is Rs. 1 crore, subject to amendments by the government.",
+      "chapter": "Part II - Corporate Insolvency Resolution Process"
+    },
+    {
+      "section_number": "6",
+      "heading": "Persons who may initiate CIRP",
+      "body_text": "This section allows a financial creditor, operational creditor, or the corporate debtor itself to initiate the corporate insolvency resolution process against a defaulting corporate debtor.",
+      "chapter": "Part II - Corporate Insolvency Resolution Process"
+    },
+    {
+      "section_number": "12",
+      "heading": "Time limit for completion of CIRP",
+      "body_text": "The corporate insolvency resolution process must be completed within 180 days from the date of admission of the application, with a one-time extension of up to 90 days if approved by the Adjudicating Authority.",
+      "chapter": "Part II - Corporate Insolvency Resolution Process"
+    },
+    {
+      "section_number": "14",
+      "heading": "Moratorium",
+      "body_text": "Upon the commencement of CIRP, a moratorium is declared, prohibiting the institution of suits, continuation of pending proceedings, and enforcement of security interests against the corporate debtor.",
+      "chapter": "Part II - Corporate Insolvency Resolution Process"
+    },
+    {
+      "section_number": "15",
+      "heading": "Public announcement of CIRP",
+      "body_text": "The resolution professional must make a public announcement of the initiation of CIRP, inviting claims from creditors and providing details of the process.",
+      "chapter": "Part II - Corporate Insolvency Resolution Process"
+    },
+    {
+      "section_number": "21",
+      "heading": "Committee of creditors",
+      "body_text": "This section establishes the committee of creditors, comprising financial creditors of the corporate debtor, which is responsible for making key decisions during the CIRP.",
+      "chapter": "Part II - Corporate Insolvency Resolution Process"
+    },
+    {
+      "section_number": "22",
+      "heading": "Appointment of resolution professional",
+      "body_text": "The committee of creditors has the authority to appoint or replace the resolution professional by a majority vote of not less than 66%.",
+      "chapter": "Part II - Corporate Insolvency Resolution Process"
+    },
+    {
+      "section_number": "23",
+      "heading": "Role of resolution professional",
+      "body_text": "The resolution professional manages the operations of the corporate debtor during the CIRP and ensures compliance with the provisions of the Code.",
+      "chapter": "Part II - Corporate Insolvency Resolution Process"
+    },
+    {
+      "section_number": "24",
+      "heading": "Meetings of committee of creditors",
+      "body_text": "This section outlines the procedure for conducting meetings of the committee of creditors, including quorum requirements and voting thresholds.",
+      "chapter": "Part II - Corporate Insolvency Resolution Process"
+    },
+    {
+      "section_number": "30",
+      "heading": "Submission of resolution plan",
+      "body_text": "Resolution applicants may submit resolution plans to the resolution professional, which must comply with the requirements specified under the Code.",
+      "chapter": "Part II - Corporate Insolvency Resolution Process"
+    },
+    {
+      "section_number": "31",
+      "heading": "Approval of resolution plan",
+      "body_text": "The resolution plan, once approved by the committee of creditors, must be submitted to the Adjudicating Authority for final approval and implementation.",
+      "chapter": "Part II - Corporate Insolvency Resolution Process"
+    },
+    {
+      "section_number": "33",
+      "heading": "Initiation of liquidation",
+      "body_text": "If the resolution plan is not approved within the prescribed timeline or is rejected, the corporate debtor enters liquidation as per the provisions of this section.",
+      "chapter": "Part II - Liquidation Process"
+    },
+    {
+      "section_number": "43",
+      "heading": "Preferential transactions",
+      "body_text": "This section deals with transactions that unfairly prefer one creditor over others and allows the resolution professional to apply for their avoidance.",
+      "chapter": "Part II - Avoidance Transactions"
+    },
+    {
+      "section_number": "44",
+      "heading": "Order in case of preferential transactions",
+      "body_text": "The Adjudicating Authority may pass orders to reverse or compensate for preferential transactions that are detrimental to the interests of creditors.",
+      "chapter": "Part II - Avoidance Transactions"
+    },
+    {
+      "section_number": "45",
+      "heading": "Undervalued transactions",
+      "body_text": "This section addresses transactions where assets are transferred for significantly less than their value, which may be avoided to protect creditors' interests.",
+      "chapter": "Part II - Avoidance Transactions"
+    },
+    {
+      "section_number": "50",
+      "heading": "Extortionate credit transactions",
+      "body_text": "This section allows the resolution professional to challenge credit transactions that impose exorbitant terms on the corporate debtor.",
+      "chapter": "Part II - Avoidance Transactions"
+    },
+    {
+      "section_number": "54",
+      "heading": "Dissolution of corporate debtor",
+      "body_text": "Upon completion of the liquidation process, the corporate debtor is dissolved, and the Adjudicating Authority passes an order to that effect.",
+      "chapter": "Part II - Liquidation Process"
+    },
+    {
+      "section_number": "60",
+      "heading": "Jurisdiction of NCLT",
+      "body_text": "The National Company Law Tribunal (NCLT) is designated as the Adjudicating Authority for corporate persons under the Code, with jurisdiction over insolvency and liquidation proceedings.",
+      "chapter": "Part II - Adjudicating Authority"
+    },
+    {
+      "section_number": "234",
+      "heading": "Agreements with foreign countries",
+      "body_text": "This section empowers the Central Government to enter into bilateral agreements with foreign countries for enforcing provisions related to cross-border insolvency.",
+      "chapter": "Part V - Cross-Border Insolvency"
+    },
+    {
+      "section_number": "235",
+      "heading": "Letter of request to a foreign court",
+      "body_text": "The Adjudicating Authority may issue a letter of request to a foreign court or authority for assistance in dealing with assets or evidence located in that country.",
+      "chapter": "Part V - Cross-Border Insolvency"
+    }
+  ]
+}

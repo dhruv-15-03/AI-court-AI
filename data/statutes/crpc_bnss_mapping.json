@@ -1,0 +1,285 @@
+{
+  "description": "CrPC (1973) to BNSS (2023) mapping",
+  "mappings": [
+    {
+      "crpc_section": "154",
+      "crpc_heading": "Information in cognizable cases",
+      "bnss_section": "173",
+      "bnss_heading": "Information in cognizable cases",
+      "notes": "No major changes in the procedure for filing FIR."
+    },
+    {
+      "crpc_section": "41",
+      "crpc_heading": "When police may arrest without warrant",
+      "bnss_section": "35",
+      "bnss_heading": "Power of police to arrest without warrant",
+      "notes": "Streamlined provisions for arrest to ensure accountability."
+    },
+    {
+      "crpc_section": "436",
+      "crpc_heading": "In what cases bail to be taken",
+      "bnss_section": "478",
+      "bnss_heading": "Bail in bailable offences",
+      "notes": "Provisions for bail in bailable offences remain largely unchanged."
+    },
+    {
+      "crpc_section": "437",
+      "crpc_heading": "When bail may be taken in case of non-bailable offence",
+      "bnss_section": "479",
+      "bnss_heading": "Bail in non-bailable offences",
+      "notes": "Enhanced safeguards for granting bail in non-bailable offences."
+    },
+    {
+      "crpc_section": "438",
+      "crpc_heading": "Direction for grant of bail to person apprehending arrest",
+      "bnss_section": "480",
+      "bnss_heading": "Anticipatory bail",
+      "notes": "Anticipatory bail provisions remain similar with minor procedural updates."
+    },
+    {
+      "crpc_section": "439",
+      "crpc_heading": "Special powers of High Court or Court of Session regarding bail",
+      "bnss_section": "482",
+      "bnss_heading": "Special powers of High Court or Court of Session regarding bail",
+      "notes": "High Court and Sessions Court retain special powers for bail."
+    },
+    {
+      "crpc_section": "93",
+      "crpc_heading": "When search-warrant may be issued",
+      "bnss_section": "101",
+      "bnss_heading": "Issuance of search warrants",
+      "notes": "Search warrant issuance process remains consistent."
+    },
+    {
+      "crpc_section": "94",
+      "crpc_heading": "Search of place suspected to contain stolen property, forged documents, etc.",
+      "bnss_section": "102",
+      "bnss_heading": "Search of premises for stolen property or evidence",
+      "notes": "Provisions for searching premises for evidence are retained."
+    },
+    {
+      "crpc_section": "97",
+      "crpc_heading": "Search for persons wrongfully confined",
+      "bnss_section": "105",
+      "bnss_heading": "Search for persons unlawfully confined",
+      "notes": "Terminology updated to 'unlawfully confined' for clarity."
+    },
+    {
+      "crpc_section": "100",
+      "crpc_heading": "Persons in charge of closed place to allow search",
+      "bnss_section": "108",
+      "bnss_heading": "Obligation to allow search of premises",
+      "notes": "Minor procedural clarifications added."
+    },
+    {
+      "crpc_section": "173",
+      "crpc_heading": "Report of police officer on completion of investigation",
+      "bnss_section": "189",
+      "bnss_heading": "Police report on completion of investigation",
+      "notes": "No significant changes in the reporting process."
+    },
+    {
+      "crpc_section": "190",
+      "crpc_heading": "Cognizance of offences by Magistrates",
+      "bnss_section": "205",
+      "bnss_heading": "Magistrate's cognizance of offences",
+      "notes": "Provisions for magistrate's cognizance remain similar."
+    },
+    {
+      "crpc_section": "200",
+      "crpc_heading": "Examination of complainant",
+      "bnss_section": "215",
+      "bnss_heading": "Examination of complainant",
+      "notes": "No major changes in the procedure for examining complainants."
+    },
+    {
+      "crpc_section": "204",
+      "crpc_heading": "Issue of process",
+      "bnss_section": "219",
+      "bnss_heading": "Issuance of process",
+      "notes": "Process issuance provisions remain consistent."
+    },
+    {
+      "crpc_section": "207",
+      "crpc_heading": "Supply to the accused of copy of police report and other documents",
+      "bnss_section": "222",
+      "bnss_heading": "Supply of police report and documents to accused",
+      "notes": "Ensures transparency in providing documents to the accused."
+    },
+    {
+      "crpc_section": "209",
+      "crpc_heading": "Commitment of case to Court of Session when offence is triable exclusively by it",
+      "bnss_section": "224",
+      "bnss_heading": "Commitment of cases to Sessions Court",
+      "notes": "Commitment procedures remain largely unchanged."
+    },
+    {
+      "crpc_section": "216",
+      "crpc_heading": "Court may alter charge",
+      "bnss_section": "231",
+      "bnss_heading": "Alteration of charges by court",
+      "notes": "Court's power to alter charges is retained."
+    },
+    {
+      "crpc_section": "227",
+      "crpc_heading": "Discharge",
+      "bnss_section": "242",
+      "bnss_heading": "Discharge of accused",
+      "notes": "Provisions for discharge remain similar."
+    },
+    {
+      "crpc_section": "228",
+      "crpc_heading": "Framing of charge",
+      "bnss_section": "243",
+      "bnss_heading": "Framing of charges",
+      "notes": "No significant changes in the procedure for framing charges."
+    },
+    {
+      "crpc_section": "239",
+      "crpc_heading": "When accused shall be discharged",
+      "bnss_section": "254",
+      "bnss_heading": "Discharge of accused in warrant cases",
+      "notes": "Provisions for discharge in warrant cases remain consistent."
+    },
+    {
+      "crpc_section": "240",
+      "crpc_heading": "Framing of charge",
+      "bnss_section": "255",
+      "bnss_heading": "Framing of charges in warrant cases",
+      "notes": "Framing of charges in warrant cases remains unchanged."
+    },
+    {
+      "crpc_section": "260",
+      "crpc_heading": "Power to try summarily",
+      "bnss_section": "275",
+      "bnss_heading": "Summary trials",
+      "notes": "Summary trial provisions are retained with minor updates."
+    },
+    {
+      "crpc_section": "300",
+      "crpc_heading": "Person once convicted or acquitted not to be tried for same offence",
+      "bnss_section": "315",
+      "bnss_heading": "Protection against double jeopardy",
+      "notes": "Double jeopardy protection remains intact."
+    },
+    {
+      "crpc_section": "313",
+      "crpc_heading": "Power to examine the accused",
+      "bnss_section": "328",
+      "bnss_heading": "Examination of accused",
+      "notes": "No major changes in the examination process."
+    },
+    {
+      "crpc_section": "320",
+      "crpc_heading": "Compounding of offences",
+      "bnss_section": "335",
+      "bnss_heading": "Compounding of offences",
+      "notes": "Compounding provisions remain consistent."
+    },
+    {
+      "crpc_section": "321",
+      "crpc_heading": "Withdrawal from prosecution",
+      "bnss_section": "336",
+      "bnss_heading": "Withdrawal from prosecution",
+      "notes": "Provisions for withdrawal from prosecution remain unchanged."
+    },
+    {
+      "crpc_section": "325",
+      "crpc_heading": "Procedure when Magistrate cannot pass sentence sufficiently severe",
+      "bnss_section": "340",
+      "bnss_heading": "Procedure for insufficient sentencing powers",
+      "notes": "No significant changes in the procedure."
+    },
+    {
+      "crpc_section": "353",
+      "crpc_heading": "Judgment",
+      "bnss_section": "368",
+      "bnss_heading": "Pronouncement of judgment",
+      "notes": "Judgment pronouncement provisions remain consistent."
+    },
+    {
+      "crpc_section": "374",
+      "crpc_heading": "Appeals from convictions",
+      "bnss_section": "389",
+      "bnss_heading": "Appeals against convictions",
+      "notes": "Appeal provisions are retained with minor updates."
+    },
+    {
+      "crpc_section": "397",
+      "crpc_heading": "Calling for records to exercise powers of revision",
+      "bnss_section": "412",
+      "bnss_heading": "Revision powers of superior courts",
+      "notes": "Revision powers remain similar with procedural updates."
+    },
+    {
+      "crpc_section": "399",
+      "crpc_heading": "Sessions Judge's powers of revision",
+      "bnss_section": "414",
+      "bnss_heading": "Revision powers of Sessions Judge",
+      "notes": "Sessions Judge's revision powers are retained."
+    },
+    {
+      "crpc_section": "401",
+      "crpc_heading": "High Court's powers of revision",
+      "bnss_section": "416",
+      "bnss_heading": "High Court's revision powers",
+      "notes": "High Court's revision powers remain consistent."
+    },
+    {
+      "crpc_section": "438",
+      "crpc_heading": "Anticipatory bail",
+      "bnss_section": "480",
+      "bnss_heading": "Anticipatory bail",
+      "notes": "Provisions for anticipatory bail remain unchanged."
+    },
+    {
+      "crpc_section": "482",
+      "crpc_heading": "Saving of inherent powers of High Court",
+      "bnss_section": "528",
+      "bnss_heading": "Inherent powers of High Court",
+      "notes": "High Court's inherent powers are preserved."
+    },
+    {
+      "crpc_section": "125",
+      "crpc_heading": "Order for maintenance of wives, children and parents",
+      "bnss_section": "136",
+      "bnss_heading": "Maintenance for dependents",
+      "notes": "Provisions for maintenance are retained with minor updates."
+    },
+    {
+      "crpc_section": "156",
+      "crpc_heading": "Police officer's power to investigate cognizable case",
+      "bnss_section": "175",
+      "bnss_heading": "Police investigation in cognizable cases",
+      "notes": "Investigation powers of police remain consistent."
+    },
+    {
+      "crpc_section": "161",
+      "crpc_heading": "Examination of witnesses by police",
+      "bnss_section": "180",
+      "bnss_heading": "Police examination of witnesses",
+      "notes": "Witness examination provisions remain unchanged."
+    },
+    {
+      "crpc_section": "162",
+      "crpc_heading": "Statements to police not to be signed: Use of statements in evidence",
+      "bnss_section": "181",
+      "bnss_heading": "Use of police statements in evidence",
+      "notes": "Provisions for police statements remain consistent."
+    },
+    {
+      "crpc_section": "164",
+      "crpc_heading": "Recording of confessions and statements",
+      "bnss_section": "183",
+      "bnss_heading": "Recording of confessions and statements",
+      "notes": "No major changes in the procedure for recording confessions."
+    },
+    {
+      "crpc_section": "167",
+      "crpc_heading": "Procedure when investigation cannot be completed in twenty-four hours",
+      "bnss_section": "186",
+      "bnss_heading": "Procedure for extended investigation",
+      "notes": "Provisions for extended investigation remain similar."
+    }
+  ]
+}

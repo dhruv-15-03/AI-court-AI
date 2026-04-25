@@ -1,0 +1,147 @@
+{
+  "act_id": "BNS",
+  "full_name": "Bharatiya Nyaya Sanhita, 2023",
+  "short_name": "BNS",
+  "year": 2023,
+  "sections": [
+    {
+      "section_number": "101",
+      "heading": "Punishment for Murder",
+      "body_text": "Whoever commits murder shall be punished with death or imprisonment for life, and shall also be liable to fine.",
+      "chapter": "XVI - Offences Affecting the Human Body"
+    },
+    {
+      "section_number": "102",
+      "heading": "Attempt to Commit Murder",
+      "body_text": "Whoever attempts to commit murder shall be punished with imprisonment for a term which may extend to ten years, and shall also be liable to fine. If hurt is caused during the attempt, the punishment may extend to imprisonment for life.",
+      "chapter": "XVI - Offences Affecting the Human Body"
+    },
+    {
+      "section_number": "105",
+      "heading": "Culpable Homicide Not Amounting to Murder",
+      "body_text": "Whoever causes death by an act with the intention of causing death, or with the intention of causing such bodily injury as is likely to cause death, shall be punished with imprisonment for life, or imprisonment for a term which may extend to ten years, and shall also be liable to fine.",
+      "chapter": "XVI - Offences Affecting the Human Body"
+    },
+    {
+      "section_number": "63",
+      "heading": "Punishment for Rape",
+      "body_text": "Whoever commits rape shall be punished with rigorous imprisonment for a term which shall not be less than ten years but which may extend to imprisonment for life, and shall also be liable to fine.",
+      "chapter": "XVI - Offences Affecting the Human Body"
+    },
+    {
+      "section_number": "64",
+      "heading": "Punishment for Gang Rape",
+      "body_text": "Where a woman is raped by one or more persons constituting a group, each of those persons shall be punished with rigorous imprisonment for a term which shall not be less than twenty years but which may extend to imprisonment for life, and shall also be liable to fine.",
+      "chapter": "XVI - Offences Affecting the Human Body"
+    },
+    {
+      "section_number": "65",
+      "heading": "Rape of a Minor",
+      "body_text": "Whoever commits rape on a woman under sixteen years of age shall be punished with rigorous imprisonment for a term which shall not be less than twenty years but which may extend to imprisonment for life, and shall also be liable to fine.",
+      "chapter": "XVI - Offences Affecting the Human Body"
+    },
+    {
+      "section_number": "66",
+      "heading": "Rape Resulting in Death or Persistent Vegetative State",
+      "body_text": "If the rape of a woman results in her death or causes her to be in a persistent vegetative state, the offender shall be punished with death or rigorous imprisonment for life, and shall also be liable to fine.",
+      "chapter": "XVI - Offences Affecting the Human Body"
+    },
+    {
+      "section_number": "67",
+      "heading": "Sexual Assault by a Person in Authority",
+      "body_text": "If a person in a position of authority commits rape, they shall be punished with rigorous imprisonment for a term which shall not be less than ten years but which may extend to imprisonment for life, and shall also be liable to fine.",
+      "chapter": "XVI - Offences Affecting the Human Body"
+    },
+    {
+      "section_number": "68",
+      "heading": "Punishment for Repeated Offenders of Rape",
+      "body_text": "Whoever has been previously convicted of an offence of rape and is subsequently convicted of rape shall be punished with death or rigorous imprisonment for life, and shall also be liable to fine.",
+      "chapter": "XVI - Offences Affecting the Human Body"
+    },
+    {
+      "section_number": "69",
+      "heading": "Punishment for Sexual Harassment",
+      "body_text": "Whoever commits sexual harassment shall be punished with imprisonment for a term which may extend to three years, or with fine, or with both.",
+      "chapter": "XVI - Offences Affecting the Human Body"
+    },
+    {
+      "section_number": "120",
+      "heading": "Punishment for Kidnapping",
+      "body_text": "Whoever kidnaps any person shall be punished with imprisonment for a term which may extend to seven years, and shall also be liable to fine.",
+      "chapter": "XVI - Offences Affecting the Human Body"
+    },
+    {
+      "section_number": "121",
+      "heading": "Kidnapping for Ransom",
+      "body_text": "Whoever kidnaps or abducts any person for ransom shall be punished with death, or imprisonment for life, and shall also be liable to fine.",
+      "chapter": "XVI - Offences Affecting the Human Body"
+    },
+    {
+      "section_number": "150",
+      "heading": "Punishment for Theft",
+      "body_text": "Whoever commits theft shall be punished with imprisonment for a term which may extend to three years, or with fine, or with both.",
+      "chapter": "XVII - Offences Against Property"
+    },
+    {
+      "section_number": "151",
+      "heading": "Punishment for Robbery",
+      "body_text": "Whoever commits robbery shall be punished with rigorous imprisonment for a term which may extend to ten years, and shall also be liable to fine.",
+      "chapter": "XVII - Offences Against Property"
+    },
+    {
+      "section_number": "152",
+      "heading": "Punishment for Dacoity",
+      "body_text": "Whoever commits dacoity shall be punished with imprisonment for life, or with rigorous imprisonment for a term which may extend to ten years, and shall also be liable to fine.",
+      "chapter": "XVII - Offences Against Property"
+    },
+    {
+      "section_number": "170",
+      "heading": "Punishment for Cheating",
+      "body_text": "Whoever cheats shall be punished with imprisonment for a term which may extend to seven years, and shall also be liable to fine.",
+      "chapter": "XVII - Offences Against Property"
+    },
+    {
+      "section_number": "171",
+      "heading": "Punishment for Forgery",
+      "body_text": "Whoever commits forgery shall be punished with imprisonment for a term which may extend to two years, or with fine, or with both.",
+      "chapter": "XVII - Offences Against Property"
+    },
+    {
+      "section_number": "172",
+      "heading": "Punishment for Criminal Breach of Trust",
+      "body_text": "Whoever commits criminal breach of trust shall be punished with imprisonment for a term which may extend to seven years, and shall also be liable to fine.",
+      "chapter": "XVII - Offences Against Property"
+    },
+    {
+      "section_number": "85",
+      "heading": "Dowry Death",
+      "body_text": "If the death of a woman is caused by burns or bodily injury or occurs under suspicious circumstances within seven years of her marriage and it is shown that she was subjected to cruelty or harassment by her husband or his relatives in connection with any demand for dowry, such death shall be called 'dowry death', and the husband or relative shall be punished with imprisonment for a term which shall not be less than seven years but which may extend to imprisonment for life.",
+      "chapter": "XVI - Offences Affecting the Human Body"
+    },
+    {
+      "section_number": "86",
+      "heading": "Cruelty by Husband or Relatives of Husband",
+      "body_text": "Whoever, being the husband or the relative of the husband of a woman, subjects her to cruelty shall be punished with imprisonment for a term which may extend to three years, and shall also be liable to fine.",
+      "chapter": "XVI - Offences Affecting the Human Body"
+    },
+    {
+      "section_number": "150A",
+      "heading": "Sedition or Acts Against the Sovereignty of India",
+      "body_text": "Whoever, by words, signs, or visible representation, or otherwise, brings or attempts to bring hatred or contempt, or excites disaffection towards the sovereignty, unity, and integrity of India, shall be punished with imprisonment for life, to which fine may be added, or with imprisonment which may extend to seven years, and shall also be liable to fine.",
+      "chapter": "VI - Offences Against the State"
+    },
+    {
+      "section_number": "120B",
+      "heading": "Punishment for Criminal Conspiracy",
+      "body_text": "Whoever is a party to a criminal conspiracy to commit an offence punishable with death, imprisonment for life, or rigorous imprisonment for a term of two years or more, shall be punished in the same manner as if they had abetted such offence.",
+      "chapter": "V - Abetment and Criminal Conspiracy"
+    },
+    {
+      "section_number": "107",
+      "heading": "Abetment of a Thing",
+      "body_text": "A person abets the doing of a thing if they instigate any person to do that thing, engage in a conspiracy to do that thing, or intentionally aid the doing of that thing. Punishment depends on the nature of the offence abetted.",
+      "chapter": "V - Abetment and Criminal Conspiracy"
+    }
+  ],
+  "replaces": "IPC"
+}

@@ -96,8 +96,12 @@ def get_case_links(query, pages=1):
                 page_links = []
                 for tag in result_blocks:
                     href = tag.get("href", "")
-                    if href and href.startswith("/doc/") and "fragment" not in href:
-                        full_url = BASE_URL + href
+                    if not href:
+                        continue
+                    # Extract doc ID from /doc/XXXX/ or /docfragment/XXXX/
+                    m = re.search(r"/(?:doc|docfragment)/(\d+)/", href)
+                    if m:
+                        full_url = BASE_URL + f"/doc/{m.group(1)}/"
                         logger.info(f"Found case link: {full_url}")
                         if full_url not in [item.get("url") for item in links]:
                             page_links.append({

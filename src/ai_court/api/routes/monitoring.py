@@ -54,9 +54,11 @@ def health_ready():
         'preprocessor_ready': state.preprocess_fn is not None,
     }
     all_ready = all(checks.values())
+    mem = state.get_memory_usage()
     return jsonify({
         "ready": all_ready,
-        "checks": checks
+        "checks": checks,
+        "memory_rss_mb": mem.get('rss_mb'),
     }), 200 if all_ready else 503
 
 @monitoring_bp.route("/api/health/live", methods=["GET"])
@@ -68,8 +70,10 @@ def health_live():
 def memory_stats():
     """Return current memory usage statistics."""
     memory_info = state.get_memory_usage()
+    under_pressure = dependencies.check_memory_pressure()
     return jsonify({
         "memory": memory_info,
+        "under_pressure": under_pressure,
         "search_index_loaded": state.search_index is not None,
         "semantic_index_loaded": state.semantic_index is not None,
         "multi_axis_loaded": state.multi_axis_bundle is not None,

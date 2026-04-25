@@ -1,0 +1,426 @@
+{
+  "description": "IPC (1860) to BNS (2023) section cross-reference",
+  "note": "BNS replaced IPC from July 1, 2024",
+  "mappings": [
+    {
+      "ipc_section": "302",
+      "ipc_heading": "Punishment for murder",
+      "bns_section": "101",
+      "bns_heading": "Punishment for murder",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "307",
+      "ipc_heading": "Attempt to murder",
+      "bns_section": "102",
+      "bns_heading": "Attempt to murder",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "304B",
+      "ipc_heading": "Dowry death",
+      "bns_section": "105",
+      "bns_heading": "Dowry death",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "376",
+      "ipc_heading": "Punishment for rape",
+      "bns_section": "123",
+      "bns_heading": "Punishment for rape",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "375",
+      "ipc_heading": "Definition of rape",
+      "bns_section": "122",
+      "bns_heading": "Definition of rape",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "354",
+      "ipc_heading": "Assault or criminal force to woman with intent to outrage her modesty",
+      "bns_section": "124",
+      "bns_heading": "Assault or criminal force to woman with intent to outrage her modesty",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "498A",
+      "ipc_heading": "Husband or relative of husband of a woman subjecting her to cruelty",
+      "bns_section": "128",
+      "bns_heading": "Husband or relative of husband of a woman subjecting her to cruelty",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "363",
+      "ipc_heading": "Punishment for kidnapping",
+      "bns_section": "110",
+      "bns_heading": "Punishment for kidnapping",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "366",
+      "ipc_heading": "Kidnapping, abducting or inducing woman to compel her marriage, etc.",
+      "bns_section": "111",
+      "bns_heading": "Kidnapping, abducting or inducing woman to compel her marriage, etc.",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "323",
+      "ipc_heading": "Punishment for voluntarily causing hurt",
+      "bns_section": "113",
+      "bns_heading": "Punishment for voluntarily causing hurt",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "324",
+      "ipc_heading": "Voluntarily causing hurt by dangerous weapons or means",
+      "bns_section": "114",
+      "bns_heading": "Voluntarily causing hurt by dangerous weapons or means",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "325",
+      "ipc_heading": "Punishment for voluntarily causing grievous hurt",
+      "bns_section": "115",
+      "bns_heading": "Punishment for voluntarily causing grievous hurt",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "326",
+      "ipc_heading": "Voluntarily causing grievous hurt by dangerous weapons or means",
+      "bns_section": "116",
+      "bns_heading": "Voluntarily causing grievous hurt by dangerous weapons or means",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "341",
+      "ipc_heading": "Punishment for wrongful restraint",
+      "bns_section": "117",
+      "bns_heading": "Punishment for wrongful restraint",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "342",
+      "ipc_heading": "Punishment for wrongful confinement",
+      "bns_section": "118",
+      "bns_heading": "Punishment for wrongful confinement",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "378",
+      "ipc_heading": "Theft",
+      "bns_section": "141",
+      "bns_heading": "Theft",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "379",
+      "ipc_heading": "Punishment for theft",
+      "bns_section": "142",
+      "bns_heading": "Punishment for theft",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "392",
+      "ipc_heading": "Punishment for robbery",
+      "bns_section": "143",
+      "bns_heading": "Punishment for robbery",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "395",
+      "ipc_heading": "Punishment for dacoity",
+      "bns_section": "144",
+      "bns_heading": "Punishment for dacoity",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "403",
+      "ipc_heading": "Dishonest misappropriation of property",
+      "bns_section": "145",
+      "bns_heading": "Dishonest misappropriation of property",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "405",
+      "ipc_heading": "Criminal breach of trust",
+      "bns_section": "146",
+      "bns_heading": "Criminal breach of trust",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "415",
+      "ipc_heading": "Cheating",
+      "bns_section": "147",
+      "bns_heading": "Cheating",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "420",
+      "ipc_heading": "Cheating and dishonestly inducing delivery of property",
+      "bns_section": "148",
+      "bns_heading": "Cheating and dishonestly inducing delivery of property",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "463",
+      "ipc_heading": "Forgery",
+      "bns_section": "149",
+      "bns_heading": "Forgery",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "499",
+      "ipc_heading": "Defamation",
+      "bns_section": "151",
+      "bns_heading": "Defamation",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "503",
+      "ipc_heading": "Criminal intimidation",
+      "bns_section": "152",
+      "bns_heading": "Criminal intimidation",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "120A",
+      "ipc_heading": "Definition of criminal conspiracy",
+      "bns_section": "153",
+      "bns_heading": "Definition of criminal conspiracy",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "120B",
+      "ipc_heading": "Punishment of criminal conspiracy",
+      "bns_section": "154",
+      "bns_heading": "Punishment of criminal conspiracy",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "34",
+      "ipc_heading": "Acts done by several persons in furtherance of common intention",
+      "bns_section": "155",
+      "bns_heading": "Acts done by several persons in furtherance of common intention",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "511",
+      "ipc_heading": "Punishment for attempting to commit offences punishable with imprisonment for life or other imprisonment",
+      "bns_section": "156",
+      "bns_heading": "Punishment for attempting to commit offences punishable with imprisonment for life or other imprisonment",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "124A",
+      "ipc_heading": "Sedition",
+      "bns_section": "157",
+      "bns_heading": "Sedition",
+      "notes": "The provision has been redefined to include additional safeguards against misuse."
+    },
+    {
+      "ipc_section": "141",
+      "ipc_heading": "Unlawful assembly",
+      "bns_section": "158",
+      "bns_heading": "Unlawful assembly",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "146",
+      "ipc_heading": "Rioting",
+      "bns_section": "159",
+      "bns_heading": "Rioting",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "153A",
+      "ipc_heading": "Promoting enmity between different groups on grounds of religion, race, etc.",
+      "bns_section": "160",
+      "bns_heading": "Promoting enmity between different groups on grounds of religion, race, etc.",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "186",
+      "ipc_heading": "Obstructing public servant in discharge of public functions",
+      "bns_section": "161",
+      "bns_heading": "Obstructing public servant in discharge of public functions",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "201",
+      "ipc_heading": "Causing disappearance of evidence of offence, or giving false information to screen offender",
+      "bns_section": "162",
+      "bns_heading": "Causing disappearance of evidence of offence, or giving false information to screen offender",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "211",
+      "ipc_heading": "False charge of offence made with intent to injure",
+      "bns_section": "163",
+      "bns_heading": "False charge of offence made with intent to injure",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "268",
+      "ipc_heading": "Public nuisance",
+      "bns_section": "164",
+      "bns_heading": "Public nuisance",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "295A",
+      "ipc_heading": "Deliberate and malicious acts, intended to outrage religious feelings",
+      "bns_section": "165",
+      "bns_heading": "Deliberate and malicious acts, intended to outrage religious feelings",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "304",
+      "ipc_heading": "Punishment for culpable homicide not amounting to murder",
+      "bns_section": "103",
+      "bns_heading": "Punishment for culpable homicide not amounting to murder",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "326A",
+      "ipc_heading": "Voluntarily causing grievous hurt by use of acid, etc.",
+      "bns_section": "119",
+      "bns_heading": "Voluntarily causing grievous hurt by use of acid, etc.",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "326B",
+      "ipc_heading": "Voluntarily throwing or attempting to throw acid",
+      "bns_section": "120",
+      "bns_heading": "Voluntarily throwing or attempting to throw acid",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "354A",
+      "ipc_heading": "Sexual harassment and punishment for sexual harassment",
+      "bns_section": "125",
+      "bns_heading": "Sexual harassment and punishment for sexual harassment",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "354B",
+      "ipc_heading": "Assault or use of criminal force to woman with intent to disrobe",
+      "bns_section": "126",
+      "bns_heading": "Assault or use of criminal force to woman with intent to disrobe",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "354C",
+      "ipc_heading": "Voyeurism",
+      "bns_section": "127",
+      "bns_heading": "Voyeurism",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "375(6)",
+      "ipc_heading": "Rape of a woman under sixteen years of age",
+      "bns_section": "122(6)",
+      "bns_heading": "Rape of a woman under sixteen years of age",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "376D",
+      "ipc_heading": "Gang rape",
+      "bns_section": "124(2)",
+      "bns_heading": "Gang rape",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "376E",
+      "ipc_heading": "Punishment for repeat offenders in rape cases",
+      "bns_section": "124(3)",
+      "bns_heading": "Punishment for repeat offenders in rape cases",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "509",
+      "ipc_heading": "Word, gesture or act intended to insult the modesty of a woman",
+      "bns_section": "129",
+      "bns_heading": "Word, gesture or act intended to insult the modesty of a woman",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "153B",
+      "ipc_heading": "Imputations, assertions prejudicial to national integration",
+      "bns_section": "166",
+      "bns_heading": "Imputations, assertions prejudicial to national integration",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "121",
+      "ipc_heading": "Waging, or attempting to wage war, or abetting waging of war, against the Government of India",
+      "bns_section": "167",
+      "bns_heading": "Waging, or attempting to wage war, or abetting waging of war, against the Government of India",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "124",
+      "ipc_heading": "Assaulting President, Governor, etc., with intent to compel or restrain the exercise of any lawful power",
+      "bns_section": "168",
+      "bns_heading": "Assaulting President, Governor, etc., with intent to compel or restrain the exercise of any lawful power",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "153",
+      "ipc_heading": "Wantonly giving provocation with intent to cause riot",
+      "bns_section": "169",
+      "bns_heading": "Wantonly giving provocation with intent to cause riot",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "304A",
+      "ipc_heading": "Causing death by negligence",
+      "bns_section": "104",
+      "bns_heading": "Causing death by negligence",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "279",
+      "ipc_heading": "Rash driving or riding on a public way",
+      "bns_section": "170",
+      "bns_heading": "Rash driving or riding on a public way",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "337",
+      "ipc_heading": "Causing hurt by act endangering life or personal safety of others",
+      "bns_section": "171",
+      "bns_heading": "Causing hurt by act endangering life or personal safety of others",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "338",
+      "ipc_heading": "Causing grievous hurt by act endangering life or personal safety of others",
+      "bns_section": "172",
+      "bns_heading": "Causing grievous hurt by act endangering life or personal safety of others",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "304",
+      "ipc_heading": "Culpable homicide not amounting to murder",
+      "bns_section": "103",
+      "bns_heading": "Culpable homicide not amounting to murder",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "499",
+      "ipc_heading": "Defamation",
+      "bns_section": "151",
+      "bns_heading": "Defamation",
+      "notes": "No significant changes in the provision."
+    },
+    {
+      "ipc_section": "511",
+      "ipc_heading": "Attempting to commit offences punishable with imprisonment for life or other imprisonment",
+      "bns_section": "156",
+      "bns_heading": "Attempting to commit offences punishable with imprisonment for life or other imprisonment",
+      "notes": "No significant changes in the provision."
+    }
+  ]
+}

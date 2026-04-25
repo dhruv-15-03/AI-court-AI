@@ -1,0 +1,98 @@
+{
+  "act_id": "HSA",
+  "full_name": "Hindu Succession Act, 1956",
+  "short_name": "HSA",
+  "year": 1956,
+  "sections": [
+    {
+      "section_number": "6",
+      "heading": "Devolution of interest in coparcenary property",
+      "body_text": "The 2005 amendment grants daughters the same rights as sons in the coparcenary property. Daughters become coparceners by birth and have the same rights and liabilities as sons. This section also provides for the devolution of interest in coparcenary property by testamentary or intestate succession.",
+      "chapter": "II - Intestate Succession"
+    },
+    {
+      "section_number": "8",
+      "heading": "General rules of succession in the case of males",
+      "body_text": "The property of a male Hindu dying intestate shall devolve firstly upon Class I heirs, and if there are no Class I heirs, then upon Class II heirs. If there are no heirs in either class, the property devolves upon agnates, and failing that, upon cognates.",
+      "chapter": "II - Intestate Succession"
+    },
+    {
+      "section_number": "9",
+      "heading": "Order of succession among heirs in the Schedule",
+      "body_text": "Among the heirs specified in the Schedule, those in Class I shall take simultaneously and to the exclusion of all other heirs. If there are no Class I heirs, the property devolves upon Class II heirs in the order of entry in the Schedule.",
+      "chapter": "II - Intestate Succession"
+    },
+    {
+      "section_number": "10",
+      "heading": "Distribution of property among heirs in Class I of the Schedule",
+      "body_text": "The property of an intestate shall be divided among the heirs in Class I of the Schedule in accordance with the specified rules. Each heir is entitled to an equal share, with certain provisions for predeceased heirs and their descendants.",
+      "chapter": "II - Intestate Succession"
+    },
+    {
+      "section_number": "11",
+      "heading": "Distribution of property among heirs in Class II of the Schedule",
+      "body_text": "The property of an intestate shall be divided among the heirs in Class II of the Schedule. The heirs in the first entry shall be preferred over those in subsequent entries, and the property shall be distributed equally among the heirs in the same entry.",
+      "chapter": "II - Intestate Succession"
+    },
+    {
+      "section_number": "12",
+      "heading": "Order of succession among agnates and cognates",
+      "body_text": "The property of an intestate shall devolve upon agnates and, failing them, upon cognates. The rules of preference and proximity are applied to determine the order of succession.",
+      "chapter": "II - Intestate Succession"
+    },
+    {
+      "section_number": "13",
+      "heading": "Computation of degrees",
+      "body_text": "For the purposes of determining the order of succession among agnates or cognates, degrees of relationship are computed by counting the number of generations between the intestate and the heir.",
+      "chapter": "II - Intestate Succession"
+    },
+    {
+      "section_number": "14",
+      "heading": "Property of a female Hindu to be her absolute property",
+      "body_text": "Any property possessed by a female Hindu, whether acquired before or after the commencement of this Act, shall be her absolute property. This includes property acquired by inheritance, partition, gift, or any other means.",
+      "chapter": "III - Succession of Female Hindus"
+    },
+    {
+      "section_number": "15",
+      "heading": "General rules of succession in the case of female Hindus",
+      "body_text": "The property of a female Hindu dying intestate shall devolve upon her children, husband, and the heirs of her husband. If none of these exist, the property devolves upon her parents and their heirs.",
+      "chapter": "III - Succession of Female Hindus"
+    },
+    {
+      "section_number": "16",
+      "heading": "Order of succession and manner of distribution among heirs of a female Hindu",
+      "body_text": "The heirs of a female Hindu are divided into categories, and the property is distributed among them in a specified order. The rules ensure equitable distribution among the heirs.",
+      "chapter": "III - Succession of Female Hindus"
+    },
+    {
+      "section_number": "17",
+      "heading": "Special provisions respecting persons governed by Marumakkattayam and Aliyasantana laws",
+      "body_text": "This section provides special rules for the succession of property among Hindus governed by the Marumakkattayam or Aliyasantana systems of law, which are matrilineal systems.",
+      "chapter": "IV - Special Provisions Relating to Certain Classes of Hindus"
+    },
+    {
+      "section_number": "18",
+      "heading": "Disqualified heirs",
+      "body_text": "A person who commits murder or any other heinous crime against the deceased or their family is disqualified from inheriting the deceased's property. Other disqualifications may also apply as per the law.",
+      "chapter": "IV - Special Provisions Relating to Certain Classes of Hindus"
+    },
+    {
+      "section_number": "19",
+      "heading": "Simultaneous deaths",
+      "body_text": "If two persons die in circumstances where it is uncertain who died first, it is presumed that the younger survived the elder. This presumption affects the devolution of property.",
+      "chapter": "IV - Special Provisions Relating to Certain Classes of Hindus"
+    },
+    {
+      "section_number": "20",
+      "heading": "Right of child in womb",
+      "body_text": "A child in the womb at the time of the death of an intestate is deemed to have been born before the intestate's death and is entitled to inherit the property, provided the child is born alive.",
+      "chapter": "IV - Special Provisions Relating to Certain Classes of Hindus"
+    },
+    {
+      "section_number": "21",
+      "heading": "Presumption in cases of simultaneous deaths",
+      "body_text": "In cases where two persons have died in circumstances rendering it uncertain which of them survived the other, the younger is presumed to have survived the elder for the purposes of succession.",
+      "chapter": "IV - Special Provisions Relating to Certain Classes of Hindus"
+    }
+  ]
+}

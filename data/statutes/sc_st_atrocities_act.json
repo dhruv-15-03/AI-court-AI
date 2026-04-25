@@ -1,0 +1,104 @@
+{
+  "act_id": "SC/ST ACT",
+  "full_name": "Scheduled Castes and Scheduled Tribes (Prevention of Atrocities) Act, 1989",
+  "short_name": "SC/ST Act",
+  "year": 1989,
+  "sections": [
+    {
+      "section_number": "2(1)(a)",
+      "heading": "Definition of Scheduled Castes and Scheduled Tribes",
+      "body_text": "Defines 'Scheduled Castes' and 'Scheduled Tribes' as per the Constitution of India, specifying the communities eligible for protection under the Act.",
+      "chapter": null
+    },
+    {
+      "section_number": "3(1)",
+      "heading": "Offences of Atrocities",
+      "body_text": "Lists specific acts considered as atrocities against members of Scheduled Castes and Scheduled Tribes, including physical harm, social boycott, denial of rights, and other discriminatory practices.",
+      "chapter": null
+    },
+    {
+      "section_number": "3(2)",
+      "heading": "Punishments for Atrocities",
+      "body_text": "Prescribes punishments for committing atrocities, including imprisonment for a term not less than six months but which may extend to five years, along with a fine.",
+      "chapter": null
+    },
+    {
+      "section_number": "3(2)(v)",
+      "heading": "Enhanced Punishment for Heinous Offences",
+      "body_text": "Specifies that if an offence under the Indian Penal Code is committed against a member of a Scheduled Caste or Scheduled Tribe on the ground of their caste or tribe, the punishment shall be imprisonment for life and a fine.",
+      "chapter": null
+    },
+    {
+      "section_number": "3(2)(va)",
+      "heading": "Punishment for Acid Attacks",
+      "body_text": "Provides for enhanced punishment for acid attacks against members of Scheduled Castes and Scheduled Tribes, with imprisonment for life and a fine.",
+      "chapter": null
+    },
+    {
+      "section_number": "3(2)(w)",
+      "heading": "Punishment for Sexual Assault",
+      "body_text": "Prescribes stringent punishment for sexual assault, including rape, against women belonging to Scheduled Castes and Scheduled Tribes, with imprisonment for life and a fine.",
+      "chapter": null
+    },
+    {
+      "section_number": "3(1)(x)",
+      "heading": "Social Boycott",
+      "body_text": "Prohibits and penalizes the imposition of social or economic boycott on members of Scheduled Castes and Scheduled Tribes, with imprisonment for a term not less than six months but which may extend to five years and a fine.",
+      "chapter": null
+    },
+    {
+      "section_number": "3(1)(xv)",
+      "heading": "Denial of Rights",
+      "body_text": "Punishes the denial of customary rights of passage to members of Scheduled Castes and Scheduled Tribes, with imprisonment for a term not less than six months but which may extend to five years and a fine.",
+      "chapter": null
+    },
+    {
+      "section_number": "4",
+      "heading": "Punishment for Neglect of Duties by Public Servant",
+      "body_text": "Prescribes punishment for public servants who willfully neglect their duties under the Act, with imprisonment for a term not less than six months but which may extend to one year.",
+      "chapter": null
+    },
+    {
+      "section_number": "8",
+      "heading": "Presumption as to Offences",
+      "body_text": "Specifies that if it is proved that an offence under the Act has been committed, the court shall presume that it was committed on the ground of the victim's caste or tribe unless proven otherwise.",
+      "chapter": null
+    },
+    {
+      "section_number": "14",
+      "heading": "Special Courts",
+      "body_text": "Mandates the establishment of Special Courts for the trial of offences under the Act to ensure speedy justice.",
+      "chapter": null
+    },
+    {
+      "section_number": "14A",
+      "heading": "Exclusive Special Courts",
+      "body_text": "Provides for the establishment of Exclusive Special Courts in districts with a high population of Scheduled Castes and Scheduled Tribes to exclusively handle cases under the Act.",
+      "chapter": null
+    },
+    {
+      "section_number": "15",
+      "heading": "Special Public Prosecutor",
+      "body_text": "Requires the appointment of a Special Public Prosecutor for conducting cases in Special Courts under the Act.",
+      "chapter": null
+    },
+    {
+      "section_number": "18",
+      "heading": "Bar on Anticipatory Bail",
+      "body_text": "Prohibits the grant of anticipatory bail to any person accused of committing an offence under the Act.",
+      "chapter": null
+    },
+    {
+      "section_number": "18A",
+      "heading": "Amendment to Bar on Anticipatory Bail",
+      "body_text": "Introduced in 2018, this section clarifies that no preliminary inquiry is required before registering an FIR under the Act, and anticipatory bail remains barred.",
+      "chapter": null
+    },
+    {
+      "section_number": "19",
+      "heading": "Time-Bound Investigation",
+      "body_text": "Mandates that investigations under the Act must be completed within 60 days from the date of registration of the FIR.",
+      "chapter": null
+    }
+  ]
+}

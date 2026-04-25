@@ -1,12 +1,11 @@
-"""RAG Pipeline for Legal Case Retrieval.
+"""RAG Pipeline for Legal Case Retrieval-Augmented Generation.
 
-Provides retrieval-augmented responses using existing TF-IDF search index.
-No LLM generation - retrieval-only mode for zero cost operation.
+Provides retrieval-augmented responses using TF-IDF search index + LLM generation.
 
 Contract:
 - retrieve(query) -> List[Doc]: Find relevant case documents
 - augment(query, docs) -> context: Format documents as context
-- generate(query, context) -> response: Format final response (no LLM)
+- generate(query, context, docs, llm_client) -> response: LLM-generated or statistical fallback
 """
 from __future__ import annotations
 
@@ -128,17 +127,21 @@ def augment(
 def generate(
     query: str,
     context: str,
-    documents: List[Dict[str, Any]]
+    documents: List[Dict[str, Any]],
+    llm_client: Any = None,
+    statute_corpus: Any = None,
 ) -> Dict[str, Any]:
     """Generate response based on retrieved context.
     
-    Note: This is retrieval-only mode - no LLM generation.
-    Returns formatted response with citations.
+    If llm_client is provided, uses LLM for intelligent generation.
+    Otherwise falls back to statistical retrieval-only mode.
     
     Args:
         query: Original user query
         context: Formatted context from augment()
         documents: Original document list
+        llm_client: Optional LLMClient instance for LLM generation
+        statute_corpus: Optional StatuteCorpus for statutory provisions
         
     Returns:
         Response dict with answer, citations, and metadata
@@ -152,16 +155,71 @@ def generate(
             "mode": "retrieval_only"
         }
     
-    # Analyze retrieved documents for patterns
+    # Build citations
+    citations = []
+    for doc in documents[:5]:
+        citations.append({
+            "title": doc.get('title'),
+            "url": doc.get('url'),
+            "outcome": doc.get('outcome'),
+            "relevance": doc.get('score')
+        })
+    
+    # Outcome distribution
     outcomes: List[str] = [str(d.get('outcome')) for d in documents if d.get('outcome')]
     outcome_counts: Dict[str, int] = {}
     for o in outcomes:
         outcome_counts[o] = outcome_counts.get(o, 0) + 1
     
-    # Find most common outcome
+    # --- LLM Generation Mode ---
+    if llm_client is not None:
+        try:
+            from ai_court.llm.prompts import SYSTEM_PROMPT_LEGAL_AGENT
+            
+            # Build statute context if available
+            statute_text = ""
+            if statute_corpus is not None and statute_corpus.loaded:
+                try:
+                    sections = statute_corpus.search_sections(query, k=5)
+                    statute_text = statute_corpus.format_for_context(sections, max_length=2000)
+                except Exception:
+                    statute_text = ""
+            
+            prompt = (
+                f"Answer the following legal question using the provided Indian case law"
+                f"{' and statutory provisions' if statute_text else ''}.\n\n"
+                f"QUESTION: {query}\n\n"
+                f"RELEVANT CASES:\n{context}\n\n"
+            )
+            if statute_text:
+                prompt += f"RELEVANT STATUTES:\n{statute_text}\n\n"
+            prompt += (
+                "Provide a clear, well-cited answer. Reference specific case names and "
+                "statutory sections. Structure your response with clear sections."
+            )
+            
+            messages = [
+                {"role": "system", "content": SYSTEM_PROMPT_LEGAL_AGENT},
+                {"role": "user", "content": prompt},
+            ]
+            answer = llm_client.chat(messages)
+            
+            return {
+                "answer": answer,
+                "confidence": float(documents[0].get('score', 0)) if documents else 0.0,
+                "citations": citations,
+                "num_documents": len(documents),
+                "outcome_distribution": outcome_counts,
+                "mode": "rag_llm",
+                "context": context[:2000] if context else None,
+            }
+        except Exception as exc:
+            logger.warning("LLM generation failed, falling back to retrieval-only: %s", exc)
+            # Fall through to statistical mode
+    
+    # --- Statistical Fallback Mode (no LLM) ---
     most_common_outcome = max(outcome_counts.items(), key=lambda x: x[1])[0] if outcome_counts else None
     
-    # Build answer
     answer_parts = []
     answer_parts.append(f"Based on {len(documents)} similar cases found in the database:")
     
@@ -171,16 +229,6 @@ def generate(
     
     answer_parts.append(f"\n• Top match: \"{documents[0].get('title', 'Unknown')}\" (relevance: {documents[0].get('score', 0):.2f})")
     
-    # Add citations
-    citations = []
-    for doc in documents[:3]:
-        citations.append({
-            "title": doc.get('title'),
-            "url": doc.get('url'),
-            "outcome": doc.get('outcome'),
-            "relevance": doc.get('score')
-        })
-    
     return {
         "answer": " ".join(answer_parts),
         "confidence": float(documents[0].get('score', 0)) if documents else 0.0,
@@ -188,7 +236,7 @@ def generate(
         "num_documents": len(documents),
         "outcome_distribution": outcome_counts,
         "mode": "retrieval_only",
-        "context": context[:2000] if context else None  # Truncate for response size
+        "context": context[:2000] if context else None,
     }
 
 
@@ -196,17 +244,22 @@ def rag_query(
     question: str,
     search_index: Optional[Dict[str, Any]] = None,
     preprocess_fn: Optional[Callable[[str], str]] = None,
-    k: int = 5
+    k: int = 5,
+    llm_client: Any = None,
+    statute_corpus: Any = None,
 ) -> Dict[str, Any]:
     """Complete RAG pipeline: retrieve, augment, generate.
     
     Convenience function that chains all pipeline steps.
+    Uses LLM for generation when llm_client is provided.
     
     Args:
         question: User's question
         search_index: Pre-loaded search index
         preprocess_fn: Text preprocessing function
         k: Number of documents to retrieve
+        llm_client: Optional LLMClient for LLM-powered answers
+        statute_corpus: Optional StatuteCorpus for statutory provisions
         
     Returns:
         Complete RAG response
@@ -217,8 +270,8 @@ def rag_query(
     # Step 2: Augment
     context = augment(question, documents)
     
-    # Step 3: Generate
-    response = generate(question, context, documents)
+    # Step 3: Generate (with LLM if available)
+    response = generate(question, context, documents, llm_client=llm_client, statute_corpus=statute_corpus)
     response['question'] = question
     
     return response

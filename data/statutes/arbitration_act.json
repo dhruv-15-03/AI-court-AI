@@ -1,0 +1,128 @@
+{
+  "act_id": "A&C ACT",
+  "full_name": "Arbitration and Conciliation Act, 1996",
+  "short_name": "A&C Act",
+  "year": 1996,
+  "sections": [
+    {
+      "section_number": "7",
+      "heading": "Arbitration Agreement",
+      "body_text": "An arbitration agreement is defined as an agreement by the parties to submit disputes to arbitration. It must be in writing and can be in the form of a clause in a contract or a separate agreement.",
+      "chapter": "Part I - Arbitration"
+    },
+    {
+      "section_number": "9",
+      "heading": "Interim Measures by Court",
+      "body_text": "A party may apply to a court for interim measures of protection before or during arbitral proceedings or at any time after the making of the arbitral award but before it is enforced.",
+      "chapter": "Part I - Arbitration"
+    },
+    {
+      "section_number": "11",
+      "heading": "Appointment of Arbitrators",
+      "body_text": "Parties are free to agree on the procedure for appointing arbitrators. If they fail to agree, the Chief Justice or a designated authority may appoint the arbitrator upon request.",
+      "chapter": "Part I - Arbitration"
+    },
+    {
+      "section_number": "12",
+      "heading": "Grounds for Challenge of Arbitrators",
+      "body_text": "An arbitrator may be challenged if there are justifiable doubts as to their independence or impartiality, or if they do not possess the qualifications agreed upon by the parties.",
+      "chapter": "Part I - Arbitration"
+    },
+    {
+      "section_number": "17",
+      "heading": "Interim Measures by Arbitral Tribunal",
+      "body_text": "The arbitral tribunal may order interim measures of protection as it deems necessary, including the preservation of assets or evidence relevant to the dispute.",
+      "chapter": "Part I - Arbitration"
+    },
+    {
+      "section_number": "29A",
+      "heading": "Time Limit for Arbitral Award",
+      "body_text": "The arbitral tribunal must make its award within 12 months from the date it enters upon the reference. This period can be extended by mutual consent of the parties or by the court.",
+      "chapter": "Part I - Arbitration"
+    },
+    {
+      "section_number": "34",
+      "heading": "Application for Setting Aside Arbitral Award",
+      "body_text": "An arbitral award may be set aside by the court if it is found to be in conflict with public policy, was induced by fraud, or if the arbitral procedure was not in accordance with the agreement of the parties.",
+      "chapter": "Part I - Arbitration"
+    },
+    {
+      "section_number": "36",
+      "heading": "Enforcement of Arbitral Awards",
+      "body_text": "An arbitral award shall be enforced in the same manner as if it were a decree of the court, subject to the provisions of Section 34.",
+      "chapter": "Part I - Arbitration"
+    },
+    {
+      "section_number": "37",
+      "heading": "Appealable Orders",
+      "body_text": "Appeals can be made against certain orders, such as those granting or refusing interim measures, setting aside or refusing to set aside an arbitral award, or accepting or rejecting an application for appointment of arbitrators.",
+      "chapter": "Part I - Arbitration"
+    },
+    {
+      "section_number": "44",
+      "heading": "Definition of International Commercial Arbitration",
+      "body_text": "An arbitration is considered international if at least one of the parties is a foreign national, a foreign body corporate, or a foreign government, or if the dispute involves international trade or commerce.",
+      "chapter": "Part II - Enforcement of Certain Foreign Awards"
+    },
+    {
+      "section_number": "45",
+      "heading": "Power of Judicial Authority to Refer Parties to Arbitration",
+      "body_text": "A judicial authority shall refer the parties to arbitration if there is a valid arbitration agreement, unless it finds the agreement to be null and void, inoperative, or incapable of being performed.",
+      "chapter": "Part II - Enforcement of Certain Foreign Awards"
+    },
+    {
+      "section_number": "47",
+      "heading": "Evidence for Enforcement of Foreign Awards",
+      "body_text": "The party applying for enforcement of a foreign award must produce the original award, the original arbitration agreement, and evidence to prove that the award is final and binding.",
+      "chapter": "Part II - Enforcement of Certain Foreign Awards"
+    },
+    {
+      "section_number": "61",
+      "heading": "Scope of Conciliation",
+      "body_text": "Conciliation applies to disputes arising out of a legal relationship, whether contractual or not, and to all proceedings unless specifically excluded by law.",
+      "chapter": "Part III - Conciliation"
+    },
+    {
+      "section_number": "62",
+      "heading": "Commencement of Conciliation Proceedings",
+      "body_text": "Conciliation proceedings commence when one party sends a written invitation to the other party to conciliate, and the other party accepts the invitation in writing.",
+      "chapter": "Part III - Conciliation"
+    },
+    {
+      "section_number": "65",
+      "heading": "Submission of Statements to Conciliator",
+      "body_text": "The conciliator may request each party to submit a written statement describing the general nature of the dispute and the points at issue.",
+      "chapter": "Part III - Conciliation"
+    },
+    {
+      "section_number": "67",
+      "heading": "Role of Conciliator",
+      "body_text": "The conciliator assists the parties in an independent and impartial manner to reach an amicable settlement of their dispute. They may make proposals for settlement at any stage of the proceedings.",
+      "chapter": "Part III - Conciliation"
+    },
+    {
+      "section_number": "73",
+      "heading": "Settlement Agreement",
+      "body_text": "If the parties reach an agreement, the conciliator shall draw up a settlement agreement, which is binding on the parties and has the same status as an arbitral award.",
+      "chapter": "Part III - Conciliation"
+    },
+    {
+      "section_number": "74",
+      "heading": "Status and Effect of Settlement Agreement",
+      "body_text": "A settlement agreement reached through conciliation has the same effect as an arbitral award on agreed terms and is enforceable as a decree of the court.",
+      "chapter": "Part III - Conciliation"
+    },
+    {
+      "section_number": "80",
+      "heading": "Role of Conciliator in Other Proceedings",
+      "body_text": "The conciliator shall not act as an arbitrator or as a representative of any party in any arbitral or judicial proceedings in respect of a dispute that was the subject of the conciliation proceedings.",
+      "chapter": "Part III - Conciliation"
+    },
+    {
+      "section_number": "81",
+      "heading": "Confidentiality",
+      "body_text": "The conciliator and the parties must keep all matters relating to the conciliation proceedings confidential, except where disclosure is required by law or for the purposes of implementation and enforcement of the settlement agreement.",
+      "chapter": "Part III - Conciliation"
+    }
+  ]
+}

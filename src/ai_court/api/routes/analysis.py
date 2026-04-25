@@ -33,6 +33,7 @@ try:
     from ai_court.utils.performance import (
         get_confidence_language,
         get_outcome_description,
+        OUTCOME_DESCRIPTIONS,
         format_minimal_response,
         format_full_response,
         format_detailed_response
@@ -40,9 +41,24 @@ try:
 except ImportError:
     get_confidence_language = None  # type: ignore[assignment]
     get_outcome_description = None  # type: ignore[assignment]
+    OUTCOME_DESCRIPTIONS = {}  # type: ignore[assignment]
     format_minimal_response = None  # type: ignore[assignment]
     format_full_response = None  # type: ignore[assignment]
     format_detailed_response = None  # type: ignore[assignment]
+
+# Import extractive summary utilities
+try:
+    from ai_court.scraper.extractive_summary import (
+        get_outcome_indicators,
+        extract_key_holdings,
+        extract_citations,
+        extract_parties,
+    )
+except ImportError:
+    get_outcome_indicators = None  # type: ignore[assignment]
+    extract_key_holdings = None  # type: ignore[assignment]
+    extract_citations = None  # type: ignore[assignment]
+    extract_parties = None  # type: ignore[assignment]
 
 logger = logging.getLogger(__name__)
 analysis_bp = Blueprint('analysis', __name__)
@@ -60,11 +76,23 @@ def _auto_queue_prediction(
         return
     
     try:
+        # Compute entropy-based uncertainty if probabilities available
+        probabilities = raw_input.get('_all_probabilities', {})
+        uncertainty = 1.0 - confidence  # fallback
+        uncertainty_method = 'confidence'
+        if probabilities:
+            from ai_court.active_learning.loop import compute_uncertainty
+            uncertainty = compute_uncertainty(probabilities, method='entropy')
+            uncertainty_method = 'entropy'
+
         item = {
             'id': str(uuid.uuid4()),
-            'text': text[:1000],  # Truncate for storage
+            'text': text[:2000],  # Truncate for storage
             'predicted_label': judgment,
             'confidence': confidence,
+            'uncertainty': round(uncertainty, 4),
+            'uncertainty_method': uncertainty_method,
+            'probabilities': probabilities,
             'reason': reason,
             'case_type': raw_input.get('case_type'),
             'added_at': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
@@ -76,7 +104,7 @@ def _auto_queue_prediction(
         from ai_court.api.routes.feedback import save_queue
         save_queue()
         
-        logger.info(f"Auto-queued prediction for review: {reason}, confidence={confidence:.2f}")
+        logger.info(f"Auto-queued prediction for review: {reason}, uncertainty={uncertainty:.3f}")
     except Exception as e:
         logger.warning(f"Failed to auto-queue prediction: {e}")
 
@@ -84,6 +112,96 @@ def _auto_queue_prediction(
 # =============================================================================
 # Response Generation Helpers
 # =============================================================================
+
+
+def _generate_case_summary(
+    raw_input: Dict[str, Any],
+    case_type: str,
+    judgment: str,
+    confidence: Optional[float],
+    key_factors: List[Dict[str, Any]],
+    similar_cases: Optional[List[Dict[str, Any]]] = None,
+) -> Dict[str, Any]:
+    """Build a brief structured analysis summary from the submitted case facts.
+
+    Returned in PRO+ plans alongside the model prediction so the user sees a
+    concise narrative of *what was submitted* plus how the model interpreted it.
+    """
+    # --- 1. Narrative summary of submitted facts ---
+    parts: List[str] = []
+    ct = case_type or raw_input.get('case_type') or 'Unknown'
+    parties = raw_input.get('parties', '')
+    if parties:
+        parts.append(f"{ct} matter involving {parties}.")
+    else:
+        parts.append(f"{ct} case submitted for analysis.")
+
+    summary_text = raw_input.get('summary')
+    if summary_text:
+        # Take first 300 chars of the user-supplied summary
+        snippet = str(summary_text).strip()
+        if len(snippet) > 300:
+            snippet = snippet[:297] + '...'
+        parts.append(snippet)
+
+    # Pick up additional contextual fields
+    field_labels = {
+        'relief_requested': 'Relief sought',
+        'sections': 'Relevant sections',
+        'evidence_type': 'Evidence type',
+        'injury_severity': 'Injury severity',
+        'weapon_used': 'Weapon involved',
+        'dispute_type': 'Dispute type',
+        'violence_level': 'Violence level',
+        'police_report': 'Police report filed',
+        'witnesses': 'Witnesses',
+        'mitigating_factors': 'Mitigating factors',
+        'children': 'Children involved',
+        'marriage_duration': 'Marriage duration',
+        'employment_duration': 'Employment duration',
+    }
+    detail_parts: List[str] = []
+    for field, label in field_labels.items():
+        val = raw_input.get(field)
+        if val and str(val).strip() and str(val).strip().lower() not in ('none', 'unknown', 'n/a', ''):
+            detail_parts.append(f"{label}: {val}")
+    if detail_parts:
+        parts.append(' | '.join(detail_parts) + '.')
+
+    narrative = ' '.join(parts)
+
+    # --- 2. Key factors digest (top-3 one-liners) ---
+    factors_digest: List[str] = []
+    for f in key_factors[:3]:
+        direction_icon = '+' if f.get('direction') == 'positive' else '-'
+        factors_digest.append(
+            f"[{direction_icon}] {f.get('feature', 'Unknown')}: {f.get('description', '')}"
+        )
+
+    # --- 3. Precedent snapshot ---
+    precedent_snapshot: Optional[Dict[str, Any]] = None
+    if similar_cases:
+        outcomes_in_similar = [sc.get('outcome') for sc in similar_cases if sc.get('outcome')]
+        matching = sum(1 for o in outcomes_in_similar if o == judgment)
+        precedent_snapshot = {
+            'cases_reviewed': len(similar_cases),
+            'matching_outcome': matching,
+            'top_match': {
+                'title': similar_cases[0].get('title'),
+                'similarity': similar_cases[0].get('similarity_score'),
+                'outcome': similar_cases[0].get('outcome'),
+            } if similar_cases else None,
+        }
+
+    conf_pct = int((confidence or 0) * 100)
+    return {
+        'narrative': narrative,
+        'predicted_outcome': judgment,
+        'confidence_pct': conf_pct,
+        'key_factors_digest': factors_digest,
+        'precedent_snapshot': precedent_snapshot,
+    }
+
 
 def _generate_basic_explanation(judgment: str, confidence: Optional[float]) -> str:
     """Generate a basic explanation when key factors are unavailable."""
@@ -109,6 +227,8 @@ def _get_similar_cases(
     k: int = 3
 ) -> List[Dict[str, Any]]:
     """Retrieve similar cases using the search index."""
+    # Ensure lazy-loaded search index is available
+    dependencies.ensure_search_index()
     similar_cases = []
     
     try:
@@ -146,9 +266,46 @@ def _generate_legal_analysis(
     key_factors: List[Dict[str, Any]],
     confidence: Optional[float]
 ) -> Dict[str, Any]:
-    """Generate legal analysis section for UNLIMITED plan."""
+    """Generate legal analysis section for UNLIMITED plan.
     
-    # Applicable sections based on case type
+    Uses LLM when available, falls back to template-based analysis.
+    """
+    # Try LLM-powered analysis first
+    if state.llm_client is not None:
+        try:
+            factors_text = "\n".join(
+                f"- {f.get('feature', 'Unknown')} ({f.get('direction', 'neutral')}): {f.get('description', '')}"
+                for f in key_factors[:5]
+            )
+            prompt = (
+                f"Provide a concise legal analysis for an Indian {case_type} case.\n\n"
+                f"Predicted outcome: {judgment} (confidence: {int((confidence or 0) * 100)}%)\n\n"
+                f"Key factors:\n{factors_text}\n\n"
+                f"Return a JSON object with these keys:\n"
+                f'- "applicable_sections": list of {{"section": "...", "relevance": "...", "interpretation": "..."}}\n'
+                f'- "precedent_strength": "STRONG"|"MODERATE"|"WEAK"\n'
+                f'- "jurisdiction_notes": string\n'
+                f'- "risk_factors": list of strings\n'
+                f'- "mitigating_factors": list of strings\n\n'
+                f"Return ONLY valid JSON, no markdown fences."
+            )
+            from ai_court.llm.prompts import SYSTEM_PROMPT_LEGAL_AGENT
+            raw = state.llm_client.chat(
+                [{"role": "system", "content": SYSTEM_PROMPT_LEGAL_AGENT},
+                 {"role": "user", "content": prompt}],
+                temperature=0.2, max_tokens=2048,
+            )
+            raw = raw.strip()
+            if raw.startswith("```"):
+                raw = raw.split("\n", 1)[-1]
+            if raw.endswith("```"):
+                raw = raw.rsplit("```", 1)[0]
+            import json as _json
+            return _json.loads(raw.strip())
+        except Exception as exc:
+            logger.warning("LLM legal analysis failed, using template: %s", exc)
+    
+    # Fallback: template-based analysis
     sections_map = {
         "Criminal": [
             {"section": "Section 437 CrPC", "relevance": "Bail in non-bailable offenses", "interpretation": "Courts consider flight risk, severity, and evidence"},
@@ -168,7 +325,6 @@ def _generate_legal_analysis(
         ],
     }
     
-    # Determine precedent strength from confidence
     if confidence and confidence >= 0.85:
         precedent_strength = "STRONG"
     elif confidence and confidence >= 0.65:
@@ -176,7 +332,6 @@ def _generate_legal_analysis(
     else:
         precedent_strength = "WEAK"
     
-    # Extract risk and mitigating factors from key_factors
     risk_factors = [f.get('feature', '') for f in key_factors if f.get('direction') == 'negative'][:3]
     mitigating_factors = [f.get('feature', '') for f in key_factors if f.get('direction') == 'positive'][:3]
     
@@ -196,24 +351,69 @@ def _generate_full_report(
     confidence: Optional[float],
     explanation: Optional[str]
 ) -> Dict[str, Any]:
-    """Generate full report section for UNLIMITED plan."""
-    
+    """Generate full report section for UNLIMITED plan.
+
+    Uses LLM when available for a comprehensive court-ready report.
+    Falls back to template-based generation otherwise.
+    """
     conf_pct = int((confidence or 0) * 100)
-    
-    # Generate argument points from key factors
+
+    # --- LLM-powered full report ---
+    if state.llm_client is not None:
+        try:
+            factors_text = "\n".join(
+                f"- {f.get('feature', 'Unknown')} ({f.get('direction', 'neutral')}): "
+                f"{f.get('description', '')}"
+                for f in key_factors[:8]
+            )
+            prompt = (
+                f"You are an expert Indian legal analyst preparing a comprehensive court-ready "
+                f"report for a {case_type} case.\n\n"
+                f"Predicted outcome: {judgment} (confidence: {conf_pct}%)\n"
+                f"Explanation: {explanation or 'N/A'}\n\n"
+                f"Key factors from ML model:\n{factors_text}\n\n"
+                f"Generate a JSON report with these exact keys:\n"
+                f'- "executive_summary": 2-3 sentence professional summary of the case assessment\n'
+                f'- "detailed_analysis": Markdown-formatted detailed analysis covering: '
+                f'case strength, evidence considerations, procedural aspects, and judicial tendencies\n'
+                f'- "argument_points_for": list of 3-5 strong arguments supporting the client\'s position, '
+                f'each citing specific Indian law sections\n'
+                f'- "argument_points_against": list of 2-4 arguments the opposing side may raise\n'
+                f'- "recommended_strategy": detailed strategy paragraph with specific next steps\n'
+                f'- "estimated_timeline": realistic timeline for this type of case in Indian courts\n'
+                f'- "alternative_outcomes": list of {{"outcome": "...", "probability": 0.X, '
+                f'"conditions": "when this could happen"}}\n\n'
+                f"Return ONLY valid JSON. No markdown fences."
+            )
+            from ai_court.llm.prompts import SYSTEM_PROMPT_LEGAL_AGENT
+            raw = state.llm_client.chat(
+                [{"role": "system", "content": SYSTEM_PROMPT_LEGAL_AGENT},
+                 {"role": "user", "content": prompt}],
+                temperature=0.3, max_tokens=3000,
+            )
+            raw = raw.strip()
+            if raw.startswith("```"):
+                raw = raw.split("\n", 1)[-1]
+            if raw.endswith("```"):
+                raw = raw.rsplit("```", 1)[0]
+            import json as _json
+            return _json.loads(raw.strip())
+        except Exception as exc:
+            logger.warning("LLM full report failed, using template: %s", exc)
+
+    # --- Template fallback ---
     args_for = [
         f"{f.get('feature', 'Factor')}: {f.get('description', 'Supports outcome')}"
         for f in key_factors if f.get('direction') == 'positive'
     ][:5]
-    
+
     args_against = [
         f"{f.get('feature', 'Factor')}: {f.get('description', 'May affect outcome')}"
         for f in key_factors if f.get('direction') == 'negative'
     ][:5]
-    
-    # Alternative outcomes with estimated probabilities
+
     alternative_outcomes = _get_alternative_outcomes(judgment, confidence)
-    
+
     return {
         "executive_summary": f"Based on analysis of the submitted {case_type} case, the predicted outcome "
                             f"is **{judgment}** with {conf_pct}% confidence. "
@@ -288,6 +488,105 @@ def _get_timeline_estimate(case_type: str) -> str:
     return timelines.get(case_type, "Variable based on court and case complexity")
 
 
+def _get_risk_level(judgment: str, confidence: Optional[float]) -> str:
+    """Derive risk level from outcome class and confidence."""
+    conf = confidence or 0.0
+    high_risk_outcomes = {"Acquittal/Conviction Overturned", "Bail Denied"}
+    if conf < 0.60 or judgment in high_risk_outcomes:
+        return "HIGH"
+    elif conf < 0.80:
+        return "MEDIUM"
+    return "LOW"
+
+
+def _get_confidence_band(confidence: Optional[float]) -> str:
+    """Convert raw confidence float to a readable band label."""
+    conf = (confidence or 0.0) * 100
+    if conf >= 85:
+        return "Very High (≥85%)"
+    elif conf >= 70:
+        return "High (70–84%)"
+    elif conf >= 50:
+        return "Moderate (50–69%)"
+    return "Low (<50%)"
+
+
+def _get_outcome_description(judgment: str) -> str:
+    """Plain-English legal meaning of each prediction class."""
+    descriptions = {
+        "Relief Granted/Convicted": (
+            "The court is likely to rule in favour of the petitioner / convict the accused. "
+            "In civil matters this means the relief sought (injunction, compensation, etc.) is likely granted. "
+            "In criminal matters it indicates a likely conviction."
+        ),
+        "Relief Denied/Dismissed": (
+            "The court is likely to dismiss the petition, appeal or application. "
+            "The opposing party's position is upheld and the relief sought is denied."
+        ),
+        "Acquittal/Conviction Overturned": (
+            "The accused is likely to be acquitted, or an existing conviction is likely to be set aside on appeal. "
+            "This is the least common outcome class and carries the highest uncertainty."
+        ),
+        "Bail Granted": (
+            "The court is likely to grant bail. Conditions such as surety, travel restrictions, "
+            "or regular reporting to police may be imposed."
+        ),
+        "Bail Denied": (
+            "Bail is likely to be refused. Grounds may include flight risk, evidence tampering concerns, "
+            "or severity of the alleged offence."
+        ),
+    }
+    return descriptions.get(
+        judgment,
+        f"Predicted outcome: {judgment}. Consult legal counsel for case-specific interpretation."
+    )
+
+
+_APPLICABLE_STATUTES: Dict[str, List[Dict[str, str]]] = {
+    "Criminal": [
+        {"section": "Section 302 IPC", "subject": "Punishment for murder", "note": "Life imprisonment or death penalty"},
+        {"section": "Section 307 IPC", "subject": "Attempt to murder", "note": "Up to 10 years or life if hurt caused"},
+        {"section": "Section 376 IPC", "subject": "Punishment for rape", "note": "Minimum 7 years, up to life"},
+        {"section": "Section 437 CrPC", "subject": "Bail in non-bailable offences", "note": "Sessions/Magistrate court bail powers"},
+        {"section": "Section 439 CrPC", "subject": "Special bail powers of High Court/Sessions Court", "note": "Wider discretion than §437"},
+        {"section": "Section 173 CrPC", "subject": "Police report / charge-sheet", "note": "Filed after completion of investigation"},
+    ],
+    "Civil": [
+        {"section": "Order 39 Rule 1 & 2 CPC", "subject": "Temporary injunction", "note": "Prima facie case + balance of convenience + irreparable injury"},
+        {"section": "Section 9 CPC", "subject": "Civil court jurisdiction", "note": "Subject-matter jurisdiction analysis"},
+        {"section": "Section 34 CPC", "subject": "Interest on decree", "note": "Pre-suit, pendente lite, and post-decree interest"},
+        {"section": "Section 89 CPC", "subject": "Alternative dispute resolution", "note": "Reference to mediation/arbitration"},
+    ],
+    "Family": [
+        {"section": "Section 125 CrPC", "subject": "Maintenance of wives, children, parents", "note": "Inability to maintain; reasonable provision"},
+        {"section": "Section 13 Hindu Marriage Act 1955", "subject": "Grounds for divorce", "note": "Cruelty, desertion, adultery, unsound mind"},
+        {"section": "Section 6 Hindu Minority and Guardianship Act", "subject": "Custody of child below 5", "note": "Natural guardian is father; mother for child below 5"},
+        {"section": "Section 24 Hindu Marriage Act", "subject": "Maintenance pendente lite", "note": "Interim maintenance during divorce proceedings"},
+    ],
+    "Labor": [
+        {"section": "Section 25F Industrial Disputes Act 1947", "subject": "Conditions precedent to retrenchment", "note": "Notice + compensation requirements"},
+        {"section": "Section 33C(2) ID Act", "subject": "Recovery of money due from employer", "note": "Calculation and execution of dues"},
+        {"section": "Section 10 ID Act", "subject": "Reference of disputes to tribunals", "note": "State/Central Government reference powers"},
+        {"section": "Article 21 Constitution", "subject": "Right to livelihood", "note": "Wrongful termination may engage fundamental rights"},
+    ],
+    "Property": [
+        {"section": "Section 54 Transfer of Property Act", "subject": "Sale of immoveable property", "note": "Essential elements: parties, price, conveyance"},
+        {"section": "Section 6 Specific Relief Act", "subject": "Recovery of possession", "note": "Summary suit for dispossession"},
+        {"section": "Section 10 Specific Relief Act", "subject": "Specific performance of contract", "note": "Contracts for immoveable property are ordinarily specifically enforceable"},
+    ],
+    "Constitutional": [
+        {"section": "Article 32 Constitution", "subject": "Writ jurisdiction of Supreme Court", "note": "Habeas corpus, mandamus, certiorari, prohibition, quo warranto"},
+        {"section": "Article 226 Constitution", "subject": "Writ jurisdiction of High Court", "note": "Wider than Art 32 — extends to any person within jurisdiction"},
+        {"section": "Article 14 Constitution", "subject": "Equality before law", "note": "Arbitrary executive/legislative action can be challenged"},
+    ],
+}
+
+
+def _get_applicable_statutes(case_type: str) -> List[Dict[str, str]]:
+    """Return applicable legal sections based on case type."""
+    return _APPLICABLE_STATUTES.get(case_type, _APPLICABLE_STATUTES["Civil"])
+
+
 @analysis_bp.route("/api/questions", methods=["GET"])
 def get_questions():
     return jsonify(constants.CASE_TYPES)
@@ -355,6 +654,7 @@ def analyze_case():
             judgment = result["judgment"]
             confidence = result["confidence"]
             processed = result["processed_text"]
+            all_probabilities = result.get("all_probabilities", {})
             pred_idx = None
             
             # Get prediction index for explainability
@@ -449,30 +749,135 @@ def analyze_case():
     response_data: Dict[str, Any] = {
         "judgment": primary_judgment,
         "confidence": round(confidence or 0, 4),
+        "class_probabilities": all_probabilities,
+        "risk_level": _get_risk_level(primary_judgment, confidence),
+        "confidence_band": _get_confidence_band(confidence),
         "case_type": inferred_case_type,
         "needs_review": needs_review,
         "abstention_reason": abstention_reason,
     }
-    
+
+    # Confidence info — rich structured block (All Plans)
+    if get_confidence_language is not None:
+        response_data["confidence_info"] = get_confidence_language(confidence)
+
     # Basic Analysis (FREE + BASIC Plans)
     if plan in ('free', 'basic', 'pro', 'unlimited'):
         response_data["explanation"] = explanation or _generate_basic_explanation(primary_judgment, confidence)
         response_data["judgment_source"] = judgment_source
-    
-    # Key Factors (PRO+ Plans)
-    if plan in ('pro', 'unlimited') and key_factors:
-        # Remove internal _raw field for API response
+
+        # Rich outcome description from OUTCOME_DESCRIPTIONS registry
+        if OUTCOME_DESCRIPTIONS:
+            rich_desc = OUTCOME_DESCRIPTIONS.get(primary_judgment)
+            if rich_desc:
+                response_data["outcome_description"] = rich_desc
+            else:
+                response_data["outcome_description"] = {
+                    "meaning": _get_outcome_description(primary_judgment),
+                    "implications": "Review the specific judgment for details.",
+                    "next_steps": "Consult with a legal professional for specific guidance.",
+                }
+        else:
+            response_data["outcome_description"] = _get_outcome_description(primary_judgment)
+
+    # Outcome indicators — phrases from text that signal the outcome (FREE+)
+    if plan in ('free', 'basic', 'pro', 'unlimited') and get_outcome_indicators is not None:
+        try:
+            indicators = get_outcome_indicators(processed or '')
+            if indicators:
+                response_data["outcome_indicators"] = indicators
+        except Exception:
+            pass
+
+    # Key Factors (PRO+ Plans) — always present so frontend can rely on it
+    if plan in ('pro', 'unlimited'):
         response_data["key_factors"] = [
             {k: v for k, v in factor.items() if not k.startswith('_')}
             for factor in key_factors
         ]
-    
-    # Similar Cases (PRO+ Plans)
+
+    # Applicable statutes (PRO+ Plans)
+    if plan in ('pro', 'unlimited'):
+        response_data["applicable_statutes"] = _get_applicable_statutes(inferred_case_type)
+
+    # Similar Cases (PRO+ Plans) with outcome_distribution
+    similar_cases: List[Dict[str, Any]] = []
     if plan in ('pro', 'unlimited') and config.INCLUDE_SIMILAR_CASES:
         similar_cases = _get_similar_cases(processed, config.SIMILAR_CASES_COUNT)
+        response_data["similar_cases"] = similar_cases
+
+        # Outcome distribution across similar cases
         if similar_cases:
-            response_data["similar_cases"] = similar_cases
-    
+            outcome_counts: Dict[str, int] = {}
+            for sc in similar_cases:
+                oc = sc.get('outcome', 'Unknown')
+                outcome_counts[oc] = outcome_counts.get(oc, 0) + 1
+            total_sc = len(similar_cases)
+            response_data["outcome_distribution"] = {
+                "total_similar": total_sc,
+                "distribution": {
+                    k: {"count": v, "pct": round(v / total_sc * 100, 1)}
+                    for k, v in outcome_counts.items()
+                },
+                "alignment": primary_judgment in outcome_counts,
+            }
+
+    # Text analysis — citations and parties extracted from input (PRO+)
+    if plan in ('pro', 'unlimited'):
+        text_analysis: Dict[str, Any] = {}
+        if extract_citations is not None:
+            try:
+                cites = extract_citations(processed or '')
+                if cites:
+                    text_analysis["citations_found"] = cites
+            except Exception:
+                pass
+        if extract_parties is not None:
+            try:
+                appellant, respondent = extract_parties(processed or '')
+                if appellant or respondent:
+                    text_analysis["parties"] = {
+                        "appellant": appellant,
+                        "respondent": respondent,
+                    }
+            except Exception:
+                pass
+        if extract_key_holdings is not None:
+            try:
+                holdings = extract_key_holdings(processed or '', max_holdings=3)
+                if holdings:
+                    text_analysis["key_holdings"] = holdings
+            except Exception:
+                pass
+        if text_analysis:
+            response_data["text_analysis"] = text_analysis
+
+    # Case Summary / Brief Analysis (PRO+ Plans)
+    if plan in ('pro', 'unlimited'):
+        response_data["case_summary"] = _generate_case_summary(
+            raw_input=raw,
+            case_type=inferred_case_type,
+            judgment=primary_judgment,
+            confidence=confidence,
+            key_factors=key_factors,
+            similar_cases=similar_cases or None,
+        )
+
+    # Shadow multi-axis model breakdown (PRO+ Plans)
+    if plan in ('pro', 'unlimited') and shadow and isinstance(shadow, dict):
+        shadow_info: Dict[str, Any] = {}
+        axes = shadow.get('axes')
+        if isinstance(axes, dict):
+            shadow_info["axes"] = axes
+            shadow_info["main_judgment"] = shadow.get('main_judgment')
+            shadow_info["agrees_with_classical"] = (
+                shadow.get('main_judgment') == judgment
+            )
+        if agreement_rate is not None:
+            shadow_info["agreement_rate"] = round(agreement_rate, 3)
+        if shadow_info:
+            response_data["multi_axis_analysis"] = shadow_info
+
     # Legal Analysis (UNLIMITED Plan)
     if plan == 'unlimited':
         response_data["legal_analysis"] = _generate_legal_analysis(
@@ -481,7 +886,7 @@ def analyze_case():
             key_factors=key_factors,
             confidence=confidence
         )
-    
+
     # Full Report (UNLIMITED Plan)
     if plan == 'unlimited':
         response_data["full_report"] = _generate_full_report(
@@ -491,26 +896,35 @@ def analyze_case():
             confidence=confidence,
             explanation=explanation
         )
-    
+
     # Metadata (Always returned)
+    model_run_id = None
+    if state.classifier and hasattr(state.classifier, 'run_id'):
+        model_run_id = state.classifier.run_id
     response_data["metadata"] = {
         "model_version": config.APP_VERSION,
+        "model_run_id": model_run_id,
+        "model_type": "TF-IDF + RandomForest",
         "request_id": request_id,
         "processed_at": datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
         "processing_time_ms": processing_time_ms,
         "rag_sources_used": len(response_data.get("similar_cases", [])),
         "tokens_used": len(processed.split()) if processed else 0,
+        "plan": plan,
+        "shadow_model_available": state.multi_axis_bundle is not None,
     }
-    
+
     # Input Echo (For DB storage)
     response_data["answers"] = data
-    
+
     return jsonify(response_data)
 
 @analysis_bp.route('/api/rag/query', methods=['POST'])
 @limiter.limit("30/minute")
 def rag_query_endpoint():
-    """RAG-style query endpoint using retrieval-only mode (no LLM, zero cost)."""
+    """RAG-style query endpoint — uses LLM when available, falls back to retrieval-only."""
+    # Ensure lazy-loaded search index is available
+    dependencies.ensure_search_index()
     raw = request.json or {}
     if not isinstance(raw, dict):
         return jsonify({"error": "invalid_body"}), 400
@@ -520,7 +934,7 @@ def rag_query_endpoint():
     
     k = min(raw.get('k', 5), config.MAX_SEARCH_RESULTS)
     
-    # Use the new RAG pipeline
+    # Use the RAG pipeline with LLM support
     try:
         from ai_court.rag.pipeline import rag_query as rag_pipeline
         
@@ -528,7 +942,9 @@ def rag_query_endpoint():
             question=question,
             search_index=state.search_index,
             preprocess_fn=state.preprocess_fn,
-            k=k
+            k=k,
+            llm_client=state.llm_client,
+            statute_corpus=state.statute_corpus,
         )
         return jsonify(response)
         
@@ -850,13 +1266,22 @@ def analyze_quick():
         if state.classifier:
             result = state.classifier.predict(text, case_type)
             elapsed_ms = (time.perf_counter() - start_time) * 1000
-            
-            return jsonify({
-                "judgment": result["judgment"],
-                "confidence": round(result["confidence"] or 0, 3),
-                "case_type": case_type or "Unknown",
-                "timing_ms": round(elapsed_ms, 2)
-            })
+
+            if format_minimal_response is not None:
+                resp = format_minimal_response(
+                    result["judgment"],
+                    result["confidence"],
+                    case_type or "Unknown",
+                )
+            else:
+                resp = {
+                    "judgment": result["judgment"],
+                    "confidence": round(result["confidence"] or 0, 3),
+                    "case_type": case_type or "Unknown",
+                }
+            resp["timing_ms"] = round(elapsed_ms, 2)
+
+            return jsonify(resp)
         else:
             return jsonify({"error": "Model not initialized"}), 500
     except Exception as e:

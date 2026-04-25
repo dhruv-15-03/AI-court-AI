@@ -1,0 +1,128 @@
+{
+  "act_id": "HMA",
+  "full_name": "Hindu Marriage Act, 1955",
+  "short_name": "HMA",
+  "year": 1955,
+  "sections": [
+    {
+      "section_number": "5",
+      "heading": "Conditions for a Hindu marriage",
+      "body_text": "A marriage may be solemnized between any two Hindus if neither party has a spouse living at the time of the marriage, neither is incapable of giving valid consent due to unsoundness of mind, the bridegroom has completed the age of 21 years and the bride the age of 18 years, and the parties are not within the degrees of prohibited relationship unless permitted by custom.",
+      "chapter": "II - Hindu Marriages"
+    },
+    {
+      "section_number": "7",
+      "heading": "Ceremonies for a Hindu marriage",
+      "body_text": "A Hindu marriage may be solemnized in accordance with the customary rites and ceremonies of either party. Where such rites include the saptapadi (seven steps), the marriage becomes complete and binding when the seventh step is taken.",
+      "chapter": "II - Hindu Marriages"
+    },
+    {
+      "section_number": "8",
+      "heading": "Registration of Hindu marriages",
+      "body_text": "The State Government may make rules for the registration of Hindu marriages. Failure to register a marriage does not affect its validity.",
+      "chapter": "II - Hindu Marriages"
+    },
+    {
+      "section_number": "9",
+      "heading": "Restitution of conjugal rights",
+      "body_text": "When either the husband or the wife has withdrawn from the society of the other without reasonable excuse, the aggrieved party may apply for restitution of conjugal rights. The court may decree restitution if it is satisfied with the truth of the statements made in the petition.",
+      "chapter": "II - Hindu Marriages"
+    },
+    {
+      "section_number": "10",
+      "heading": "Judicial separation",
+      "body_text": "Either party to a marriage may seek a decree for judicial separation on grounds specified in Section 13(1) or 13(2). During the period of separation, neither party is obligated to cohabit with the other.",
+      "chapter": "II - Hindu Marriages"
+    },
+    {
+      "section_number": "11",
+      "heading": "Void marriages",
+      "body_text": "A marriage shall be null and void if it contravenes any of the conditions specified in clauses (i), (iv), and (v) of Section 5, such as bigamy, prohibited degrees of relationship, or sapinda relationships unless permitted by custom.",
+      "chapter": "II - Hindu Marriages"
+    },
+    {
+      "section_number": "12",
+      "heading": "Voidable marriages",
+      "body_text": "A marriage is voidable and may be annulled by a decree if it was solemnized without the consent of a party due to unsoundness of mind, fraud, force, or if the wife was pregnant by another man at the time of marriage.",
+      "chapter": "II - Hindu Marriages"
+    },
+    {
+      "section_number": "13",
+      "heading": "Grounds for divorce",
+      "body_text": "Either party to a marriage may petition for divorce on grounds such as adultery, cruelty, desertion, conversion to another religion, mental disorder, venereal disease, renunciation of the world, or presumption of death. Additional grounds are available to women, such as remarriage of the husband or rape, sodomy, or bestiality.",
+      "chapter": "II - Hindu Marriages"
+    },
+    {
+      "section_number": "13B",
+      "heading": "Divorce by mutual consent",
+      "body_text": "Both parties to a marriage may jointly file a petition for divorce on the ground that they have been living separately for a period of one year or more, have not been able to live together, and have mutually agreed to dissolve the marriage.",
+      "chapter": "II - Hindu Marriages"
+    },
+    {
+      "section_number": "14",
+      "heading": "No petition for divorce within one year of marriage",
+      "body_text": "No petition for divorce shall be entertained within one year of marriage unless exceptional hardship or depravity is proved. The court may allow such a petition if it is satisfied with the circumstances.",
+      "chapter": "II - Hindu Marriages"
+    },
+    {
+      "section_number": "15",
+      "heading": "Divorced persons when may marry again",
+      "body_text": "When a marriage has been dissolved by a decree of divorce and no appeal has been preferred, or the time for appeal has expired, it shall be lawful for either party to marry again.",
+      "chapter": "II - Hindu Marriages"
+    },
+    {
+      "section_number": "16",
+      "heading": "Legitimacy of children of void and voidable marriages",
+      "body_text": "Children of a void or voidable marriage, who would have been legitimate if the marriage had been valid, shall be deemed legitimate, irrespective of the decree of nullity.",
+      "chapter": "II - Hindu Marriages"
+    },
+    {
+      "section_number": "18",
+      "heading": "Punishment for contravention of certain conditions",
+      "body_text": "Any person who contravenes the conditions specified in clauses (iii), (iv), and (v) of Section 5 shall be punishable with imprisonment up to 15 days or with a fine up to one thousand rupees, or both.",
+      "chapter": "II - Hindu Marriages"
+    },
+    {
+      "section_number": "19",
+      "heading": "Court to which petition shall be presented",
+      "body_text": "Every petition under this Act shall be presented to the district court within the local limits of whose jurisdiction the marriage was solemnized, the respondent resides, or the petitioner resides.",
+      "chapter": "III - Jurisdiction and Procedure"
+    },
+    {
+      "section_number": "21",
+      "heading": "Application of the Civil Procedure Code",
+      "body_text": "Subject to the provisions of this Act, all proceedings under this Act shall be regulated by the Code of Civil Procedure, 1908.",
+      "chapter": "III - Jurisdiction and Procedure"
+    },
+    {
+      "section_number": "23",
+      "heading": "Decree in proceedings",
+      "body_text": "The court shall ensure that there is no collusion between the parties and that the petitioner is not taking advantage of their own wrong before granting any relief under this Act.",
+      "chapter": "III - Jurisdiction and Procedure"
+    },
+    {
+      "section_number": "24",
+      "heading": "Maintenance pendente lite and expenses of proceedings",
+      "body_text": "The court may order either party to pay maintenance and litigation expenses to the other party during the pendency of proceedings, based on the income and needs of the parties.",
+      "chapter": "III - Jurisdiction and Procedure"
+    },
+    {
+      "section_number": "25",
+      "heading": "Permanent alimony and maintenance",
+      "body_text": "The court may order either party to pay permanent alimony and maintenance to the other party, considering the income, property, and conduct of the parties, as well as other relevant circumstances.",
+      "chapter": "III - Jurisdiction and Procedure"
+    },
+    {
+      "section_number": "26",
+      "heading": "Custody of children",
+      "body_text": "The court may pass orders regarding the custody, maintenance, and education of minor children during or after the proceedings under this Act, considering the welfare of the children.",
+      "chapter": "III - Jurisdiction and Procedure"
+    },
+    {
+      "section_number": "28",
+      "heading": "Appeals from decrees and orders",
+      "body_text": "All decrees made by the court in any proceeding under this Act shall be appealable, subject to the provisions of the Code of Civil Procedure, 1908.",
+      "chapter": "III - Jurisdiction and Procedure"
+    }
+  ]
+}

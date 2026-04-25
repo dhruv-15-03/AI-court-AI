@@ -1,0 +1,98 @@
+{
+  "act_id": "PC ACT",
+  "full_name": "Prevention of Corruption Act, 1988",
+  "short_name": "PC Act",
+  "year": 1988,
+  "sections": [
+    {
+      "section_number": "2(c)",
+      "heading": "Definition of 'Public Servant'",
+      "body_text": "This section defines 'public servant' to include any person in the service or pay of the government, local authority, statutory corporation, or any other body owned or controlled by the government, as well as judges, arbitrators, and office-bearers of cooperative societies receiving financial aid from the government.",
+      "chapter": "I - Preliminary"
+    },
+    {
+      "section_number": "7",
+      "heading": "Offense of Public Servant Taking Gratification Other than Legal Remuneration",
+      "body_text": "A public servant who accepts or agrees to accept any gratification other than legal remuneration as a motive or reward for performing or refraining from performing an official act shall be punishable with imprisonment for a term not less than three years, which may extend to seven years, and shall also be liable to a fine.",
+      "chapter": "II - Offences and Penalties"
+    },
+    {
+      "section_number": "7A",
+      "heading": "Taking Undue Advantage to Influence Public Servant",
+      "body_text": "Whoever accepts or attempts to obtain an undue advantage with the intention of inducing or rewarding a public servant to perform or forbear from performing an official act shall be punishable with imprisonment for a term not less than three years, which may extend to seven years, and shall also be liable to a fine.",
+      "chapter": "II - Offences and Penalties"
+    },
+    {
+      "section_number": "8",
+      "heading": "Offense of Bribing a Public Servant",
+      "body_text": "Any person who gives or promises to give an undue advantage to a public servant, with the intention to induce or reward the public servant for improper performance of public duty, shall be punishable with imprisonment for a term not less than three years, which may extend to seven years, and shall also be liable to a fine.",
+      "chapter": "II - Offences and Penalties"
+    },
+    {
+      "section_number": "9",
+      "heading": "Bribing a Public Servant by a Commercial Organization",
+      "body_text": "If a commercial organization is found guilty of giving or promising to give an undue advantage to a public servant to obtain or retain business or an advantage in the conduct of business, the organization shall be punishable with a fine, and the person in charge of the organization may also face imprisonment.",
+      "chapter": "II - Offences and Penalties"
+    },
+    {
+      "section_number": "10",
+      "heading": "Person in Charge of Commercial Organization to be Guilty in Certain Cases",
+      "body_text": "If an offense under Section 9 is committed by a commercial organization, every person who was in charge of and responsible for the conduct of its business at the time of the offense shall be deemed guilty unless they prove that the offense was committed without their knowledge or that they exercised due diligence.",
+      "chapter": "II - Offences and Penalties"
+    },
+    {
+      "section_number": "11",
+      "heading": "Public Servant Obtaining Valuable Thing Without Consideration",
+      "body_text": "If a public servant accepts or obtains any valuable thing without consideration or for inadequate consideration from a person concerned in proceedings or business transacted by such public servant, they shall be punishable with imprisonment for a term not less than six months, which may extend to five years, and shall also be liable to a fine.",
+      "chapter": "II - Offences and Penalties"
+    },
+    {
+      "section_number": "12",
+      "heading": "Punishment for Abetment of Offenses",
+      "body_text": "Whoever abets any offense punishable under this Act, whether or not the offense is or is not committed in consequence of the abetment, shall be punishable with the punishment provided for the offense.",
+      "chapter": "II - Offences and Penalties"
+    },
+    {
+      "section_number": "13",
+      "heading": "Criminal Misconduct by a Public Servant",
+      "body_text": "A public servant is said to commit criminal misconduct if they dishonestly or fraudulently misappropriate property entrusted to them, abuse their position to obtain an undue advantage, or are in possession of disproportionate assets. The punishment is imprisonment for a term not less than four years, which may extend to ten years, and a fine.",
+      "chapter": "II - Offences and Penalties"
+    },
+    {
+      "section_number": "14",
+      "heading": "Punishment for Habitual Offender",
+      "body_text": "A public servant who habitually commits offenses under Sections 7, 11, or 13 shall be punishable with imprisonment for a term not less than five years, which may extend to ten years, and shall also be liable to a fine.",
+      "chapter": "II - Offences and Penalties"
+    },
+    {
+      "section_number": "15",
+      "heading": "Punishment for Attempt",
+      "body_text": "Whoever attempts to commit an offense referred to in Sections 7, 11, or 13 shall be punishable with imprisonment for a term not less than two years, which may extend to five years, and shall also be liable to a fine.",
+      "chapter": "II - Offences and Penalties"
+    },
+    {
+      "section_number": "17",
+      "heading": "Persons Authorized to Investigate",
+      "body_text": "No police officer below the rank of an Inspector shall investigate any offense punishable under this Act without the order of a Magistrate or the prior approval of the appropriate authority.",
+      "chapter": "III - Investigation"
+    },
+    {
+      "section_number": "18",
+      "heading": "Power to Inspect Bankers' Books",
+      "body_text": "If it is necessary to inspect the books of a banker for the purpose of investigation under this Act, the police officer conducting the investigation may do so with prior approval from the appropriate authority.",
+      "chapter": "III - Investigation"
+    },
+    {
+      "section_number": "19",
+      "heading": "Previous Sanction Necessary for Prosecution",
+      "body_text": "No court shall take cognizance of an offense under this Act alleged to have been committed by a public servant except with the previous sanction of the appropriate government or authority.",
+      "chapter": "IV - Sanction for Prosecution and Other Miscellaneous Provisions"
+    },
+    {
+      "section_number": "20",
+      "heading": "Presumption Where Public Servant Accepts Gratification",
+      "body_text": "If a public servant is found to have accepted or obtained any gratification other than legal remuneration, it shall be presumed, unless proven otherwise, that the gratification was accepted as a motive or reward for performing or refraining from performing an official act.",
+      "chapter": "IV - Sanction for Prosecution and Other Miscellaneous Provisions"
+    }
+  ]
+}

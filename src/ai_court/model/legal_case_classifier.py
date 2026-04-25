@@ -148,16 +148,24 @@ class LegalCaseClassifier:
                 proba = self.model.predict_proba([processed])[0]
                 pred_idx = int(proba.argmax())
                 confidence = float(proba.max())
+                # Build per-class probability dict keyed by human-readable label
+                classes = self.label_encoder.classes_
+                all_probabilities = {
+                    str(cls): round(float(p), 4)
+                    for cls, p in zip(classes, proba)
+                }
             else:
                 pred_idx = int(self.model.predict([processed])[0])
                 confidence = None
+                all_probabilities = {}
                 
             judgment = self.label_encoder.inverse_transform([pred_idx])[0]
             
             return {
                 "judgment": judgment,
                 "confidence": confidence,
-                "processed_text": processed
+                "processed_text": processed,
+                "all_probabilities": all_probabilities,
             }
         except Exception as e:
             logger.error(f"Prediction failed: {e}")

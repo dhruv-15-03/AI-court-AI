@@ -21,6 +21,11 @@
   "cv_macro_f1_std": 0.011850462833802287,
   "test_macro_f1": 0.8270246867865834,
   "test_weighted_f1": 0.9097991414186438,
+  "per_class_f1": {
+    "Acquittal/Conviction Overturned": 0.6357,
+    "Relief Denied/Dismissed": 0.8833,
+    "Relief Granted/Convicted": 0.9621
+  },
   "head_macro_f1": 0.3300395256916996,
   "tail_macro_f1": 0.5187441137175023,
   "pre_upsampling_distribution": {

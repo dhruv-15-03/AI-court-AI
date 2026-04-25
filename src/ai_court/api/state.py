@@ -17,6 +17,12 @@ multi_axis_lock = threading.Lock()
 search_index: Optional[Dict[str, Any]] = None
 semantic_index: Optional[Dict[str, Any]] = None
 
+# Agent State
+llm_client: Any = None  # Instance of LLMClient
+statute_corpus: Any = None  # Instance of StatuteCorpus
+session_manager: Any = None  # Instance of SessionManager
+agent_pipeline: Any = None  # Instance of LegalAgentPipeline
+
 # Active Learning Queue
 AL_QUEUE: List[Dict[str, Any]] = []
 AL_QUEUE_MAX_SIZE = 1000  # Prevent unbounded growth
@@ -54,7 +60,8 @@ def update_prediction_stats(confidence: float, abstained: bool = False):
         conf_sum = float(prediction_stats.get('_confidence_sum') or 0.0) + confidence
         prediction_stats['_confidence_sum'] = conf_sum
         prediction_stats['avg_confidence'] = conf_sum / total if total > 0 else 0.0
-        if confidence < 0.5:  # Hardcoded threshold for stats
+        from ai_court.api import config as _cfg
+        if confidence < _cfg.CONFIDENCE_THRESHOLD:
             prediction_stats['low_confidence_count'] = int(prediction_stats.get('low_confidence_count') or 0) + 1
     
     if abstained:

@@ -1,0 +1,128 @@
+{
+  "act_id": "MV ACT",
+  "full_name": "Motor Vehicles Act, 1988",
+  "short_name": "MV Act",
+  "year": 1988,
+  "sections": [
+    {
+      "section_number": "140",
+      "heading": "Liability without fault in certain cases",
+      "body_text": "This section provides for no-fault liability in cases of death or permanent disablement due to motor vehicle accidents. The owner of the vehicle is liable to pay compensation of Rs. 50,000 in case of death and Rs. 25,000 in case of permanent disablement, irrespective of fault.",
+      "chapter": "VIII - Insurance of Motor Vehicles Against Third Party Risks"
+    },
+    {
+      "section_number": "161",
+      "heading": "Special provisions as to compensation in case of hit and run motor accidents",
+      "body_text": "This section provides compensation for victims of hit-and-run accidents. In case of death, Rs. 2,00,000 is payable, and in case of grievous injury, Rs. 50,000 is payable from the Solatium Fund.",
+      "chapter": "VIII - Insurance of Motor Vehicles Against Third Party Risks"
+    },
+    {
+      "section_number": "163A",
+      "heading": "Special provisions as to payment of compensation on structured formula basis",
+      "body_text": "This section allows victims or their legal representatives to claim compensation on a structured formula basis without proving fault or negligence. Compensation is calculated based on the victim's age, income, and other factors.",
+      "chapter": "VIII - Insurance of Motor Vehicles Against Third Party Risks"
+    },
+    {
+      "section_number": "166",
+      "heading": "Application for compensation",
+      "body_text": "This section allows persons entitled to compensation or their legal representatives to file an application before the Motor Accident Claims Tribunal for compensation arising out of motor vehicle accidents.",
+      "chapter": "VIII - Insurance of Motor Vehicles Against Third Party Risks"
+    },
+    {
+      "section_number": "168",
+      "heading": "Award of compensation by Claims Tribunal",
+      "body_text": "The Claims Tribunal determines the amount of compensation payable to the claimant after considering the evidence and circumstances of the case. The award is binding and enforceable.",
+      "chapter": "VIII - Insurance of Motor Vehicles Against Third Party Risks"
+    },
+    {
+      "section_number": "173",
+      "heading": "Appeals",
+      "body_text": "Any person aggrieved by the award of the Claims Tribunal may file an appeal to the High Court within 90 days from the date of the award, subject to conditions specified in the Act.",
+      "chapter": "VIII - Insurance of Motor Vehicles Against Third Party Risks"
+    },
+    {
+      "section_number": "146",
+      "heading": "Necessity for insurance against third party risk",
+      "body_text": "This section mandates that no motor vehicle shall be used in a public place unless it is insured against third-party risks. The insurance policy must cover liability for death or injury to third parties.",
+      "chapter": "VIII - Insurance of Motor Vehicles Against Third Party Risks"
+    },
+    {
+      "section_number": "147",
+      "heading": "Requirements of policies and limits of liability",
+      "body_text": "This section specifies the requirements for insurance policies, including coverage for third-party liability for death, bodily injury, or property damage caused by the use of the vehicle.",
+      "chapter": "VIII - Insurance of Motor Vehicles Against Third Party Risks"
+    },
+    {
+      "section_number": "149",
+      "heading": "Duty of insurers to satisfy judgments and awards against persons insured in respect of third party risks",
+      "body_text": "This section mandates that insurers must satisfy judgments or awards made against the insured for third-party liability arising out of motor vehicle accidents.",
+      "chapter": "VIII - Insurance of Motor Vehicles Against Third Party Risks"
+    },
+    {
+      "section_number": "150",
+      "heading": "Rights of third parties against insurers on insolvency of the insured",
+      "body_text": "This section provides that third parties can claim compensation directly from the insurer if the insured becomes insolvent or dies.",
+      "chapter": "VIII - Insurance of Motor Vehicles Against Third Party Risks"
+    },
+    {
+      "section_number": "151",
+      "heading": "Duty to give information as to insurance",
+      "body_text": "This section requires the driver or owner of a vehicle involved in an accident to provide information about the insurance policy to the victim or authorities.",
+      "chapter": "VIII - Insurance of Motor Vehicles Against Third Party Risks"
+    },
+    {
+      "section_number": "152",
+      "heading": "Settlement between insurers and insured persons",
+      "body_text": "This section allows insurers and insured persons to settle claims without involving the Claims Tribunal, provided the settlement is fair and reasonable.",
+      "chapter": "VIII - Insurance of Motor Vehicles Against Third Party Risks"
+    },
+    {
+      "section_number": "184",
+      "heading": "Driving dangerously",
+      "body_text": "This section penalizes driving in a manner that is dangerous to the public. The punishment includes imprisonment up to 6 months or a fine up to Rs. 1,000 for the first offense, and higher penalties for subsequent offenses.",
+      "chapter": "XIII - Offenses, Penalties, and Procedure"
+    },
+    {
+      "section_number": "185",
+      "heading": "Driving by a drunken person or by a person under the influence of drugs",
+      "body_text": "This section prohibits driving under the influence of alcohol or drugs. The punishment includes imprisonment up to 6 months or a fine up to Rs. 10,000 for the first offense, and higher penalties for subsequent offenses.",
+      "chapter": "XIII - Offenses, Penalties, and Procedure"
+    },
+    {
+      "section_number": "186",
+      "heading": "Driving when mentally or physically unfit to drive",
+      "body_text": "This section prohibits driving a motor vehicle if the driver is mentally or physically unfit to drive. The punishment includes a fine or imprisonment as prescribed.",
+      "chapter": "XIII - Offenses, Penalties, and Procedure"
+    },
+    {
+      "section_number": "187",
+      "heading": "Punishment for offenses relating to accident",
+      "body_text": "This section penalizes failure to provide information or render assistance in case of an accident. The punishment includes imprisonment up to 3 months or a fine up to Rs. 500, or both.",
+      "chapter": "XIII - Offenses, Penalties, and Procedure"
+    },
+    {
+      "section_number": "188",
+      "heading": "Punishment for abetment of certain offenses",
+      "body_text": "This section penalizes abetment of offenses such as dangerous driving or driving under the influence of alcohol or drugs. The punishment is similar to that prescribed for the principal offense.",
+      "chapter": "XIII - Offenses, Penalties, and Procedure"
+    },
+    {
+      "section_number": "190",
+      "heading": "Using vehicle in unsafe condition",
+      "body_text": "This section penalizes the use of a motor vehicle in a condition that endangers the safety of the public. The punishment includes a fine up to Rs. 2,000 for the first offense and higher penalties for subsequent offenses.",
+      "chapter": "XIII - Offenses, Penalties, and Procedure"
+    },
+    {
+      "section_number": "192",
+      "heading": "Using vehicle without registration",
+      "body_text": "This section penalizes the use of a motor vehicle without proper registration. The punishment includes a fine up to Rs. 5,000 for the first offense and higher penalties for subsequent offenses.",
+      "chapter": "XIII - Offenses, Penalties, and Procedure"
+    },
+    {
+      "section_number": "196",
+      "heading": "Driving uninsured vehicle",
+      "body_text": "This section penalizes driving a motor vehicle without a valid insurance policy. The punishment includes a fine up to Rs. 2,000 or imprisonment up to 3 months, or both.",
+      "chapter": "XIII - Offenses, Penalties, and Procedure"
+    }
+  ]
+}
