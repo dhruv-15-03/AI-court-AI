@@ -245,3 +245,72 @@ def al_sync_outcomes():
     except Exception as exc:
         logger.error("sync_outcomes failed: %s", exc, exc_info=True)
         return jsonify({"error": "sync_failed", "message": str(exc)}), 500
+
+
+# ── User Feedback (was this helpful?) ─────────────────────────────────
+
+FEEDBACK_FILE = os.path.join(config.PROJECT_ROOT, "data", "user_feedback.jsonl")
+
+
+@feedback_bp.route('/api/feedback', methods=['POST'])
+def user_feedback():
+    """Record user feedback (thumbs up/down) on AI responses.
+
+    Body:
+        response_type: "analysis" | "chat" | "rag" | "document"
+        helpful:       true | false
+        query_excerpt: first 100 chars of the query (for matching)
+        session_id:    optional
+        comment:       optional free text
+    """
+    raw = request.json or {}
+    helpful = raw.get('helpful')
+    if helpful is None:
+        return jsonify({"error": "missing_helpful"}), 400
+
+    import time as _time, json as _json
+    entry = {
+        "timestamp": _time.time(),
+        "response_type": raw.get("response_type", "unknown"),
+        "helpful": bool(helpful),
+        "query_excerpt": (raw.get("query_excerpt") or "")[:200],
+        "session_id": raw.get("session_id", ""),
+        "comment": (raw.get("comment") or "")[:500],
+    }
+    try:
+        os.makedirs(os.path.dirname(FEEDBACK_FILE), exist_ok=True)
+        with open(FEEDBACK_FILE, "a", encoding="utf-8") as f:
+            f.write(_json.dumps(entry, ensure_ascii=False) + "\n")
+    except Exception as exc:
+        logger.warning("feedback write failed: %s", exc)
+
+    return jsonify({"status": "recorded"})
+
+
+@feedback_bp.route('/api/feedback/stats', methods=['GET'])
+def feedback_stats():
+    """Return aggregate feedback statistics."""
+    import json as _json
+    if not os.path.exists(FEEDBACK_FILE):
+        return jsonify({"total": 0, "helpful": 0, "not_helpful": 0, "rate": 0})
+    helpful = not_helpful = 0
+    with open(FEEDBACK_FILE, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                e = _json.loads(line)
+                if e.get("helpful"):
+                    helpful += 1
+                else:
+                    not_helpful += 1
+            except _json.JSONDecodeError:
+                continue
+    total = helpful + not_helpful
+    return jsonify({
+        "total": total,
+        "helpful": helpful,
+        "not_helpful": not_helpful,
+        "rate": round(helpful / total, 3) if total > 0 else 0,
+    })

@@ -139,5 +139,18 @@
     "case_type": "Civil",
     "added_at": "2026-04-25T07:15:19.249879Z",
     "source": "auto_queue"
+  },
+  {
+    "id": "6a95dfea-e420-4739-b218-03d3506976e7",
+    "text": "civil party v b",
+    "predicted_label": "Petition Withdrawn/Dismissed as Withdrawn",
+    "confidence": 0.19193891108399375,
+    "uncertainty": 0.8081,
+    "uncertainty_method": "confidence",
+    "probabilities": {},
+    "reason": "Low confidence (0.19 < 0.5)",
+    "case_type": "Civil",
+    "added_at": "2026-04-26T14:29:33.584966Z",
+    "source": "auto_queue"
   }
 ]
