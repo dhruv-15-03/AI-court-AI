@@ -97,6 +97,14 @@ app.register_blueprint(feedback_bp)
 app.register_blueprint(agent_bp)
 app.register_blueprint(audit_bp)
 
+# ── Initialize SQLite persistent store ─────────────────────────────────
+try:
+    from ai_court.storage import init_db
+    init_db()
+    logger.info("SQLite persistent store initialized")
+except Exception as _e:
+    logger.warning("SQLite init failed (will use fallback flat files): %s", _e)
+
 
 # ── Global error handlers ─────────────────────────────────────────────
 @app.errorhandler(400)
@@ -189,6 +197,10 @@ def _after_request(response):
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Cache-Control"] = "no-store"
+    if config.APP_ENV == "production":
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    response.headers["X-Permitted-Cross-Domain-Policies"] = "none"
     return response
 
 
