@@ -7,7 +7,6 @@ Run after datasets have been downloaded.
 Usage:
     python scripts/convert_hf_datasets.py
 """
-import json
 import logging
 import os
 import re

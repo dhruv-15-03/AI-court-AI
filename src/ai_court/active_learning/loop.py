@@ -9,11 +9,10 @@ Features:
 """
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Optional, Callable
+from typing import List, Dict, Any, Optional
 import heapq
 import json
 import logging
-import math
 import os
 import time
 

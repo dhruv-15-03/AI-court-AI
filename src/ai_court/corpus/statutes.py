@@ -105,6 +105,7 @@ class StatuteCorpus:
         query: str,
         act_filter: Optional[str] = None,
         *,
+        k: int = 10,
         use_semantic: Optional[bool] = None,
         alpha: float = 0.5,
     ) -> list[StatuteSection]:

@@ -128,7 +128,6 @@ def _humanize_feature(term: str) -> str:
 
 def _generate_feature_description(term: str, direction: str) -> str:
     """Generate a contextual description for a feature."""
-    import random
     
     term_lower = term.lower()
     templates = DIRECTION_TEMPLATES.get(direction, DIRECTION_TEMPLATES['positive'])

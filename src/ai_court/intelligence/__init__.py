@@ -16,7 +16,7 @@ from __future__ import annotations
 import json
 import logging
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -79,8 +79,7 @@ class JudgePatternAnalyzer:
             top_idx = np.argsort(-scores)[:100]  # Top 100 matches
 
             # Analyze outcomes
-            outcomes = {}
-            case_types = {}
+            outcomes: Dict[str, int] = {}
             for idx in top_idx:
                 if idx < len(meta) and scores[idx] > 0.1:
                     m = meta[idx]
@@ -127,7 +126,7 @@ class JudgePatternAnalyzer:
         if total < 5:
             return "Insufficient data for reliable pattern analysis."
 
-        top_outcome = max(outcomes, key=outcomes.get)
+        top_outcome = max(outcomes, key=lambda name: outcomes[name])
         top_pct = outcomes[top_outcome] / total * 100
 
         return (
@@ -187,7 +186,7 @@ class EvidenceAdmissibilityChecker:
     """
 
     # Evidence rules — each rule checks for a specific issue
-    RULES = [
+    RULES: List[Dict[str, Any]] = [
         {
             "id": "electronic_evidence_cert",
             "triggers": ["whatsapp", "email", "sms", "screenshot", "cctv", "video", "audio recording",
@@ -260,7 +259,7 @@ class EvidenceAdmissibilityChecker:
         },
     ]
 
-    def check(self, case_text: str, evidence_descriptions: List[str] = None) -> List[EvidenceIssue]:
+    def check(self, case_text: str, evidence_descriptions: Optional[List[str]] = None) -> List[EvidenceIssue]:
         """
         Check evidence in a case for admissibility issues.
         
@@ -309,7 +308,7 @@ class EvidenceAdmissibilityChecker:
 # 3. PROCEDURAL CHECKLISTS
 # ═══════════════════════════════════════════════════════════════════════════
 
-PROCEDURAL_CHECKLISTS = {
+PROCEDURAL_CHECKLISTS: Dict[str, Dict[str, Any]] = {
     "bail_application": {
         "title": "Bail Application Checklist",
         "case_types": ["criminal", "murder", "narcotics", "assault"],

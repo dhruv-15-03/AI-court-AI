@@ -195,7 +195,6 @@ class DataLoader:
                 present_labels = [self.label_encoder.inverse_transform([v])[0] for v in sorted(set(y))]
                 self.label_encoder = LabelEncoder()
                 label_map = {old: new for new, old in enumerate(sorted(set(y)))}
-                inv_map = {old: present_labels[i] for i, old in enumerate(sorted(set(y)))}
                 y = np.array([label_map[v] for v in y])
                 self.label_encoder.fit(present_labels)
                 import logging

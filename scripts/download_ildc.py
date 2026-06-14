@@ -12,12 +12,10 @@ This script:
 3. Extracts richer summaries from the full judgment text
 4. Maps binary labels to our 11-class ontology using text analysis
 """
-import json
 import logging
 import os
 import re
 import sys
-import time
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent.parent

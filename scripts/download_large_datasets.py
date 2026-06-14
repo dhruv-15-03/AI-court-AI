@@ -172,7 +172,6 @@ def main():
             grand += len(pd.read_csv(csv))
         except:
             pass
-    from pathlib import Path
     enriched_dir = PROJECT_ROOT / "data" / "raw_enriched"
     if enriched_dir.exists():
         for csv in enriched_dir.glob("*.csv"):

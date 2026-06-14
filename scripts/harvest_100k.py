@@ -28,8 +28,6 @@ import random
 import re
 import sys
 import time
-import traceback
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
@@ -751,7 +749,7 @@ def load_hldc(manifest: Dict[str, Any], target: int) -> int:
             summary = _create_rich_summary(text, judgment)
 
             records.append({
-                "title": str(rec.get("title", f"HLDC Bail Case"))[:300],
+                "title": str(rec.get("title", "HLDC Bail Case"))[:300],
                 "url": rec.get("url", ""),
                 "case_summary": summary,
                 "judgment": judgment,
@@ -866,9 +864,9 @@ def print_status():
     print("\n" + "=" * 60)
     print("  HARVEST STATUS")
     print("=" * 60)
-    print(f"\n  Existing cases in data/raw + data/raw_enriched:")
+    print("\n  Existing cases in data/raw + data/raw_enriched:")
     print(f"    Total: {existing_total:,} rows across {len(by_file)} files")
-    print(f"\n  Manifest:")
+    print("\n  Manifest:")
     print(f"    Total harvested (tracked): {manifest.get('total_harvested', 0):,}")
     print(f"    Target: {manifest.get('target', 100000):,}")
     print(f"    Processed URLs: {len(manifest.get('processed_urls', [])):,}")
@@ -877,18 +875,18 @@ def print_status():
 
     sc = manifest.get("source_counts", {})
     if sc:
-        print(f"\n  By source:")
+        print("\n  By source:")
         for src, cnt in sorted(sc.items()):
             print(f"    {src}: {cnt:,}")
 
     cc = manifest.get("category_counts", {})
     if cc:
-        print(f"\n  By category (top 15):")
+        print("\n  By category (top 15):")
         for cat, cnt in sorted(cc.items(), key=lambda x: -x[1])[:15]:
             print(f"    {cat}: {cnt:,}")
 
     if by_file:
-        print(f"\n  File breakdown:")
+        print("\n  File breakdown:")
         for fname, count in sorted(by_file.items(), key=lambda x: -x[1])[:20]:
             print(f"    {fname}: {count:,}")
 
@@ -977,7 +975,7 @@ Examples:
 
     # Final status
     print("\n" + "=" * 60)
-    print(f"  HARVEST COMPLETE")
+    print("  HARVEST COMPLETE")
     print(f"  Final count: {final_count or total:,} / {args.target:,}")
     print(f"  Master CSV: {MASTER_CSV}")
     print("=" * 60)

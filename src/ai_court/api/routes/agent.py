@@ -396,7 +396,7 @@ def _free_tier_analysis(query: str, k_cases: int = 3) -> dict:
     # Similar cases (no LLM needed)
     from ai_court.api.routes.analysis import _get_similar_cases
 
-    processed = state.preprocess_fn(query) if state.preprocess_fn else query.lower()
+    processed = state.preprocess_fn(query) if state.preprocess_fn is not None else query.lower()
     result["similar_cases"] = _get_similar_cases(processed, k=k_cases)
 
     return result

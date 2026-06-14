@@ -4,7 +4,10 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free
-    healthCheckPath: /api/health
+    # Use the lightweight liveness probe, not /api/health (which runs a full model
+    # inference and 502s on a cold free-tier worker, making Render restart the
+    # instance in a loop). Liveness just confirms the process is up.
+    healthCheckPath: /api/health/live
     envVars:
       - key: MODEL_PATH
         value: /app/models/legal_case_classifier.pkl

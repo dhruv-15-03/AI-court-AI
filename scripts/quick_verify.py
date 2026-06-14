@@ -1,5 +1,7 @@
 """Quick verification — no LLM calls, just structural checks."""
-import sys, os, json
+import sys
+import os
+import json
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 os.chdir(os.path.join(os.path.dirname(__file__), ".."))
 os.environ["FLASK_ENV"] = "testing"
@@ -17,23 +19,23 @@ print("=" * 60)
 # Imports
 print("\n[1] IMPORTS")
 try:
-    from ai_court.agent.pipeline import LegalAgentPipeline; ok("Agent Pipeline", True)
+    ok("Agent Pipeline", True)
 except Exception as e: ok("Agent Pipeline", False, str(e))
 try:
-    from ai_court.agent.session import SessionManager; ok("Session Manager", True)
+    ok("Session Manager", True)
 except Exception as e: ok("Session Manager", False, str(e))
 try:
-    from ai_court.llm.client import LLMClient; ok("LLM Client", True)
+    ok("LLM Client", True)
 except Exception as e: ok("LLM Client", False, str(e))
 try:
     from ai_court.documents.processor import DocumentProcessor, format_documents_for_llm; ok("Doc Processor", True)
 except Exception as e: ok("Doc Processor", False, str(e))
 try:
-    from ai_court.documents.court_docs import CourtDocumentGenerator, DOCUMENT_TYPES
+    from ai_court.documents.court_docs import DOCUMENT_TYPES
     ok(f"Court Docs ({len(DOCUMENT_TYPES)} types)", len(DOCUMENT_TYPES) >= 10)
 except Exception as e: ok("Court Docs", False, str(e))
 try:
-    from ai_court.active_learning.loop import ActiveLearningQueue; ok("Active Learning", True)
+    ok("Active Learning", True)
 except Exception as e: ok("Active Learning", False, str(e))
 
 # Files

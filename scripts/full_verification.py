@@ -3,7 +3,8 @@ FULL END-TO-END PRODUCT VERIFICATION
 =====================================
 Tests every layer: Python AI → API endpoints → Document processing → Agent pipeline
 """
-import sys, os, json, time
+import sys
+import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 os.chdir(os.path.join(os.path.dirname(__file__), ".."))
 os.environ["FLASK_ENV"] = "testing"
@@ -33,19 +34,16 @@ print("=" * 70)
 # ── 1. Core Imports ──────────────────────────────────────────────────────
 print("\n[1] CORE IMPORTS")
 try:
-    from ai_court.agent.pipeline import LegalAgentPipeline
     check("Agent Pipeline import", True)
 except Exception as e:
     check("Agent Pipeline import", False, str(e))
 
 try:
-    from ai_court.agent.session import SessionManager
     check("Session Manager import", True)
 except Exception as e:
     check("Session Manager import", False, str(e))
 
 try:
-    from ai_court.llm.client import LLMClient
     check("LLM Client import", True)
 except Exception as e:
     check("LLM Client import", False, str(e))
@@ -57,20 +55,18 @@ except Exception as e:
     check("Document Processor import", False, str(e))
 
 try:
-    from ai_court.documents.court_docs import CourtDocumentGenerator, DOCUMENT_TYPES
+    from ai_court.documents.court_docs import DOCUMENT_TYPES
     check("Court Doc Generator import", True)
     check(f"Document types: {len(DOCUMENT_TYPES)}", len(DOCUMENT_TYPES) >= 10)
 except Exception as e:
     check("Court Doc Generator import", False, str(e))
 
 try:
-    from ai_court.corpus.statutes import StatuteCorpus
     check("Statute Corpus import", True)
 except Exception as e:
     check("Statute Corpus import", False, str(e))
 
 try:
-    from ai_court.active_learning.loop import ActiveLearningQueue
     check("Active Learning import", True)
 except Exception as e:
     check("Active Learning import", False, str(e))

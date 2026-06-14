@@ -23,7 +23,6 @@ from __future__ import annotations
 import argparse
 import json
 import logging
-import os
 import shutil
 import subprocess
 import sys
@@ -220,7 +219,7 @@ def main():
         print(f"    {name}: {status}")
     print("=" * 50)
     print(f"\nData directory: {EXTERNAL_DIR}")
-    print(f"\nNext: python scripts/harvest_100k.py --external-only")
+    print("\nNext: python scripts/harvest_100k.py --external-only")
 
 
 if __name__ == "__main__":
