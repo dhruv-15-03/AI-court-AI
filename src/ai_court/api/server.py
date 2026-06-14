@@ -63,9 +63,10 @@ app = Flask(__name__)
 def _validate_config() -> None:
     """Fail fast if critical production config is missing."""
     if config.APP_ENV == "production" and not config.API_KEY:
-        logger.warning(
-            "API_KEY is empty in production mode. "
-            "Set API_KEY env var to enable authentication."
+        raise RuntimeError(
+            "API_KEY must be set in production. Refusing to start with "
+            "authentication disabled. Set the API_KEY environment variable "
+            "(it must match the backend's AI_SERVICE_API_KEY)."
         )
     if config.CORS_ORIGINS == ["*"] and config.APP_ENV == "production":
         logger.warning(
