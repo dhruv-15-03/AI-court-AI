@@ -80,9 +80,11 @@ jobs:
           python scripts/train_model.py || true
           python scripts/evaluate_saved_model.py || true
       - name: API import smoke
+        env:
+          PYTHONPATH: src
         run: |
           python - <<'PY'
-          from src.ai_court.api.server import app
+          from ai_court.api.server import app
           with app.test_client() as c:
               r = c.get('/api/health')
               print(r.status_code, r.get_json())
