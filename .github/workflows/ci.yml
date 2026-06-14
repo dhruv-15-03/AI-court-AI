@@ -11,6 +11,11 @@ jobs:
     env:
       # Optional: set to deployed URL to run external smoke (e.g., Render) in CI
       DEPLOY_URL: ""
+      # Importing the Flask app (pytest, API import smoke, train scripts) triggers
+      # _validate_config(), which fail-fasts in production when API_KEY is unset.
+      # Run CI imports in a non-production env so the app boots; API_KEY stays
+      # empty so require_api_key() is a no-op and endpoints need no auth header.
+      APP_ENV: testing
     steps:
       - uses: actions/checkout@v4
       - name: Free disk space
@@ -93,6 +98,7 @@ jobs:
       - name: Docker smoke
         run: |
           docker run -d --rm -p 8000:8000 --name ai-court-ci \
+            -e APP_ENV=testing \
             -e LOW_MEMORY=1 \
             -e DISABLE_SEARCH_INDEX=1 \
             -e DISABLE_SEMANTIC_INDEX=1 \
