@@ -5,6 +5,7 @@ import os
 import random
 import logging
 import pandas as pd
+from typing import Any, Optional
 from urllib.parse import quote_plus
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
@@ -36,37 +37,108 @@ HUGGINGFACE_DISABLE = os.getenv("HUGGINGFACE_DISABLE", "0") == "1"
 # One-time availability flag to prevent repeated attempts after a failure
 _HF_AVAILABLE = True
 
+# ── Polite scraping controls ────────────────────────────────────────────
+# Honest, contactable User-Agent (override via env). A research crawler should
+# identify itself rather than spoof a browser.
+SCRAPER_USER_AGENT = os.getenv(
+    "SCRAPER_USER_AGENT",
+    "AI-CourtRoom-Research/1.0 (+https://github.com/dhruv-15-03/AI-court-AI)",
+)
+# Minimum seconds between successive HTTP requests to the target host.
+SCRAPER_MIN_DELAY = float(os.getenv("SCRAPER_MIN_DELAY", "3.0"))
+# Respect robots.txt (default ON). Disable only with explicit permission.
+SCRAPER_RESPECT_ROBOTS = os.getenv("SCRAPER_RESPECT_ROBOTS", "1") == "1"
+
+# Rate-limit + robots.txt state
+_last_request_ts = 0.0
+_robots_parser: Optional[Any] = None
+_robots_loaded = False
+
+
+def _base_headers():
+    return {
+        "User-Agent": SCRAPER_USER_AGENT,
+        "Accept": "text/html,application/xhtml+xml,application/xml",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Connection": "keep-alive",
+    }
+
+
+def _throttle():
+    """Block until at least SCRAPER_MIN_DELAY has elapsed since the last request."""
+    global _last_request_ts
+    wait = SCRAPER_MIN_DELAY - (time.monotonic() - _last_request_ts)
+    if wait > 0:
+        time.sleep(wait + random.uniform(0, 0.5))
+    _last_request_ts = time.monotonic()
+
+
+def _get_robots():
+    """Load and cache the target's robots.txt (once)."""
+    global _robots_parser, _robots_loaded
+    if _robots_loaded:
+        return _robots_parser
+    _robots_loaded = True
+    if not SCRAPER_RESPECT_ROBOTS:
+        return None
+    try:
+        from urllib import robotparser
+        rp = robotparser.RobotFileParser()
+        rp.set_url(f"{BASE_URL}/robots.txt")
+        rp.read()
+        _robots_parser = rp
+        logger.info("Loaded robots.txt from %s/robots.txt", BASE_URL)
+    except Exception as e:  # pragma: no cover - network dependent
+        logger.warning("Could not load robots.txt (%s); proceeding conservatively", e)
+        _robots_parser = None
+    return _robots_parser
+
+
+def _can_fetch(url):
+    """Return True if robots.txt permits fetching url (fail-open if unavailable)."""
+    if not SCRAPER_RESPECT_ROBOTS:
+        return True
+    rp = _get_robots()
+    if rp is None:
+        return True
+    try:
+        return rp.can_fetch(SCRAPER_USER_AGENT, url)
+    except Exception:
+        return True
+
+
+def _polite_get(url, timeout=15, retries=3):
+    """robots-aware, rate-limited GET with backoff. Returns Response or None."""
+    if not _can_fetch(url):
+        logger.warning("Blocked by robots.txt, skipping: %s", url)
+        return None
+    headers = _base_headers()
+    for attempt in range(retries):
+        try:
+            _throttle()
+            return requests.get(url, headers=headers, timeout=timeout)
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+            logger.warning("Request attempt %d failed: %s", attempt + 1, e)
+            if attempt < retries - 1:
+                time.sleep(2 ** attempt)
+    return None
+
+
 def get_case_links(query, pages=1):
     """Get links to cases using only requests (no browser automation)"""
     links = []
+    seen_urls = set()
     encoded_query = quote_plus(query)
 
     for page in range(1, pages + 1):
         url = f"{SEARCH_URL}{encoded_query}&pagenum={page}"
         logger.info(f"Searching page {page}: {url}")
 
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'DNT': '1',  # Do Not Track
-            'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1',
-            'Cache-Control': 'max-age=0',
-        }
-
         try:
-            # Add timeout and retries
-            for attempt in range(3):
-                try:
-                    response = requests.get(url, headers=headers, timeout=15)
-                    break
-                except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
-                    logger.warning(f"Request attempt {attempt+1} failed: {e}")
-                    if attempt < 2:  # Don't sleep after last attempt
-                        time.sleep(3)
-
-            if response.status_code == 200:
+            response = _polite_get(url, timeout=15)
+            if response is None:
+                logger.error(f"No response for page {page} (blocked by robots.txt or network error)")
+            elif response.status_code == 200:
                 logger.info(f"Got page content (length: {len(response.text)} bytes)")
 
                 # Save HTML for debugging
@@ -102,8 +174,9 @@ def get_case_links(query, pages=1):
                     m = re.search(r"/(?:doc|docfragment)/(\d+)/", href)
                     if m:
                         full_url = BASE_URL + f"/doc/{m.group(1)}/"
-                        logger.info(f"Found case link: {full_url}")
-                        if full_url not in [item.get("url") for item in links]:
+                        if full_url not in seen_urls:
+                            seen_urls.add(full_url)
+                            logger.info(f"Found case link: {full_url}")
                             page_links.append({
                                 "url": full_url,
                                 "title": tag.get_text(strip=True)
@@ -118,7 +191,8 @@ def get_case_links(query, pages=1):
                     for href, title in doc_links:
                         if "fragment" not in href:
                             full_url = BASE_URL + href
-                            if full_url not in [item.get("url") for item in links]:
+                            if full_url not in seen_urls:
+                                seen_urls.add(full_url)
                                 page_links.append({
                                     "url": full_url,
                                     "title": BeautifulSoup(title, "html.parser").get_text(strip=True)
@@ -142,21 +216,11 @@ def get_case_links(query, pages=1):
 def get_case_content(url):
     logger.info(f"Getting case: {url}")
 
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml',
-        'Accept-Language': 'en-US,en;q=0.9',
-    }
-
     try:
-        for attempt in range(3):
-            try:
-                response = requests.get(url, headers=headers, timeout=45)  # Extended timeout for large documents
-                break
-            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
-                logger.warning(f"Request attempt {attempt+1} failed: {e}")
-                if attempt < 2:  # Don't sleep after last attempt
-                    time.sleep(3)
+        response = _polite_get(url, timeout=45)  # Extended timeout for large documents
+        if response is None:
+            logger.error(f"No response for {url} (blocked by robots.txt or network error)")
+            return None
 
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, "html.parser")

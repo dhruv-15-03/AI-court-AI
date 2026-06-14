@@ -47,16 +47,43 @@ MAX_QUERY_LENGTH = 15000       # ~3000 words max
 MAX_MESSAGE_LENGTH = 5000
 MIN_QUERY_LENGTH = 10
 
-# Patterns that indicate prompt injection attempts
+# Patterns that indicate prompt injection attempts. Tuned to target
+# instruction/prompt-manipulation phrasing while avoiding ordinary legal
+# language (e.g. "ignore the previous ruling", "override the rules of evidence").
 _INJECTION_PATTERNS = [
-    r"ignore\s+(all\s+)?previous\s+instructions",
-    r"disregard\s+(all\s+)?(above|prior|previous)",
-    r"you\s+are\s+now\s+(a|an)\s+",
-    r"new\s+system\s+prompt",
-    r"override\s+system\s+prompt",
-    r"forget\s+(all\s+)?(your|previous)\s+instructions",
-    r"\bsystem:\s*",
-    r"act\s+as\s+if\s+you\s+have\s+no\s+restrictions",
+    # ── Instruction-override attempts ──────────────────────────────────
+    r"ignore\s+(?:all\s+|the\s+|any\s+|everything\s+)?(?:previous\s+|prior\s+|preceding\s+|earlier\s+|above\s+)?(?:instructions?|prompts?|rules?|directives?|context|messages?)",
+    r"ignore\s+(?:everything\s+|all\s+)?(?:the\s+)?above\b",
+    r"disregard\s+(?:all\s+|the\s+|any\s+)?(?:previous\s+|prior\s+|preceding\s+|above\s+)?(?:instructions?|prompts?|rules?|directives?|guidelines?|context)",
+    r"disregard\s+(?:everything\s+|all\s+)?(?:the\s+)?above\b",
+    r"disregard\s+(?:the\s+)?(?:disclaimer|safety|content\s+policy)",
+    r"forget\s+(?:all\s+|everything\s+)?(?:your\s+|the\s+|previous\s+|prior\s+)?(?:instructions?|rules?|context|prompt|training)",
+    r"forget\s+(?:everything\s+|all\s+)?(?:the\s+)?above\b",
+    r"do\s+not\s+follow\s+(?:your|the|any)\s+(?:previous|prior|system)\s+(?:instructions|rules)",
+    r"new\s+(?:system\s+)?(?:instructions?|prompt)\s*:",
+    r"override\s+(?:the\s+|your\s+)?(?:system\s+(?:prompt|instructions|rules|settings)|safety\s+(?:rules|filters?|guidelines)|content\s+filters?)",
+    # ── Role / persona hijacking ───────────────────────────────────────
+    r"you\s+are\s+now\s+(?:a|an|the)\s+",
+    r"you\s+are\s+no\s+longer\s+",
+    r"pretend\s+(?:to\s+be|you\s+are|that\s+you)",
+    r"act\s+as\s+(?:if\s+you\s+have\s+no\s+restrictions|an?\s+unrestricted)",
+    r"from\s+now\s+on\s+you\s+(?:are|will|must)",
+    r"\b(?:jailbreak|do\s+anything\s+now|DAN|developer\s+mode)\b",
+    # ── Prompt / secret exfiltration ───────────────────────────────────
+    r"(?:reveal|show|print|output|repeat|expose|tell\s+me)\s+(?:your|the)\s+(?:system\s+|initial\s+|original\s+)?(?:prompt|instructions|rules)",
+    r"what\s+(?:are|were)\s+your\s+(?:system\s+)?(?:instructions|rules)",
+    r"repeat\s+(?:everything|the\s+text)\s+above",
+    # ── Restriction bypass ─────────────────────────────────────────────
+    r"without\s+(?:any\s+)?(?:restrictions|filters?|safety\s+rules|guardrails|censorship)",
+    r"bypass\s+(?:the\s+|your\s+)?(?:safety|content|filters?|guard\s*rails?|rules)",
+    r"ignore\s+(?:your\s+)?(?:safety|content)\s+(?:guidelines|policy|filters?)",
+    # ── Delimiter / chat-template injection ────────────────────────────
+    r"\bsystem\s*:\s*",
+    r"(?:^|\n)\s*(?:assistant|developer)\s*:",
+    r"<\s*/?\s*(?:system|assistant|im_start|im_end|inst)\s*>",
+    r"\[\s*/?\s*(?:system|assistant|inst)\s*\]",
+    r"<\|\s*(?:im_start|im_end|system|user|assistant|endoftext)\s*\|>",
+    r"###\s*(?:system|instruction|new\s+prompt)",
 ]
 _INJECTION_RE = re.compile("|".join(_INJECTION_PATTERNS), re.IGNORECASE)
 
