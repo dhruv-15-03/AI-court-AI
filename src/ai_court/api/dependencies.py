@@ -160,7 +160,7 @@ def load_multi_axis():
         with open(prom_path,'r',encoding='utf-8') as f:
             pm = json.load(f) or {}
         run_id = pm.get('run_id')
-        bundle = torch.load(ckpt_path, map_location='cpu')
+        bundle = torch.load(ckpt_path, map_location='cpu', weights_only=True)
         from ai_court.model.multi_axis_transformer import MultiAxisModel
         model = MultiAxisModel(bundle['backbone'], {ax: len(m) for ax,m in bundle['label_maps'].items()})
         model.load_state_dict(bundle['model_state'])

@@ -124,14 +124,19 @@ def governance_status():
 @monitoring_bp.route('/api/governance/refresh', methods=['POST'])
 def governance_refresh():
     """Force a refresh of governance_status.json by executing the script inline."""
+    auth = dependencies.require_api_key()
+    if auth:
+        return auth
     try:
         import subprocess
         import sys
         cmd = [sys.executable, 'scripts/governance_status.py']
-        rc = subprocess.run(cmd, capture_output=True, text=True)
+        rc = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
         if rc.returncode != 0:
             return jsonify({'status':'error','detail': rc.stderr.strip()}), 500
         return jsonify({'status':'ok'}), 200
+    except subprocess.TimeoutExpired:
+        return jsonify({'status':'error','detail':'governance refresh timed out'}), 504
     except Exception as e:
         return jsonify({'status':'error','detail':str(e)}), 500
 
