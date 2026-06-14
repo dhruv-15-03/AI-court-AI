@@ -35,6 +35,72 @@ _pdfplumber = None
 _easyocr_reader = None
 _docx = None
 
+# ── Upload validation ──────────────────────────────────────────────────
+# Defence-in-depth cap on a single document, on top of Flask MAX_CONTENT_LENGTH.
+_MAX_DOCUMENT_BYTES = int(os.getenv("MAX_DOCUMENT_BYTES", str(15 * 1024 * 1024)))  # 15 MB
+
+# Canonical kinds we know how to process.
+_SUPPORTED_KINDS = {"pdf", "image", "docx", "text"}
+
+
+def _sniff_kind(data: bytes) -> str:
+    """Identify a document by its magic bytes (file signature).
+
+    Returns one of: pdf, image, docx, text, unknown.  Trusting the magic
+    bytes — rather than the client-supplied filename/extension or MIME type —
+    prevents a malicious upload from being routed to the wrong parser by
+    spoofing its extension.
+    """
+    if not data:
+        return "unknown"
+    # PDF
+    if data[:5] == b"%PDF-":
+        return "pdf"
+    # Images
+    if data[:8] == b"\x89PNG\r\n\x1a\n":
+        return "image"
+    if data[:3] == b"\xff\xd8\xff":  # JPEG / JFIF / EXIF
+        return "image"
+    if data[:6] in (b"GIF87a", b"GIF89a"):
+        return "image"
+    if data[:2] == b"BM":  # BMP
+        return "image"
+    if data[:4] in (b"II*\x00", b"MM\x00*"):  # TIFF (LE / BE)
+        return "image"
+    if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+        return "image"
+    # DOCX (and other OOXML) are ZIP containers
+    if data[:4] == b"PK\x03\x04":
+        return "docx"
+    # Plain UTF-8/ASCII text — only if the leading bytes decode cleanly.
+    try:
+        data[:4096].decode("utf-8")
+        return "text"
+    except UnicodeDecodeError:
+        return "unknown"
+
+
+def _validate_upload(file_bytes: bytes, filename: str) -> str:
+    """Enforce size limits and detect the true file kind via magic bytes.
+
+    Raises ValueError on empty, oversized, or unsupported/disguised files.
+    Returns the canonical kind (pdf | image | docx | text).
+    """
+    if not file_bytes:
+        raise ValueError("Empty file: no content to process.")
+    size = len(file_bytes)
+    if size > _MAX_DOCUMENT_BYTES:
+        raise ValueError(
+            f"File too large: {size} bytes (limit {_MAX_DOCUMENT_BYTES} bytes)."
+        )
+    kind = _sniff_kind(file_bytes)
+    if kind not in _SUPPORTED_KINDS:
+        raise ValueError(
+            f"Unsupported or unrecognized file type for {filename!r}. "
+            "Supported: PDF, PNG/JPEG/GIF/BMP/TIFF/WebP images, DOCX, and plain text."
+        )
+    return kind
+
 
 def _get_pdfplumber():
     global _pdfplumber
@@ -140,28 +206,32 @@ class DocumentProcessor:
         if not file_bytes:
             raise ValueError("Either file_path or file_bytes must be provided")
 
+        # Validate size + identify the true type from magic bytes (defends
+        # against extension/MIME spoofing and oversized uploads).
+        kind = _validate_upload(file_bytes, filename)
+
         # Detect file type
         ext = Path(filename).suffix.lower()
         if not content_type:
             content_type = mimetypes.guess_type(filename)[0] or ""
 
-        logger.info(f"Processing document: {filename} ({ext}, {len(file_bytes)} bytes)")
+        logger.info(f"Processing document: {filename} ({ext}, {kind}, {len(file_bytes)} bytes)")
 
-        if ext == ".pdf" or "pdf" in content_type:
+        # Route by the sniffed kind, not the client-supplied extension.
+        if kind == "pdf":
             return self._process_pdf(file_bytes, filename)
-        elif ext in (".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif", ".webp") or "image" in content_type:
+        elif kind == "image":
             return self._process_image(file_bytes, filename)
-        elif ext == ".docx" or "wordprocessing" in content_type:
-            return self._process_docx(file_bytes, filename)
-        elif ext in (".txt", ".text") or "text/plain" in content_type:
+        elif kind == "docx":
+            # A bare ZIP that is not a declared DOCX is rejected rather than
+            # handed to the OOXML parser.
+            if ext == ".docx" or "wordprocessing" in content_type or "officedocument" in content_type:
+                return self._process_docx(file_bytes, filename)
+            raise ValueError(
+                f"Unsupported archive uploaded as {filename!r}; only .docx documents are accepted."
+            )
+        else:  # text
             return self._process_text(file_bytes, filename)
-        else:
-            # Try as text first, fall back to image OCR
-            try:
-                text = file_bytes.decode("utf-8", errors="strict")
-                return self._process_text(text.encode(), filename)
-            except (UnicodeDecodeError, ValueError):
-                return self._process_image(file_bytes, filename)
 
     def process_multiple(self, files: List[Dict[str, Any]]) -> List[ExtractedDocument]:
         """

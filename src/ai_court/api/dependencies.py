@@ -49,10 +49,21 @@ except Exception:
     def map_coarse_label(label: str) -> tuple[str, bool]:  # type: ignore[misc]
         return (label, False)
 
+def _model_required() -> bool:
+    """Whether a missing/broken classifier should abort startup (fail-fast).
+
+    Defaults to ON in production so a broken deploy fails loudly instead of
+    serving a silently degraded service.  Set REQUIRE_MODEL=0 to opt out
+    (e.g. low-memory / lazy modes that intentionally run without the model).
+    """
+    default = "1" if config.APP_ENV == "production" else "0"
+    return os.getenv("REQUIRE_MODEL", default) == "1"
+
+
 def load_model():
     _default_model_path = os.path.join(config.PROJECT_ROOT, "models", "legal_case_classifier.pkl")
     _env_model_path = config.MODEL_PATH
-    
+
     model_path = _default_model_path
     if _env_model_path and os.path.exists(_env_model_path):
         model_path = _env_model_path
@@ -63,8 +74,15 @@ def load_model():
         if os.path.exists(_docker_path):
             model_path = _docker_path
         else:
-            logger.warning(f"Model file not found at {model_path} or {_docker_path}")
-            # Don't raise here to allow app to start, but functionality will be broken
+            msg = f"Model file not found at {_default_model_path} or {_docker_path}"
+            if _model_required():
+                logger.error(msg)
+                raise RuntimeError(
+                    f"{msg}. Refusing to start without the classifier "
+                    f"(APP_ENV={config.APP_ENV}). Provide MODEL_PATH or set "
+                    f"REQUIRE_MODEL=0 to start in degraded mode."
+                )
+            logger.warning(f"{msg} — starting in degraded mode (REQUIRE_MODEL=0)")
             return
 
     try:
@@ -89,7 +107,12 @@ def load_model():
         
         logger.info(f"[api] Loaded model from {model_path}")
     except Exception as e:
-        logger.error(f"Failed to load model: {e}")
+        logger.error(f"Failed to load model from {model_path}: {e}")
+        if _model_required():
+            raise RuntimeError(
+                f"Failed to load model from {model_path}: {e}. "
+                f"Set REQUIRE_MODEL=0 to start in degraded mode."
+            ) from e
 
 def load_search_index():
     low_memory = os.getenv("LOW_MEMORY", "0") == "1"
