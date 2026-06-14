@@ -24,7 +24,6 @@ from __future__ import annotations
 import argparse
 import csv
 import logging
-import os
 import sys
 from pathlib import Path
 from typing import Iterable, List
@@ -98,7 +97,7 @@ def train(
     batch_size: int,
     lr: float,
 ) -> None:
-    from sentence_transformers import SentenceTransformer, LoggingHandler, models, losses
+    from sentence_transformers import SentenceTransformer, models, losses
     from sentence_transformers.datasets import DenoisingAutoEncoderDataset
     from torch.utils.data import DataLoader
 

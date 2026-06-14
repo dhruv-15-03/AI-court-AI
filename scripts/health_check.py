@@ -1,16 +1,13 @@
 """Health check for all agent components."""
-import sys, os
+import sys
+import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 os.chdir(os.path.join(os.path.dirname(__file__), ".."))
 
 print("Testing imports...")
-from ai_court.agent.pipeline import LegalAgentPipeline
 from ai_court.agent.session import SessionManager
-from ai_court.llm.client import LLMClient
 from ai_court.corpus.statutes import StatuteCorpus
-from ai_court.rag.pipeline import rag_query
 from ai_court.active_learning.loop import ActiveLearningQueue
-from ai_court.model.preprocessor import TextPreprocessor
 print("All imports OK\n")
 
 # Statute corpus
@@ -26,7 +23,7 @@ if hasattr(sc, "_acts"):
 
 # Session manager
 sm = SessionManager()
-print(f"\nSessionManager: OK")
+print("\nSessionManager: OK")
 
 # Active learning
 alq = ActiveLearningQueue()

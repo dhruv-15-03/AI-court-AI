@@ -11,7 +11,7 @@ from __future__ import annotations
 import logging
 import os
 import time
-from typing import Iterator, Optional
+from typing import Iterator, Literal, Optional, overload
 
 from openai import OpenAI
 
@@ -46,7 +46,7 @@ class LLMClient:
         max_tokens: int = 4096,
         timeout: float = 120.0,
     ):
-        provider = (provider or os.getenv("LLM_PROVIDER", "github")).lower().strip()
+        provider = (provider or os.getenv("LLM_PROVIDER") or "github").lower().strip()
         if provider not in _PROVIDER_DEFAULTS:
             logger.warning("Unknown LLM_PROVIDER=%s, defaulting to 'github'", provider)
             provider = "github"
@@ -81,6 +81,24 @@ class LLMClient:
             "[llm] provider=%s model=%s base_url=%s",
             self.provider, self.model, self.base_url,
         )
+
+    @overload
+    def chat(
+        self,
+        messages: list[dict[str, str]],
+        temperature: Optional[float] = ...,
+        max_tokens: Optional[int] = ...,
+        stream: Literal[False] = ...,
+    ) -> str: ...
+
+    @overload
+    def chat(
+        self,
+        messages: list[dict[str, str]],
+        temperature: Optional[float] = ...,
+        max_tokens: Optional[int] = ...,
+        stream: Literal[True] = ...,
+    ) -> Iterator[str]: ...
 
     def chat(
         self,

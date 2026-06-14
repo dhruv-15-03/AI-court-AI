@@ -1,5 +1,6 @@
 """End-to-end verification of the trained system."""
-import sys, os
+import sys
+import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 os.chdir(os.path.join(os.path.dirname(__file__), ".."))
 os.environ["FLASK_ENV"] = "testing"

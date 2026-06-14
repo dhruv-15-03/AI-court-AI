@@ -340,8 +340,6 @@ class LegalAgentPipeline:
             "evidence_alerts": evidence_context,
             "cross_references": cross_ref_context,
             "procedural_checklist": checklist_context,
-            "analysis": analysis_text,
-            "strategy": strategy_text,
             "metadata": {
                 "model_used": self.llm.model,
                 "cases_searched": len(similar_cases),

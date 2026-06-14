@@ -52,6 +52,10 @@ where = ["src"]
 [tool.ruff]
 line-length = 88
 target-version = "py310"
+# scripts/ holds one-off operational and research utilities (dataset harvest,
+# report figures, manual verification) that are not part of the shipped package
+# or the Docker image. They are still syntax-checked by the CI py_compile step.
+extend-exclude = ["scripts"]
 
 [tool.ruff.lint.per-file-ignores]
 # preprocessor.py calls ensure_nltk_resources() between stdlib and nltk imports

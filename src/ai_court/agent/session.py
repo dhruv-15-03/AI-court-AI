@@ -30,7 +30,7 @@ class CaseSession:
     case_query: str = ""
     case_type: str = ""
     analysis_result: Optional[Dict[str, Any]] = None
-    conversation_history: List[Dict[str, str]] = field(default_factory=list)
+    conversation_history: List[Dict[str, Any]] = field(default_factory=list)
     created_at: float = field(default_factory=time.time)
     last_active: float = field(default_factory=time.time)
     ttl: float = DEFAULT_SESSION_TTL

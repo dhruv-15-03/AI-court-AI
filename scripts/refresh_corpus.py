@@ -18,7 +18,6 @@ import argparse
 import csv
 import json
 import logging
-import os
 import sys
 from pathlib import Path
 from typing import List
@@ -63,7 +62,6 @@ def refresh(index_path: Path, queries: List[str], pages: int) -> dict:
         store = VectorStore.build([""], [{}])  # tiny placeholder, will be replaced
         store._texts.clear()
         store._metadata.clear()
-        import numpy as np
         store._embeddings = store._embeddings[:0]
         store._faiss_index = None
 

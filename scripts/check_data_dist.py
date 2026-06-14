@@ -12,5 +12,5 @@ for v, c in vals.head(30).items():
     print(f"  {c:>5} | {str(v)[:90]}")
 
 print(f"\nUnique judgement values: {df['judgement'].nunique()}")
-print(f"\nCase type dist:")
+print("\nCase type dist:")
 print(df["case_type"].value_counts().head(20).to_string())
