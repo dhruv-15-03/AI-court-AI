@@ -1,5 +1,7 @@
 """Check current class distribution across all data."""
-import sys, os, glob, re
+import sys
+import os
+import glob
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 os.chdir(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -56,7 +58,7 @@ for path in csvs:
             labels = labels.where(labels != "Other", filename_label)
         
         frames.append(labels)
-    except Exception as e:
+    except Exception:
         pass
 
 all_labels = pd.concat(frames, ignore_index=True)

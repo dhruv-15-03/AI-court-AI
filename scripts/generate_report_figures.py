@@ -3,7 +3,9 @@
 Uses real metrics from models/metrics.json, confusion_matrix.json, metadata.json.
 Output: docs/figures/*.png at 200 DPI.
 """
-import json, os, sys, textwrap
+import json
+import os
+import sys
 import numpy as np
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -14,7 +16,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.patches import FancyBboxPatch
-import matplotlib.patheffects as pe
 
 OUT = os.path.join(ROOT, "docs", "figures")
 os.makedirs(OUT, exist_ok=True)

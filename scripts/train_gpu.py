@@ -308,7 +308,7 @@ def train_bert(labeled_df, dl, epochs=3, batch_size=24, max_len=256, lr=2e-5):
     )
 
     logger.info(f"\n{'='*60}")
-    logger.info(f"  FINAL RESULTS (DistilBERT)")
+    logger.info("  FINAL RESULTS (DistilBERT)")
     logger.info(f"  Accuracy: {final_acc:.4f}")
     logger.info(f"  Macro F1: {final_macro_f1:.4f}")
     logger.info(f"  Weighted F1: {final_weighted_f1:.4f}")

@@ -1,5 +1,6 @@
 """Check total rows across all raw/enriched CSVs."""
-import os, pandas as pd
+import os
+import pandas as pd
 
 total = 0
 for d in ["data/raw", "data/raw_enriched"]:

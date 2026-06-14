@@ -16,9 +16,7 @@ Indian court documents following established legal formatting conventions.
 """
 from __future__ import annotations
 
-import json
 import logging
-import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Dict, List, Optional
@@ -27,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 # ── Document Templates ────────────────────────────────────────────────────
 
-DOCUMENT_TYPES = {
+DOCUMENT_TYPES: Dict[str, Dict[str, Any]] = {
     "bail_application": {
         "title": "Application for Bail",
         "sections": ["header", "court_details", "case_details", "grounds", "prayer", "verification"],
@@ -164,7 +162,7 @@ class CourtDocumentGenerator:
         precedents: str = "",
         document_context: str = "",
         user_instructions: str = "",
-        case_id: str = None,
+        case_id: Optional[str] = None,
     ) -> GeneratedDocument:
         """
         Generate a court document.

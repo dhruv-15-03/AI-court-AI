@@ -1,11 +1,12 @@
 """Test document processing and court document generation."""
-import sys, os
+import sys
+import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 os.chdir(os.path.join(os.path.dirname(__file__), ".."))
 
 # Test imports
-from ai_court.documents.processor import DocumentProcessor, ExtractedDocument, format_documents_for_llm
-from ai_court.documents.court_docs import CourtDocumentGenerator, DOCUMENT_TYPES
+from ai_court.documents.processor import DocumentProcessor, format_documents_for_llm
+from ai_court.documents.court_docs import DOCUMENT_TYPES
 print("Document processor: OK")
 print(f"Document types available: {len(DOCUMENT_TYPES)}")
 for k, v in DOCUMENT_TYPES.items():
@@ -26,7 +27,7 @@ fir_text = (
     b"The accused was identified as Suresh Sharma, resident of Dwarka.\n"
 )
 doc = proc.process_file(file_bytes=fir_text, filename="test_fir.txt")
-print(f"\nTest FIR processing:")
+print("\nTest FIR processing:")
 print(f"  Doc type: {doc.doc_type_guess}")
 print(f"  Sections: {doc.sections_mentioned}")
 print(f"  Dates: {doc.dates_found}")

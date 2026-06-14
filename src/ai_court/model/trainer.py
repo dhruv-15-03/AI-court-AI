@@ -6,7 +6,7 @@ import logging
 import numpy as np
 import pandas as pd
 from datetime import datetime
-from typing import Dict, Tuple, Optional
+from typing import Dict, Tuple, Optional, Any
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
@@ -77,7 +77,7 @@ class Trainer:
                 return X_tfidf, y_train
             
             # Parse sampling strategy
-            strategy = SMOTE_SAMPLING_STRATEGY
+            strategy: Any = SMOTE_SAMPLING_STRATEGY
             if isinstance(strategy, str) and strategy != 'auto':
                 try:
                     strategy = float(strategy)

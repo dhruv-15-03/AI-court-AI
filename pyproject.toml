@@ -52,6 +52,10 @@ where = ["src"]
 [tool.ruff]
 line-length = 88
 target-version = "py310"
+# scripts/ holds one-off operational and research utilities (dataset harvest,
+# report figures, manual verification) that are not part of the shipped package
+# or the Docker image. They are still syntax-checked by the CI py_compile step.
+extend-exclude = ["scripts"]
 
 [tool.ruff.lint.per-file-ignores]
 # preprocessor.py calls ensure_nltk_resources() between stdlib and nltk imports
@@ -63,3 +67,9 @@ python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+# Only collect the real test suite under tests/. scripts/test_*.py are manual
+# operational/integration utilities (not unit tests) that import the live server
+# and perform side effects; collecting them as part of the suite breaks CI.
+testpaths = ["tests"]

@@ -23,12 +23,10 @@ import logging
 import mimetypes
 import os
 import re
-import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
-from PIL import Image
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +44,7 @@ def _get_pdfplumber():
     return _pdfplumber
 
 
-def _get_easyocr(languages: List[str] = None):
+def _get_easyocr(languages: Optional[List[str]] = None):
     """Get or create EasyOCR reader. Lazy-loaded and cached."""
     global _easyocr_reader
     if _easyocr_reader is None:
@@ -111,7 +109,7 @@ class DocumentProcessor:
     - Regex for legal entity extraction
     """
 
-    def __init__(self, llm_client=None, ocr_languages: List[str] = None):
+    def __init__(self, llm_client=None, ocr_languages: Optional[List[str]] = None):
         """
         Args:
             llm_client: Optional LLM client for evidence photo analysis.
@@ -120,8 +118,8 @@ class DocumentProcessor:
         self.llm_client = llm_client
         self.ocr_languages = ocr_languages or ["en", "hi"]
 
-    def process_file(self, file_path: str = None, file_bytes: bytes = None,
-                     filename: str = "document", content_type: str = None) -> ExtractedDocument:
+    def process_file(self, file_path: Optional[str] = None, file_bytes: Optional[bytes] = None,
+                     filename: str = "document", content_type: Optional[str] = None) -> ExtractedDocument:
         """
         Process a single document file.
         

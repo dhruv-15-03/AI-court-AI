@@ -61,7 +61,6 @@ def main():
 
     # Step 2: Load data
     logger.info("Loading data...")
-    import pandas as pd
     from ai_court.model.legal_case_classifier import LegalCaseClassifier
 
     clf = LegalCaseClassifier()
