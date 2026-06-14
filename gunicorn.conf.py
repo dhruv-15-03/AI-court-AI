@@ -18,7 +18,10 @@ preload_app = False
 accesslog = "-"
 errorlog = "-"
 loglevel = "info"
-timeout = 60
+# First inference after a cold start loads the model lazily and can take well over
+# 60s on a free-tier instance; a short timeout kills the worker mid-load (502).
+# Override via GUNICORN_TIMEOUT if needed.
+timeout = int(os.environ.get('GUNICORN_TIMEOUT', '120'))
 
 # Recycle workers after serving this many requests to guard against memory leaks.
 max_requests = int(os.environ.get('GUNICORN_MAX_REQUESTS', '1000'))
