@@ -11,7 +11,7 @@ from __future__ import annotations
 import logging
 import os
 import time
-from typing import Iterator, Literal, Optional, overload
+from typing import Any, Iterator, Literal, Optional, cast, overload
 
 from openai import OpenAI
 
@@ -136,7 +136,7 @@ class LLMClient:
             try:
                 response = self._client.chat.completions.create(
                     model=self.model,
-                    messages=messages,
+                    messages=cast(Any, messages),
                     temperature=temperature or self.temperature,
                     max_tokens=max_tokens or self.max_tokens,
                 )
@@ -175,12 +175,12 @@ class LLMClient:
     ) -> Iterator[str]:
         stream = self._client.chat.completions.create(
             model=self.model,
-            messages=messages,
+            messages=cast(Any, messages),
             temperature=temperature or self.temperature,
             max_tokens=max_tokens or self.max_tokens,
             stream=True,
         )
-        for chunk in stream:
+        for chunk in cast(Any, stream):
             if chunk.choices and chunk.choices[0].delta.content:
                 yield chunk.choices[0].delta.content
 
