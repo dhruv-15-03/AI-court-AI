@@ -1,6 +1,6 @@
 # Model Card: Legal Case Outcome Classifier
 
-Last updated: 2026-04-25
+Last updated: 2026-06-15
 
 ## Overview
 
@@ -20,10 +20,10 @@ Last updated: 2026-04-25
 
 ## Metrics (latest run)
 
-- Test Accuracy: 0.845
+- Test Accuracy: unknown
 - Train F1 (weighted): 1.000
 - Test Macro-F1: unknown
-- Test Weighted-F1: 0.845
+- Test Weighted-F1: unknown
 - CV macro-F1: unavailable
 - Drift: Jensen–Shannon divergence (/api/drift/compare) warn ≥0.10 alert ≥0.20
 - Per-class F1: will appear after next retrain
