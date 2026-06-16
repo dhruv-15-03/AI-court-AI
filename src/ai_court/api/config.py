@@ -37,6 +37,17 @@ PREPROCESSING_CACHE_SIZE = int(os.getenv("PREPROCESSING_CACHE_SIZE", "512"))
 ENABLE_PREPROCESSING_CACHE = os.getenv("ENABLE_PREPROCESSING_CACHE", "1") == "1"
 BATCH_SIZE_LIMIT = int(os.getenv("BATCH_SIZE_LIMIT", "50"))
 
+# Response Cache (deterministic classifier responses: /analyze, /analyze/quick)
+# Memoises identical requests to skip the TF-IDF + RandomForest pipeline. Falls
+# back to a per-process LRU when no shared Redis backend is configured.
+RESPONSE_CACHE_ENABLED = os.getenv("RESPONSE_CACHE_ENABLED", "1") == "1"
+RESPONSE_CACHE_TTL = int(os.getenv("RESPONSE_CACHE_TTL", "3600"))  # seconds
+RESPONSE_CACHE_MAX_SIZE = int(os.getenv("RESPONSE_CACHE_MAX_SIZE", "512"))  # entries
+# Optional shared backend so all gunicorn workers share entries; empty -> memory-only.
+RESPONSE_CACHE_REDIS_URL = os.getenv(
+    "RESPONSE_CACHE_REDIS_URL", os.getenv("REDIS_URL", "")
+)
+
 # CORS
 # Comma-separated list of allowed origins, e.g.:
 #   CORS_ORIGINS=http://localhost:3000,https://your-frontend.vercel.app
