@@ -1,3 +1,20 @@
+# Render Blueprint for the AI-court-AI Python ML microservice.
+#
+# REQUIRED dashboard secrets (declared below with `sync: false`, so Render
+# prompts for them on blueprint sync and never stores them in git):
+#   - API_KEY       Shared server-to-server secret. The app HARD-FAILS to boot
+#                   in production when this is unset (server.py:_validate_config).
+#                   It MUST equal the backend's AI_SERVICE_API_KEY. It gates the
+#                   /api/analyze* and /api/agent/* routes (the /api/agent/stream
+#                   SSE route is exempt and rate-limited instead).
+#   - GITHUB_TOKEN  PAT used by the default LLM provider (GitHub Models at
+#                   models.inference.ai.azure.com). Without it the LLM agent is
+#                   unavailable and chat/rag/analyze/generate-document return 503.
+# Optional: SENTRY_DSN (error monitoring), HUGGINGFACE_API_TOKEN, and the
+# LLM_PROVIDER / LLM_MODEL / LLM_BASE_URL / LLM_API_KEY overrides.
+#
+# NOTE: the live service is served at ai-court-ai.onrender.com (the host the
+# frontend and backend are configured to call). Keep that hostname stable.
 services:
   - type: web
     name: ai-court
@@ -9,6 +26,12 @@ services:
     # instance in a loop). Liveness just confirms the process is up.
     healthCheckPath: /api/health/live
     envVars:
+      # ── Required secrets (set these in the Render dashboard) ──────────
+      - key: API_KEY
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      # ── Non-secret runtime config ────────────────────────────────────
       - key: MODEL_PATH
         value: /app/models/legal_case_classifier.pkl
       - key: APP_ENV
