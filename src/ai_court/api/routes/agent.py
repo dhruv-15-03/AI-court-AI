@@ -26,7 +26,7 @@ import re
 import time
 from flask import Blueprint, request, jsonify, Response, stream_with_context
 
-from ai_court.api import state, config
+from ai_court.api import state, config, dependencies
 from ai_court.api.extensions import limiter
 
 logger = logging.getLogger(__name__)
@@ -144,6 +144,9 @@ def agent_analyze():
 
     Response: Full analysis with prediction, cases, statutes, LLM analysis.
     """
+    auth = dependencies.require_api_key()
+    if auth:
+        return auth
     agent = _get_agent()
     raw = request.json or {}
     if not isinstance(raw, dict):
@@ -251,6 +254,9 @@ def agent_chat():
 
     Response: LLM answer with full case context.
     """
+    auth = dependencies.require_api_key()
+    if auth:
+        return auth
     agent = _get_agent()
     if agent is None:
         return jsonify({"error": "agent_unavailable", "message": "AI agent not initialized."}), 503
@@ -319,6 +325,9 @@ def agent_rag():
 
     Response: LLM-generated answer with case citations.
     """
+    auth = dependencies.require_api_key()
+    if auth:
+        return auth
     agent = _get_agent()
     raw = request.json or {}
     question = (raw.get("question") or "").strip()
@@ -482,6 +491,9 @@ def agent_upload_documents():
 
     Response: Extracted text, entities, document types for each file.
     """
+    auth = dependencies.require_api_key()
+    if auth:
+        return auth
     if "files" not in request.files and "file" not in request.files:
         return jsonify({"error": "no_files", "message": "Upload at least one file using 'files' or 'file' field."}), 400
 
@@ -570,6 +582,9 @@ def agent_analyze_with_docs():
 
     Response: Full analysis incorporating document contents.
     """
+    auth = dependencies.require_api_key()
+    if auth:
+        return auth
     agent = _get_agent()
 
     # Handle both JSON and form-data
@@ -692,6 +707,9 @@ def agent_generate_document():
 
     Response: Generated document content.
     """
+    auth = dependencies.require_api_key()
+    if auth:
+        return auth
     if state.llm_client is None:
         return jsonify({"error": "llm_unavailable", "message": "LLM not configured."}), 503
 
@@ -794,6 +812,12 @@ def agent_stream():
       - ``done``     : final marker with metadata
       - ``error``    : on failure
     """
+    # SECURITY NOTE: This browser-facing SSE endpoint is intentionally exempt
+    # from require_api_key(). The frontend streams to it directly and cannot
+    # safely hold the server-to-server shared secret. It is protected by rate
+    # limiting (20/min). Every non-streaming agent route enforces the key.
+    # Follow-up hardening: proxy SSE through the Java backend so this path can
+    # also require the shared secret.
     raw = request.json or {}
     query = (raw.get("query") or "").strip()
     if not query:
