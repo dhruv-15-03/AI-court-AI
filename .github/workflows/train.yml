@@ -11,19 +11,19 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Cache pip
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: Cache NLTK data
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/nltk_data
           key: ${{ runner.os }}-nltk-v1
@@ -44,7 +44,7 @@ jobs:
         run: |
           python scripts/generate_model_card.py --fail-on-missing
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: model-artifacts
           path: |
