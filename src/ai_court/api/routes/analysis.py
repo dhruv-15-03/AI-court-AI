@@ -1,6 +1,7 @@
 import os
 import json
 import uuid
+import copy
 import logging
 import time
 from datetime import datetime, timezone
@@ -12,6 +13,7 @@ import numpy as np
 
 from ai_court.api import state, dependencies, models, constants, config
 from ai_court.api.extensions import limiter
+from ai_court.utils.cache import ResponseCache, make_key, normalize_text
 from typing import Any, Callable, List, Dict, Optional
 
 # Type aliases for explainability functions
@@ -62,6 +64,53 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 analysis_bp = Blueprint('analysis', __name__)
+
+# Shared response cache for deterministic classifier predictions. The model run id
+# is folded into every key (see _model_version), so a new model deploy transparently
+# invalidates old entries instead of serving stale predictions.
+response_cache = ResponseCache(
+    enabled=config.RESPONSE_CACHE_ENABLED,
+    ttl_seconds=config.RESPONSE_CACHE_TTL,
+    max_size=config.RESPONSE_CACHE_MAX_SIZE,
+    redis_url=config.RESPONSE_CACHE_REDIS_URL,
+)
+
+
+def _model_version() -> str:
+    """Identify the loaded model so cache keys are scoped to a model version."""
+    run_id = ""
+    classifier = getattr(state, "classifier", None)
+    if classifier is not None:
+        run_id = str(getattr(classifier, "run_id", "") or "")
+    return f"{config.APP_VERSION}:{run_id}"
+
+
+def _utc_iso_now() -> str:
+    return datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
+
+
+def _finalize_analyze_cache_hit(
+    cached: Dict[str, Any],
+    raw: Dict[str, Any],
+    request_id: str,
+    start_time: float,
+) -> Dict[str, Any]:
+    """Return a per-request copy of a cached /analyze response.
+
+    The cached body omits volatile/identity fields; here we restore the caller's
+    own input echo and refresh request-scoped metadata so two different callers
+    never see each other's request id or input.
+    """
+    result = copy.deepcopy(cached)
+    result["cached"] = True
+    result["answers"] = raw
+    meta = result.get("metadata")
+    if isinstance(meta, dict):
+        meta["request_id"] = request_id
+        meta["processed_at"] = _utc_iso_now()
+        meta["processing_time_ms"] = round((time.perf_counter() - start_time) * 1000, 2)
+        meta["cache_hit"] = True
+    return result
 
 
 def _auto_queue_prediction(
@@ -642,7 +691,15 @@ def analyze_case():
     
     # Get plan from request (default to 'basic' for backwards compatibility)
     plan = raw.get('_plan', 'basic').lower()  # free, basic, pro, unlimited
-    
+
+    # Serve a memoised response for an identical request when available.
+    cache_key = make_key("analyze", raw, model_version=_model_version())
+    cached_response = response_cache.get(cache_key)
+    if cached_response is not None:
+        hit = jsonify(_finalize_analyze_cache_hit(cached_response, raw, request_id, start_time))
+        hit.headers["X-Cache"] = "HIT"
+        return hit
+
     try:
         if state.classifier:
             # Clean Logic: Pass components separately as expected by the model
@@ -917,7 +974,15 @@ def analyze_case():
     # Input Echo (For DB storage)
     response_data["answers"] = data
 
-    return jsonify(response_data)
+    # Cache the deterministic response (excluding the per-request input echo, which
+    # is restored per-caller on a hit) so identical future requests skip the model.
+    response_data["cached"] = False
+    cacheable = {k: v for k, v in response_data.items() if k != "answers"}
+    response_cache.set(cache_key, cacheable)
+
+    miss = jsonify(response_data)
+    miss.headers["X-Cache"] = "MISS"
+    return miss
 
 @analysis_bp.route('/api/rag/query', methods=['POST'])
 @limiter.limit("30/minute")
@@ -1259,7 +1324,22 @@ def analyze_quick():
         return jsonify({"error": "Missing 'text' field"}), 400
     
     case_type = raw.get('case_type', '')
-    
+
+    # Memoise on the normalized text + case type (deterministic classifier output).
+    quick_key = make_key(
+        "analyze_quick",
+        {"text": normalize_text(str(text)), "case_type": case_type},
+        model_version=_model_version(),
+    )
+    cached_quick = response_cache.get(quick_key)
+    if cached_quick is not None:
+        payload = dict(cached_quick)
+        payload["cached"] = True
+        payload["timing_ms"] = 0.0
+        hit = jsonify(payload)
+        hit.headers["X-Cache"] = "HIT"
+        return hit
+
     start_time = time.perf_counter()
     
     try:
@@ -1281,11 +1361,28 @@ def analyze_quick():
                 }
             resp["timing_ms"] = round(elapsed_ms, 2)
 
-            return jsonify(resp)
+            # Store without the volatile timing field; mark and time fresh per request.
+            cacheable = {k: v for k, v in resp.items() if k != "timing_ms"}
+            cacheable["cached"] = False
+            response_cache.set(quick_key, cacheable)
+
+            resp["cached"] = False
+            miss = jsonify(resp)
+            miss.headers["X-Cache"] = "MISS"
+            return miss
         else:
             return jsonify({"error": "Model not initialized"}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@analysis_bp.route("/api/cache/stats", methods=["GET"])
+def cache_stats():
+    """Return response-cache hit/miss statistics for diagnostics."""
+    auth = dependencies.require_api_key()
+    if auth:
+        return auth
+    return jsonify(response_cache.stats())
 
 
 # =============================================================================

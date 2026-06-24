@@ -36,6 +36,11 @@ prometheus_client==0.24.1
 sentry-sdk[flask]==2.54.0
 mlflow==3.10.1
 
+# ── Caching ──────────────────────────────────────────────────────────
+# Optional shared backend for the response cache; the in-process LRU tier
+# works without a running Redis server (client import only, lazy connect).
+redis==5.2.1
+
 # ── Dimensionality Reduction ─────────────────────────────────────────
 umap-learn==0.5.11
 hdbscan==0.8.41
