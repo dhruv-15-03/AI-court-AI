@@ -17,7 +17,7 @@ jobs:
       # empty so require_api_key() is a no-op and endpoints need no auth header.
       APP_ENV: testing
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Free disk space
         # The full ML stack (torch + CUDA nvidia-*-cu12 wheels + transformers +
         # mlflow) plus the later Docker build exhaust the ~14 GB free on a stock
