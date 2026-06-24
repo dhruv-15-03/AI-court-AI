@@ -47,6 +47,6 @@ hdbscan==0.8.41
 
 # ── Utilities ────────────────────────────────────────────────────────
 dill==0.4.1
-pydantic==2.12.5
+pydantic==2.13.4
 python-dotenv==1.2.2
 PyYAML==6.0.3
