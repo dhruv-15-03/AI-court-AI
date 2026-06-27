@@ -16,9 +16,9 @@ imbalanced-learn==0.14.1
 nltk==3.9.3
 
 # ── Deep Learning ────────────────────────────────────────────────────
-torch==2.6.0
+torch==2.12.1
 transformers==5.3.0
-sentence-transformers==5.2.3
+sentence-transformers==5.6.0
 accelerate==1.13.0
 safetensors==0.7.0
 tokenizers==0.22.2
@@ -43,7 +43,9 @@ redis==5.2.1
 
 # ── Dimensionality Reduction ─────────────────────────────────────────
 umap-learn==0.5.11
-hdbscan==0.8.41
+# hdbscan 0.8.43+ is the first release publishing cp314 wheels (Python 3.14);
+# 0.8.41 has none, which would force a fragile from-source build on 3.14.
+hdbscan==0.8.44
 
 # ── Utilities ────────────────────────────────────────────────────────
 dill==0.4.1
