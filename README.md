@@ -2,7 +2,7 @@
 
 AI-powered Indian legal case classifier and precedent search (production-ready, memory-efficient)
 
-[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.14+](https://img.shields.io/badge/python-3.14+-blue.svg)](https://www.python.org/downloads/)
 [![Model](https://img.shields.io/badge/Model-TFIDF%20%2B%20BoostedRF-blue.svg)](#current-model)
 [![Accuracy](https://img.shields.io/badge/Test%20Accuracy-91.8%25-green.svg)](#current-model)
 [![Deploy](https://img.shields.io/badge/Deploy-Render%20Free%20Tier-green.svg)](#deploy-on-render-free-tier)
@@ -336,7 +336,7 @@ Drift comparisons are appended to `logs/drift_history.log`.
 
 ## ✅ Quick Checklist
 
-- [ ] Python 3.12+ and dependencies installed
+- [ ] Python 3.14+ and dependencies installed
 - [ ] Model file at `models/legal_case_classifier.pkl`
 - [ ] Optional: `models/search_index.pkl` if enabling `/api/search`
 - [ ] Environment tuned for target (Render free tier: LOW_MEMORY=1, DISABLE_* indices)

@@ -1,6 +1,6 @@
 # Production container for AI Court API (multi-stage)
 
-FROM python:3.12-slim AS builder
+FROM python:3.14-slim AS builder
 
 # Build arg to bust Render's layer cache when needed
 ARG CACHE_BUST=1
@@ -33,7 +33,7 @@ RUN pip install --no-cache-dir .
 # Pre-download NLTK data at build time (avoids runtime failures)
 RUN python -c "import nltk; nltk.download('punkt', quiet=True); nltk.download('punkt_tab', quiet=True); nltk.download('stopwords', quiet=True); nltk.download('wordnet', quiet=True); nltk.download('omw-1.4', quiet=True)"
 
-FROM python:3.12-slim AS runtime
+FROM python:3.14-slim AS runtime
 ARG APP_VERSION=0.1.0
 ARG GIT_COMMIT=dev
 ENV PYTHONDONTWRITEBYTECODE=1 \
