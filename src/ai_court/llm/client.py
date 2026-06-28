@@ -32,6 +32,67 @@ _PROVIDER_DEFAULTS = {
     },
 }
 
+# Substrings that mark a provider error as worth retrying (transient): rate limits
+# (HTTP 429), upstream 5xx, and connection/timeout blips. Kept conservative so we
+# never retry 4xx client errors (bad request, auth) that will fail deterministically.
+_RETRYABLE_MARKERS = (
+    "429", "rate limit", "rate_limit", "too many requests",
+    "500", "502", "503", "504", "overloaded", "server error",
+    "timeout", "timed out", "connection", "temporarily unavailable",
+)
+
+
+def _is_retryable(err_str: str) -> bool:
+    low = err_str.lower()
+    return any(marker in low for marker in _RETRYABLE_MARKERS)
+
+
+def _resolve_float(explicit: Optional[float], env_var: str, default: float) -> float:
+    """Pick an explicit value, else env var, else default. Ignores invalid/<=0 env."""
+    if explicit is not None:
+        return explicit
+    raw = (os.getenv(env_var) or "").strip()
+    if not raw:
+        return default
+    try:
+        value = float(raw)
+    except ValueError:
+        return default
+    return value if value > 0 else default
+
+
+def _resolve_int(explicit: Optional[int], env_var: str, default: int) -> int:
+    """Pick an explicit value, else env var, else default. Ignores invalid/<0 env."""
+    if explicit is not None:
+        return explicit
+    raw = (os.getenv(env_var) or "").strip()
+    if not raw:
+        return default
+    try:
+        value = int(raw)
+    except ValueError:
+        return default
+    return value if value >= 0 else default
+
+
+def route_timeout(route: str, default: float) -> float:
+    """Resolve a per-route LLM wall-clock budget (seconds) from the environment.
+
+    Reads ``LLM_TIMEOUT_<ROUTE>`` (e.g. ``LLM_TIMEOUT_CHAT``). Falls back to
+    ``default`` when the variable is unset, blank, or not a positive number.
+    Operators tune these so a single request's total LLM time (including retries)
+    stays under the gunicorn worker ``timeout`` (default 120s), preventing the
+    worker from being killed mid-call (which surfaces to clients as a 502).
+    """
+    raw = (os.getenv(f"LLM_TIMEOUT_{route.upper()}") or "").strip()
+    if not raw:
+        return default
+    try:
+        value = float(raw)
+    except ValueError:
+        return default
+    return value if value > 0 else default
+
 
 class LLMClient:
     """Thin wrapper around an OpenAI-compatible endpoint for legal reasoning."""
@@ -44,7 +105,9 @@ class LLMClient:
         provider: Optional[str] = None,
         temperature: float = 0.3,
         max_tokens: int = 4096,
-        timeout: float = 120.0,
+        timeout: Optional[float] = None,
+        max_retries: Optional[int] = None,
+        max_backoff: Optional[float] = None,
     ):
         provider = (provider or os.getenv("LLM_PROVIDER") or "github").lower().strip()
         if provider not in _PROVIDER_DEFAULTS:
@@ -57,7 +120,15 @@ class LLMClient:
         self.model = model or os.getenv("LLM_MODEL") or defaults["model"]
         self.temperature = temperature
         self.max_tokens = max_tokens
-        self.timeout = timeout
+        # Default wall-clock budget for a single chat() call (incl. retries). Kept
+        # below the gunicorn worker timeout (120s) so a slow upstream never causes
+        # a worker kill -> 502. Env-overridable; per-route callers pass tighter values.
+        self.timeout = _resolve_float(timeout, "LLM_TIMEOUT", 90.0)
+        # App-level retry budget for transient errors. The OpenAI SDK's own retries
+        # are disabled below (max_retries=0) so this loop is the single source of
+        # truth and total latency stays bounded by self.timeout.
+        self.max_retries = _resolve_int(max_retries, "LLM_MAX_RETRIES", 1)
+        self.max_backoff = _resolve_float(max_backoff, "LLM_RETRY_MAX_BACKOFF", 5.0)
 
         # Resolve API key: explicit > provider env > generic LLM_API_KEY > ollama placeholder
         self.api_key = (
@@ -76,10 +147,13 @@ class LLMClient:
             api_key=self.api_key,
             base_url=self.base_url,
             timeout=self.timeout,
+            # Disable SDK-level retries: the app retry loop in _complete() owns
+            # retries so cumulative latency can't silently exceed the worker budget.
+            max_retries=0,
         )
         logger.info(
-            "[llm] provider=%s model=%s base_url=%s",
-            self.provider, self.model, self.base_url,
+            "[llm] provider=%s model=%s base_url=%s timeout=%.0fs max_retries=%d",
+            self.provider, self.model, self.base_url, self.timeout, self.max_retries,
         )
 
     @overload
@@ -89,6 +163,7 @@ class LLMClient:
         temperature: Optional[float] = ...,
         max_tokens: Optional[int] = ...,
         stream: Literal[False] = ...,
+        timeout: Optional[float] = ...,
     ) -> str: ...
 
     @overload
@@ -98,6 +173,7 @@ class LLMClient:
         temperature: Optional[float] = ...,
         max_tokens: Optional[int] = ...,
         stream: Literal[True] = ...,
+        timeout: Optional[float] = ...,
     ) -> Iterator[str]: ...
 
     def chat(
@@ -106,6 +182,7 @@ class LLMClient:
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
         stream: bool = False,
+        timeout: Optional[float] = None,
     ) -> str | Iterator[str]:
         """Send a chat completion request.
 
@@ -114,31 +191,46 @@ class LLMClient:
             temperature: Override default temperature.
             max_tokens: Override default max_tokens.
             stream: If True, returns an iterator of content chunks.
+            timeout: Per-call wall-clock budget (seconds) for the whole request,
+                including retries. Defaults to ``self.timeout``. Callers pass a
+                per-route value (see ``route_timeout``) to keep total time under
+                the gunicorn worker timeout.
 
         Returns:
             Complete response text, or iterator of chunks if stream=True.
         """
         if stream:
-            return self._stream(messages, temperature, max_tokens)
-        return self._complete(messages, temperature, max_tokens)
+            return self._stream(messages, temperature, max_tokens, timeout)
+        return self._complete(messages, temperature, max_tokens, timeout)
 
     def _complete(
         self,
         messages: list[dict[str, str]],
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
+        timeout: Optional[float] = None,
     ) -> str:
+        budget = timeout if timeout is not None else self.timeout
         t0 = time.perf_counter()
+        deadline = t0 + budget
         retries = 0
-        max_retries = 3
 
-        while retries <= max_retries:
+        while True:
+            # First attempt gets the full budget; retries get only the time left so
+            # the call can never run past `budget` wall-clock seconds in total.
+            attempt_timeout = budget if retries == 0 else deadline - time.perf_counter()
+            if attempt_timeout <= 0:
+                raise RuntimeError(
+                    f"LLM request exceeded its {budget:.0f}s budget after {retries} retr"
+                    f"{'y' if retries == 1 else 'ies'}"
+                )
             try:
                 response = self._client.chat.completions.create(
                     model=self.model,
                     messages=cast(Any, messages),
-                    temperature=temperature or self.temperature,
+                    temperature=temperature if temperature is not None else self.temperature,
                     max_tokens=max_tokens or self.max_tokens,
+                    timeout=attempt_timeout,
                 )
                 elapsed = time.perf_counter() - t0
                 logger.info(
@@ -151,34 +243,39 @@ class LLMClient:
 
             except Exception as e:
                 err_str = str(e)
-                if "429" in err_str or "rate" in err_str.lower():
+                if retries < self.max_retries and _is_retryable(err_str):
                     retries += 1
-                    wait = 2 ** retries
-                    logger.warning("Rate limited, retrying in %ds (attempt %d)", wait, retries)
-                    time.sleep(wait)
-                    continue
-                if "5" in err_str[:3] and retries < max_retries:
-                    retries += 1
-                    wait = 2 ** retries
-                    logger.warning("Server error, retrying in %ds: %s", wait, err_str[:100])
+                    wait = min(2 ** retries, self.max_backoff)
+                    # Don't sleep past the deadline — fail fast instead of overrunning.
+                    if time.perf_counter() + wait >= deadline:
+                        logger.warning(
+                            "LLM transient error with no budget left to retry: %s",
+                            err_str[:100],
+                        )
+                        raise
+                    logger.warning(
+                        "LLM transient error, retrying in %.0fs (attempt %d/%d): %s",
+                        wait, retries, self.max_retries, err_str[:100],
+                    )
                     time.sleep(wait)
                     continue
                 raise
-
-        raise RuntimeError(f"LLM request failed after {max_retries} retries")
 
     def _stream(
         self,
         messages: list[dict[str, str]],
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
+        timeout: Optional[float] = None,
     ) -> Iterator[str]:
+        budget = timeout if timeout is not None else self.timeout
         stream = self._client.chat.completions.create(
             model=self.model,
             messages=cast(Any, messages),
-            temperature=temperature or self.temperature,
+            temperature=temperature if temperature is not None else self.temperature,
             max_tokens=max_tokens or self.max_tokens,
             stream=True,
+            timeout=budget,
         )
         for chunk in cast(Any, stream):
             if chunk.choices and chunk.choices[0].delta.content:
@@ -191,6 +288,7 @@ class LLMClient:
                 [{"role": "user", "content": "Reply with OK"}],
                 temperature=0,
                 max_tokens=5,
+                timeout=route_timeout("health", 10.0),
             )
             return {
                 "status": "ok",

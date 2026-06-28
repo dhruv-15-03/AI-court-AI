@@ -48,16 +48,27 @@ def health():
 
 @monitoring_bp.route("/api/health/ready", methods=["GET"])
 def health_ready():
-    """Readiness probe - checks if model is loaded and ready to serve."""
+    """Readiness probe — verifies the classifier model is actually loaded.
+
+    Returns 200 only when the core classifier and its underlying model are in
+    memory and able to serve predictions; 503 otherwise. The LLM agent is an
+    optional dependency, so its availability is reported informationally
+    (``llm_available``) but does NOT gate readiness — the service can still serve
+    classification/search without the LLM. This endpoint runs no inference, so it
+    is cheap enough for an orchestrator to poll without the cold-start 502 risk of
+    the deep ``/api/health`` check.
+    """
+    classifier = state.classifier
+    model_loaded = classifier is not None and getattr(classifier, "model", None) is not None
     checks = {
-        'model_loaded': state.classifier is not None,
-        'preprocessor_ready': state.preprocess_fn is not None,
+        'model_loaded': model_loaded,
     }
     all_ready = all(checks.values())
     mem = state.get_memory_usage()
     return jsonify({
         "ready": all_ready,
         "checks": checks,
+        "llm_available": state.llm_client is not None,
         "memory_rss_mb": mem.get('rss_mb'),
     }), 200 if all_ready else 503
 
