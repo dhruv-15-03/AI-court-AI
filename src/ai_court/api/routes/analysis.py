@@ -340,19 +340,12 @@ def _generate_legal_analysis(
             )
             from ai_court.llm.prompts import SYSTEM_PROMPT_LEGAL_AGENT
             from ai_court.llm.client import route_timeout
-            raw = state.llm_client.chat(
+            return state.llm_client.chat_json(
                 [{"role": "system", "content": SYSTEM_PROMPT_LEGAL_AGENT},
                  {"role": "user", "content": prompt}],
                 temperature=0.2, max_tokens=2048,
                 timeout=route_timeout("analyze", 60.0),
             )
-            raw = raw.strip()
-            if raw.startswith("```"):
-                raw = raw.split("\n", 1)[-1]
-            if raw.endswith("```"):
-                raw = raw.rsplit("```", 1)[0]
-            import json as _json
-            return _json.loads(raw.strip())
         except Exception as exc:
             logger.warning("LLM legal analysis failed, using template: %s", exc)
     
@@ -438,19 +431,12 @@ def _generate_full_report(
             )
             from ai_court.llm.prompts import SYSTEM_PROMPT_LEGAL_AGENT
             from ai_court.llm.client import route_timeout
-            raw = state.llm_client.chat(
+            return state.llm_client.chat_json(
                 [{"role": "system", "content": SYSTEM_PROMPT_LEGAL_AGENT},
                  {"role": "user", "content": prompt}],
                 temperature=0.3, max_tokens=3000,
                 timeout=route_timeout("analyze", 60.0),
             )
-            raw = raw.strip()
-            if raw.startswith("```"):
-                raw = raw.split("\n", 1)[-1]
-            if raw.endswith("```"):
-                raw = raw.rsplit("```", 1)[0]
-            import json as _json
-            return _json.loads(raw.strip())
         except Exception as exc:
             logger.warning("LLM full report failed, using template: %s", exc)
 
@@ -1014,6 +1000,8 @@ def rag_query_endpoint():
             k=k,
             llm_client=state.llm_client,
             statute_corpus=state.statute_corpus,
+            semantic_index=state.semantic_index,
+            query_embed_fn=dependencies.semantic_query_embeddings,
         )
         return jsonify(response)
         

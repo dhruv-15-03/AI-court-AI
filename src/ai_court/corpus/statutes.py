@@ -149,7 +149,6 @@ class StatuteCorpus:
                 scores = tfidf_scores
         else:
             scores = tfidf_scores
-        scores = (self._matrix @ qv.T).toarray().ravel()
 
         # Apply act filter
         if act_filter:
