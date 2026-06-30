@@ -932,7 +932,10 @@ def agent_stream():
 
             full_answer_parts: list = []
             try:
-                for chunk in state.llm_client.chat(messages, stream=True):
+                from ai_court.llm.client import route_timeout
+                for chunk in state.llm_client.chat(
+                    messages, stream=True, timeout=route_timeout("chat", 45.0)
+                ):
                     if not chunk:
                         continue
                     full_answer_parts.append(chunk)

@@ -339,10 +339,12 @@ def _generate_legal_analysis(
                 f"Return ONLY valid JSON, no markdown fences."
             )
             from ai_court.llm.prompts import SYSTEM_PROMPT_LEGAL_AGENT
+            from ai_court.llm.client import route_timeout
             raw = state.llm_client.chat(
                 [{"role": "system", "content": SYSTEM_PROMPT_LEGAL_AGENT},
                  {"role": "user", "content": prompt}],
                 temperature=0.2, max_tokens=2048,
+                timeout=route_timeout("analyze", 60.0),
             )
             raw = raw.strip()
             if raw.startswith("```"):
@@ -435,10 +437,12 @@ def _generate_full_report(
                 f"Return ONLY valid JSON. No markdown fences."
             )
             from ai_court.llm.prompts import SYSTEM_PROMPT_LEGAL_AGENT
+            from ai_court.llm.client import route_timeout
             raw = state.llm_client.chat(
                 [{"role": "system", "content": SYSTEM_PROMPT_LEGAL_AGENT},
                  {"role": "user", "content": prompt}],
                 temperature=0.3, max_tokens=3000,
+                timeout=route_timeout("analyze", 60.0),
             )
             raw = raw.strip()
             if raw.startswith("```"):
