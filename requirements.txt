@@ -12,14 +12,14 @@ pandas==2.3.3
 pyarrow==23.0.1
 scikit-learn==1.8.0
 joblib==1.5.3
-imbalanced-learn==0.14.1
-nltk==3.9.3
+imbalanced-learn==0.14.2
+nltk==3.9.4
 
 # ── Deep Learning ────────────────────────────────────────────────────
 torch==2.12.1
-transformers==5.3.0
+transformers==5.12.1
 sentence-transformers==5.6.0
-accelerate==1.13.0
+accelerate==1.14.0
 safetensors==0.7.0
 tokenizers==0.22.2
 
@@ -33,7 +33,7 @@ lxml==6.0.3
 
 # ── Monitoring / Ops ─────────────────────────────────────────────────
 prometheus_client==0.25.0
-sentry-sdk[flask]==2.54.0
+sentry-sdk[flask]==2.63.0
 mlflow==3.10.1
 
 # ── Caching ──────────────────────────────────────────────────────────
