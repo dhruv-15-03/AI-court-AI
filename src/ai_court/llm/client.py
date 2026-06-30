@@ -47,6 +47,68 @@ def _is_retryable(err_str: str) -> bool:
     return any(marker in low for marker in _RETRYABLE_MARKERS)
 
 
+# Markers identifying a deterministic provider rejection of the `response_format`
+# parameter (e.g. older Ollama builds, or models without JSON mode). Used by
+# chat_json() to decide whether to transparently retry without structured-output
+# mode rather than surfacing the error.
+_RESPONSE_FORMAT_REJECTION_MARKERS = (
+    "response_format", "response format", "json_object", "json schema",
+    "unsupported", "not supported", "does not support", "unexpected keyword",
+    "unknown parameter", "unrecognized", "unknown field", "extra inputs",
+    "invalid_request_error",
+)
+
+
+def _is_unsupported_response_format(err_str: str) -> bool:
+    low = err_str.lower()
+    return any(marker in low for marker in _RESPONSE_FORMAT_REJECTION_MARKERS)
+
+
+def parse_json_object(text: Optional[str]) -> dict[str, Any]:
+    """Parse a JSON object from possibly-decorated model output.
+
+    Tolerates ```json code fences, leading/trailing prose, and assistant chatter
+    around the object by falling back to the outermost ``{...}`` span. This makes
+    structured-output parsing robust even when a model ignores instructions to
+    emit bare JSON.
+
+    Raises:
+        ValueError: if no JSON object can be recovered.
+    """
+    import json
+
+    if not text or not text.strip():
+        raise ValueError("empty LLM response")
+    s = text.strip()
+
+    # Strip a leading ```/```json fence and any trailing fence.
+    if s.startswith("```"):
+        s = s[3:]
+        if s[:4].lower() == "json":
+            s = s[4:]
+        if s.endswith("```"):
+            s = s[:-3]
+        s = s.strip()
+
+    try:
+        obj = json.loads(s)
+        if isinstance(obj, dict):
+            return obj
+    except Exception:
+        pass
+
+    start = s.find("{")
+    end = s.rfind("}")
+    if start != -1 and end > start:
+        try:
+            obj = json.loads(s[start : end + 1])
+        except Exception as exc:
+            raise ValueError(f"could not parse JSON object: {exc}") from exc
+        if isinstance(obj, dict):
+            return obj
+    raise ValueError("no JSON object found in LLM response")
+
+
 def _resolve_float(explicit: Optional[float], env_var: str, default: float) -> float:
     """Pick an explicit value, else env var, else default. Ignores invalid/<=0 env."""
     if explicit is not None:
@@ -203,14 +265,73 @@ class LLMClient:
             return self._stream(messages, temperature, max_tokens, timeout)
         return self._complete(messages, temperature, max_tokens, timeout)
 
+    def chat_json(
+        self,
+        messages: list[dict[str, str]],
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
+        timeout: Optional[float] = None,
+    ) -> dict[str, Any]:
+        """Chat completion that returns a parsed JSON object.
+
+        Requests a JSON-object response via ``response_format`` when the provider
+        supports it (GitHub Models / OpenAI ``gpt-4o`` do; some Ollama models do
+        not), transparently retrying once as a plain completion on a
+        parameter-rejection error. The text is then parsed with a tolerant
+        extractor (:func:`parse_json_object`) that strips code fences and
+        surrounding prose, so a stray ```json fence or trailing sentence no longer
+        derails downstream ``json.loads``.
+
+        The prompt must still instruct the model to return JSON (OpenAI's
+        json_object mode requires the word "json" to appear in the messages).
+
+        Args:
+            messages: Same shape as :meth:`chat`.
+            temperature/max_tokens/timeout: As in :meth:`chat`.
+
+        Returns:
+            The parsed JSON object as a dict.
+
+        Raises:
+            ValueError: if the model output cannot be parsed into a JSON object.
+        """
+        try:
+            raw = self._complete(
+                messages,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                timeout=timeout,
+                response_format={"type": "json_object"},
+            )
+        except Exception as exc:
+            # A provider/model that rejects `response_format` fails deterministically
+            # (HTTP 400) -> retry once without it. Transient errors are re-raised so
+            # the caller's existing fallback handles them and we don't silently
+            # double the latency budget on an upstream outage.
+            if _is_unsupported_response_format(str(exc)):
+                logger.info("[llm] response_format unsupported, retrying without it")
+                raw = self._complete(
+                    messages,
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    timeout=timeout,
+                )
+            else:
+                raise
+        return parse_json_object(raw)
+
     def _complete(
         self,
         messages: list[dict[str, str]],
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
         timeout: Optional[float] = None,
+        response_format: Optional[dict[str, Any]] = None,
     ) -> str:
         budget = timeout if timeout is not None else self.timeout
+        extra: dict[str, Any] = {}
+        if response_format is not None:
+            extra["response_format"] = response_format
         t0 = time.perf_counter()
         deadline = t0 + budget
         retries = 0
@@ -231,6 +352,7 @@ class LLMClient:
                     temperature=temperature if temperature is not None else self.temperature,
                     max_tokens=max_tokens or self.max_tokens,
                     timeout=attempt_timeout,
+                    **extra,
                 )
                 elapsed = time.perf_counter() - t0
                 logger.info(

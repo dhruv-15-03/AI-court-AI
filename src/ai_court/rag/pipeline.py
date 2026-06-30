@@ -13,49 +13,33 @@ import logging
 from typing import List, Dict, Any, Optional, Callable
 import numpy as np
 
+from ai_court.llm.faithfulness import verify_citations
+
 logger = logging.getLogger(__name__)
 
 
-def retrieve(
+def _lexical_retrieve(
     query: str,
-    search_index: Optional[Dict[str, Any]] = None,
-    preprocess_fn: Optional[Callable[[str], str]] = None,
-    k: int = 5
+    search_index: Optional[Dict[str, Any]],
+    preprocess_fn: Optional[Callable[[str], str]],
+    k: int,
 ) -> List[Dict[str, Any]]:
-    """Retrieve relevant documents using TF-IDF search index.
-    
-    Args:
-        query: User's search query
-        search_index: Pre-loaded search index with vectorizer, matrix, and meta
-        preprocess_fn: Text preprocessing function
-        k: Number of documents to retrieve
-        
-    Returns:
-        List of document dicts with title, url, snippet, outcome, and score
-    """
+    """TF-IDF retrieval leg (the historical behaviour)."""
     if search_index is None:
-        logger.warning("No search index available for retrieval")
         return []
-    
     try:
         vectorizer = search_index.get('vectorizer')
         matrix = search_index.get('matrix')
         meta = search_index.get('meta', [])
-        
         if vectorizer is None or matrix is None:
             logger.warning("Search index missing vectorizer or matrix")
             return []
-        
-        # Preprocess query
+
         processed_query = preprocess_fn(query) if preprocess_fn else query.lower()
-        
-        # Transform and compute similarity
         query_vector = vectorizer.transform([processed_query])
         scores = (matrix @ query_vector.T).toarray().ravel()
-        
-        # Get top-k indices
         top_indices = np.argsort(-scores)[:k]
-        
+
         documents: List[Dict[str, Any]] = []
         for idx in top_indices:
             if idx < len(meta) and scores[idx] > 0:
@@ -66,14 +50,97 @@ def retrieve(
                     'snippet': m.get('snippet', ''),
                     'outcome': m.get('outcome'),
                     'score': float(scores[idx]),
-                    'rank': len(documents) + 1
+                    'rank': len(documents) + 1,
                 })
-        
         return documents
-        
     except Exception as e:
-        logger.error(f"Retrieval failed: {e}")
+        logger.error(f"Lexical retrieval failed: {e}")
         return []
+
+
+def _semantic_retrieve(
+    query: str,
+    semantic_index: Optional[Dict[str, Any]],
+    query_embed_fn: Optional[Callable[[str], Any]],
+    k: int,
+) -> List[Dict[str, Any]]:
+    """Dense/semantic retrieval leg using a pre-built embedding index.
+
+    ``query_embed_fn`` embeds the raw query (it applies its own preprocessing)
+    and returns an array whose first row is the query vector, matching the
+    convention used by the /api/search endpoint.
+    """
+    if semantic_index is None or query_embed_fn is None:
+        return []
+    try:
+        dense = semantic_index.get('embeddings')
+        meta = semantic_index.get('meta', [])
+        if dense is None or not hasattr(dense, 'shape'):
+            return []
+        qv = query_embed_fn(query)
+        if qv is None or not hasattr(qv, '__getitem__'):
+            return []
+        sims = np.dot(dense, qv[0])
+        top_indices = np.argsort(-sims)[:k]
+
+        documents: List[Dict[str, Any]] = []
+        for idx in top_indices:
+            if idx < len(meta):
+                m = meta[idx]
+                documents.append({
+                    'title': m.get('title', 'Unknown'),
+                    'url': m.get('url'),
+                    'snippet': m.get('snippet', ''),
+                    'outcome': m.get('outcome'),
+                    'score': float(sims[idx]),
+                    'rank': len(documents) + 1,
+                })
+        return documents
+    except Exception as e:
+        logger.error(f"Semantic retrieval failed: {e}")
+        return []
+
+
+def retrieve(
+    query: str,
+    search_index: Optional[Dict[str, Any]] = None,
+    preprocess_fn: Optional[Callable[[str], str]] = None,
+    k: int = 5,
+    semantic_index: Optional[Dict[str, Any]] = None,
+    query_embed_fn: Optional[Callable[[str], Any]] = None,
+) -> List[Dict[str, Any]]:
+    """Retrieve relevant documents.
+
+    Fuses dense semantic search with TF-IDF via reciprocal-rank fusion when a
+    semantic index *and* an embedding function are supplied; otherwise falls back
+    to whichever single retriever is available. The result shape is identical in
+    all three cases, so downstream augment()/generate() are unaffected.
+
+    Args:
+        query: User's search query.
+        search_index: Pre-loaded TF-IDF index (vectorizer, matrix, meta).
+        preprocess_fn: Text preprocessing function for the lexical leg.
+        k: Number of documents to retrieve.
+        semantic_index: Optional dense index (embeddings, meta).
+        query_embed_fn: Optional callable that embeds the query for the dense leg.
+
+    Returns:
+        List of document dicts with title, url, snippet, outcome, score (+rank).
+    """
+    lexical = _lexical_retrieve(query, search_index, preprocess_fn, k)
+    semantic = _semantic_retrieve(query, semantic_index, query_embed_fn, k)
+
+    if semantic and lexical:
+        # Both legs available -> hybrid. Reuse the shared RRF utility. Each fused
+        # doc keeps its original retriever 'score' (used downstream as a rough
+        # confidence) and gains a 'fusion_score'; ordering is by fusion_score.
+        from ai_court.retrieval.hybrid import reciprocal_rank_fusion
+        fused = reciprocal_rank_fusion(semantic=semantic, lexical=lexical, k=k)
+        for rank, doc in enumerate(fused, 1):
+            doc['rank'] = rank
+        return fused
+
+    return (semantic or lexical)[:k]
 
 
 def augment(
@@ -194,8 +261,11 @@ def generate(
             if statute_text:
                 prompt += f"RELEVANT STATUTES:\n{statute_text}\n\n"
             prompt += (
-                "Provide a clear, well-cited answer. Reference specific case names and "
-                "statutory sections. Structure your response with clear sections."
+                "Provide a clear, well-cited answer. Cite ONLY the case names listed "
+                "under RELEVANT CASES above and the statutory sections provided — do "
+                "NOT introduce any case that does not appear in that list. If the "
+                "provided material is insufficient to answer, say so explicitly rather "
+                "than citing cases from memory. Structure your response with clear sections."
             )
             
             messages = [
@@ -203,11 +273,29 @@ def generate(
                 {"role": "user", "content": prompt},
             ]
             answer = llm_client.chat(messages)
-            
+
+            # Post-hoc citation faithfulness check: flag any case the model cited
+            # that is NOT among the retrieved documents (legal AI's #1 liability).
+            faith = verify_citations(answer, documents)
+            if not faith["grounded"]:
+                logger.warning(
+                    "Ungrounded citation(s) in RAG answer: %s",
+                    faith["unverified_citations"],
+                )
+                answer = (
+                    answer
+                    + "\n\n> \u26a0\ufe0f **Citation caution:** the following case "
+                    "reference(s) could not be matched to the retrieved source "
+                    "documents and may be inaccurate \u2014 verify before relying on "
+                    "them: " + "; ".join(faith["unverified_citations"])
+                )
+
             return {
                 "answer": answer,
                 "confidence": float(documents[0].get('score', 0)) if documents else 0.0,
                 "citations": citations,
+                "unverified_citations": faith["unverified_citations"],
+                "grounded": faith["grounded"],
                 "num_documents": len(documents),
                 "outcome_distribution": outcome_counts,
                 "mode": "rag_llm",
@@ -247,25 +335,38 @@ def rag_query(
     k: int = 5,
     llm_client: Any = None,
     statute_corpus: Any = None,
+    semantic_index: Optional[Dict[str, Any]] = None,
+    query_embed_fn: Optional[Callable[[str], Any]] = None,
 ) -> Dict[str, Any]:
     """Complete RAG pipeline: retrieve, augment, generate.
     
     Convenience function that chains all pipeline steps.
-    Uses LLM for generation when llm_client is provided.
+    Uses LLM for generation when llm_client is provided, and hybrid
+    (dense + TF-IDF) retrieval when a semantic index and embedding function
+    are supplied.
     
     Args:
         question: User's question
-        search_index: Pre-loaded search index
+        search_index: Pre-loaded TF-IDF search index
         preprocess_fn: Text preprocessing function
         k: Number of documents to retrieve
         llm_client: Optional LLMClient for LLM-powered answers
         statute_corpus: Optional StatuteCorpus for statutory provisions
+        semantic_index: Optional dense index for hybrid retrieval
+        query_embed_fn: Optional query embedding callable for hybrid retrieval
         
     Returns:
         Complete RAG response
     """
-    # Step 1: Retrieve
-    documents = retrieve(question, search_index, preprocess_fn, k)
+    # Step 1: Retrieve (hybrid when a semantic index is available)
+    documents = retrieve(
+        question,
+        search_index,
+        preprocess_fn,
+        k,
+        semantic_index=semantic_index,
+        query_embed_fn=query_embed_fn,
+    )
     
     # Step 2: Augment
     context = augment(question, documents)
