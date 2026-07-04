@@ -20,7 +20,7 @@ torch==2.12.1
 transformers==5.12.1
 sentence-transformers==5.6.0
 accelerate==1.14.0
-safetensors==0.7.0
+safetensors==0.8.0
 tokenizers==0.22.2
 
 # ── LLM Agent ────────────────────────────────────────────────────────
