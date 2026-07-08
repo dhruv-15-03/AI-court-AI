@@ -29,7 +29,7 @@ openai==2.30.0
 # ── Scraping / Parsing ───────────────────────────────────────────────
 requests==2.34.2
 beautifulsoup4==4.15.0
-lxml==6.0.3
+lxml==6.1.1
 
 # ── Monitoring / Ops ─────────────────────────────────────────────────
 prometheus_client==0.25.0
