@@ -1,6 +1,7 @@
 import gc
 import os
 import json
+import threading
 import dill
 import logging
 from typing import Dict, Any, Optional, List
@@ -8,6 +9,30 @@ from flask import request, jsonify
 from ai_court.api import config, state
 
 logger = logging.getLogger("api")
+
+# semantic_query_embeddings() used to construct a brand-new SentenceTransformer
+# on every /api/search call (loading model weights + tokenizer from disk each
+# time) even though the model never changes for the process's lifetime. That's
+# hundreds of ms to low seconds of pure model-load overhead added to every
+# semantic search request. Cache the loaded encoder per model_name (there's
+# normally exactly one) and reuse it; guarded by a lock since gunicorn runs
+# this worker with multiple threads (see gunicorn.conf.py worker_class=gthread).
+_sentence_transformer_cache: Dict[str, Any] = {}
+_sentence_transformer_lock = threading.Lock()
+
+
+def _get_sentence_transformer(model_name: str):
+    """Return a process-wide cached SentenceTransformer for model_name."""
+    cached = _sentence_transformer_cache.get(model_name)
+    if cached is not None:
+        return cached
+    with _sentence_transformer_lock:
+        cached = _sentence_transformer_cache.get(model_name)
+        if cached is None:
+            from sentence_transformers import SentenceTransformer
+            cached = SentenceTransformer(model_name)
+            _sentence_transformer_cache[model_name] = cached
+    return cached
 
 # Memory high-water mark in MB (for 512 MB Render free-tier)
 _MEMORY_WARN_MB = int(os.getenv('MEMORY_WARN_MB', '400'))
@@ -289,13 +314,9 @@ def persist_agreement():
 def semantic_query_embeddings(query: str):
     if state.semantic_index is None:
         return None
-    try:
-        from sentence_transformers import SentenceTransformer
-    except Exception:
-        return None
     model_name = state.semantic_index.get('model_name') or 'all-MiniLM-L6-v2'
     try:
-        model = SentenceTransformer(model_name)
+        model = _get_sentence_transformer(model_name)
         vec = model.encode([state.preprocess_fn(query)], normalize_embeddings=True)
         return vec
     except Exception:
