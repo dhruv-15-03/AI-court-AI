@@ -17,6 +17,7 @@ from __future__ import annotations
 import json
 import logging
 import time
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Callable, Dict, List, Optional
 
 from ai_court.llm.client import LLMClient
@@ -236,21 +237,29 @@ class LegalAgentPipeline:
         """
         t0 = time.perf_counter()
 
-        # 1. Understand
-        understanding = self.understand_query(query)
+        # 1. Understand (LLM round-trip) + 3. search similar cases (local TF-IDF
+        # matmul) run concurrently: `find_similar_cases` only needs the raw
+        # `query`, not the LLM's structured understanding, so there is no data
+        # dependency forcing them to be sequential. Overlapping the network-bound
+        # LLM call with the CPU-bound local search shaves the search's cost off
+        # the critical path entirely (wall time -> max(llm, search) instead of
+        # llm + search).
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            understanding_future = pool.submit(self.understand_query, query)
+            similar_cases_future = pool.submit(self.find_similar_cases, query, k=k_cases)
+            understanding = understanding_future.result()
+            similar_cases = similar_cases_future.result()
+
         case_type = understanding.get("case_type", "Unknown")
         legal_issues = understanding.get("legal_issues", [])
         relevant_acts = understanding.get("relevant_acts", [])
         party_role = understanding.get("party_role", "unknown")
         relief_sought = understanding.get("relief_sought", "unknown")
 
-        # 2. Predict
+        # 2. Predict (depends on case_type from understanding, so must follow it)
         prediction = self.predict_outcome(query, case_type)
 
-        # 3. Search similar cases
-        similar_cases = self.find_similar_cases(query, k=k_cases)
-
-        # 4. Find statutes
+        # 4. Find statutes (depends on legal_issues/acts from understanding)
         statute_query = query + " " + " ".join(legal_issues)
         statute_context = self.find_relevant_statutes(
             statute_query, acts=relevant_acts, k=k_statutes
