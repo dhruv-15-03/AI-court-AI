@@ -9,7 +9,7 @@ waitress==3.0.2
 # ── Data / ML ────────────────────────────────────────────────────────
 numpy==2.4.2
 pandas==2.3.3
-pyarrow==23.0.1
+pyarrow==25.0.0
 scikit-learn==1.8.0
 joblib==1.5.3
 imbalanced-learn==0.14.2
