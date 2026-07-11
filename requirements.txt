@@ -13,7 +13,7 @@ pyarrow==23.0.1
 scikit-learn==1.8.0
 joblib==1.5.3
 imbalanced-learn==0.14.2
-nltk==3.9.4
+nltk==3.10.0
 
 # ── Deep Learning ────────────────────────────────────────────────────
 torch==2.12.1
