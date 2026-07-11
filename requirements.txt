@@ -34,7 +34,7 @@ lxml==6.1.1
 # ── Monitoring / Ops ─────────────────────────────────────────────────
 prometheus_client==0.25.0
 sentry-sdk[flask]==2.63.0
-mlflow==3.10.1
+mlflow==3.14.0
 
 # ── Caching ──────────────────────────────────────────────────────────
 # Optional shared backend for the response cache; the in-process LRU tier
