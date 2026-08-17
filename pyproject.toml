@@ -40,10 +40,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Keep these in lockstep with requirements-dev.txt, which pins the exact
+# versions CI installs (ruff's default rule set is version-sensitive).
 dev = [
     "pytest>=7.4",
-    "ruff>=0.5",
-    "mypy>=1.8"
+    "ruff==0.16.3",
+    "mypy==2.3.0"
 ]
 
 [tool.setuptools.packages.find]
@@ -56,6 +58,30 @@ target-version = "py310"
 # report figures, manual verification) that are not part of the shipped package
 # or the Docker image. They are still syntax-checked by the CI py_compile step.
 extend-exclude = ["scripts"]
+
+[tool.ruff.lint]
+# No `select` override: we deliberately track ruff's curated default rule set.
+# That set is a moving target across minor releases, so requirements-dev.txt
+# pins an exact ruff version (see the note there). Bumping that pin is the
+# supported way to adopt new rules, as a reviewed change rather than a silent
+# CI break. Enabling whole families beyond the default (S, PL, TRY, ...) would
+# add ~1600 findings that are unrelated to correctness here.
+ignore = [
+    # Blind `except Exception` is the deliberate fail-soft boundary around every
+    # optional subsystem (search index, semantic index, multi-axis model, Redis
+    # cache, OCR, MLflow). The service must still boot and serve when those
+    # artifacts are absent - that is exactly how it runs on Render's free tier
+    # and in the CI docker smoke (DISABLE_SEARCH_INDEX / LOW_MEMORY). Narrowing
+    # these to concrete exception tuples would turn optional-feature degradation
+    # into hard 500s, so the broad catch is intentional, not an oversight.
+    "BLE001",
+    # Same boundaries, seen from the other side: a few of those handlers have
+    # nothing useful to do (best-effort stats dumps, optional cache warmers) and
+    # intentionally swallow. Handlers that *can* act do log - see the many
+    # logger.warning/​logger.exception calls alongside them.
+    "S110",  # try-except-pass
+    "S112",  # try-except-continue
+]
 
 [tool.ruff.lint.per-file-ignores]
 # preprocessor.py calls ensure_nltk_resources() between stdlib and nltk imports

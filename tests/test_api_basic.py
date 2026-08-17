@@ -1,5 +1,7 @@
 import json
+
 from ai_court.api.server import app
+
 
 def test_health():
     with app.test_client() as c:

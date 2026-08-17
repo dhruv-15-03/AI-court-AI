@@ -1,27 +1,28 @@
-from typing import Optional, Dict, List
+
 from pydantic import BaseModel, Field
 
+
 class AnalyzeRequest(BaseModel):
-    case_type: Optional[str] = Field(default="Unknown", max_length=100)
-    summary: Optional[str] = Field(default=None, max_length=5000)
-    parties: Optional[str] = Field(default=None, max_length=2000)
-    violence_level: Optional[str] = Field(default=None, max_length=100)
-    weapon: Optional[str] = Field(default=None, max_length=50)
-    police_report: Optional[str] = Field(default=None, max_length=50)
-    witnesses: Optional[str] = Field(default=None, max_length=50)
-    premeditation: Optional[str] = Field(default=None, max_length=50)
-    employment_duration: Optional[str] = Field(default=None, max_length=100)
-    children: Optional[str] = Field(default=None, max_length=50)
-    marriage_duration: Optional[str] = Field(default=None, max_length=100)
-    dispute_type: Optional[str] = Field(default=None, max_length=100)
-    document_evidence: Optional[str] = Field(default=None, max_length=50)
-    monetary_value: Optional[str] = Field(default=None, max_length=100)
-    prior_relationship: Optional[str] = Field(default=None, max_length=200)
-    attempts_resolution: Optional[str] = Field(default=None, max_length=50)
+    case_type: str | None = Field(default="Unknown", max_length=100)
+    summary: str | None = Field(default=None, max_length=5000)
+    parties: str | None = Field(default=None, max_length=2000)
+    violence_level: str | None = Field(default=None, max_length=100)
+    weapon: str | None = Field(default=None, max_length=50)
+    police_report: str | None = Field(default=None, max_length=50)
+    witnesses: str | None = Field(default=None, max_length=50)
+    premeditation: str | None = Field(default=None, max_length=50)
+    employment_duration: str | None = Field(default=None, max_length=100)
+    children: str | None = Field(default=None, max_length=50)
+    marriage_duration: str | None = Field(default=None, max_length=100)
+    dispute_type: str | None = Field(default=None, max_length=100)
+    document_evidence: str | None = Field(default=None, max_length=50)
+    monetary_value: str | None = Field(default=None, max_length=100)
+    prior_relationship: str | None = Field(default=None, max_length=200)
+    attempts_resolution: str | None = Field(default=None, max_length=50)
 
     def combined_text(self) -> str:
         # This legacy method only includes typed fields. We prefer synthesizing from raw.
-        parts: List[str] = []
+        parts: list[str] = []
         data = self.model_dump()
         ct = data.get("case_type", "") or ""
         # Put summary first if provided
@@ -41,10 +42,10 @@ class SearchRequest(BaseModel):
 
 
 class DriftCompareRequest(BaseModel):
-    counts: Dict[str, int]
+    counts: dict[str, int]
     minimum_total: int = Field(default=1, ge=1)
 
-    def normalized(self, classes: List[str]) -> List[float]:
+    def normalized(self, classes: list[str]) -> list[float]:
         total = sum(v for v in self.counts.values() if isinstance(v, (int, float)))
         if total <= 0:
             return [0.0 for _ in classes]

@@ -11,7 +11,8 @@ from __future__ import annotations
 import logging
 import os
 import time
-from typing import Any, Iterator, Literal, Optional, cast, overload
+from collections.abc import Iterator
+from typing import Any, Literal, cast, overload
 
 from openai import OpenAI
 
@@ -64,7 +65,7 @@ def _is_unsupported_response_format(err_str: str) -> bool:
     return any(marker in low for marker in _RESPONSE_FORMAT_REJECTION_MARKERS)
 
 
-def parse_json_object(text: Optional[str]) -> dict[str, Any]:
+def parse_json_object(text: str | None) -> dict[str, Any]:
     """Parse a JSON object from possibly-decorated model output.
 
     Tolerates ```json code fences, leading/trailing prose, and assistant chatter
@@ -86,8 +87,7 @@ def parse_json_object(text: Optional[str]) -> dict[str, Any]:
         s = s[3:]
         if s[:4].lower() == "json":
             s = s[4:]
-        if s.endswith("```"):
-            s = s[:-3]
+        s = s.removesuffix("```")
         s = s.strip()
 
     try:
@@ -109,7 +109,7 @@ def parse_json_object(text: Optional[str]) -> dict[str, Any]:
     raise ValueError("no JSON object found in LLM response")
 
 
-def _resolve_float(explicit: Optional[float], env_var: str, default: float) -> float:
+def _resolve_float(explicit: float | None, env_var: str, default: float) -> float:
     """Pick an explicit value, else env var, else default. Ignores invalid/<=0 env."""
     if explicit is not None:
         return explicit
@@ -123,7 +123,7 @@ def _resolve_float(explicit: Optional[float], env_var: str, default: float) -> f
     return value if value > 0 else default
 
 
-def _resolve_int(explicit: Optional[int], env_var: str, default: int) -> int:
+def _resolve_int(explicit: int | None, env_var: str, default: int) -> int:
     """Pick an explicit value, else env var, else default. Ignores invalid/<0 env."""
     if explicit is not None:
         return explicit
@@ -161,15 +161,15 @@ class LLMClient:
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
-        base_url: Optional[str] = None,
-        model: Optional[str] = None,
-        provider: Optional[str] = None,
+        api_key: str | None = None,
+        base_url: str | None = None,
+        model: str | None = None,
+        provider: str | None = None,
         temperature: float = 0.3,
         max_tokens: int = 4096,
-        timeout: Optional[float] = None,
-        max_retries: Optional[int] = None,
-        max_backoff: Optional[float] = None,
+        timeout: float | None = None,
+        max_retries: int | None = None,
+        max_backoff: float | None = None,
     ):
         provider = (provider or os.getenv("LLM_PROVIDER") or "github").lower().strip()
         if provider not in _PROVIDER_DEFAULTS:
@@ -222,29 +222,29 @@ class LLMClient:
     def chat(
         self,
         messages: list[dict[str, str]],
-        temperature: Optional[float] = ...,
-        max_tokens: Optional[int] = ...,
+        temperature: float | None = ...,
+        max_tokens: int | None = ...,
         stream: Literal[False] = ...,
-        timeout: Optional[float] = ...,
+        timeout: float | None = ...,
     ) -> str: ...
 
     @overload
     def chat(
         self,
         messages: list[dict[str, str]],
-        temperature: Optional[float] = ...,
-        max_tokens: Optional[int] = ...,
+        temperature: float | None = ...,
+        max_tokens: int | None = ...,
         stream: Literal[True] = ...,
-        timeout: Optional[float] = ...,
+        timeout: float | None = ...,
     ) -> Iterator[str]: ...
 
     def chat(
         self,
         messages: list[dict[str, str]],
-        temperature: Optional[float] = None,
-        max_tokens: Optional[int] = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
         stream: bool = False,
-        timeout: Optional[float] = None,
+        timeout: float | None = None,
     ) -> str | Iterator[str]:
         """Send a chat completion request.
 
@@ -268,9 +268,9 @@ class LLMClient:
     def chat_json(
         self,
         messages: list[dict[str, str]],
-        temperature: Optional[float] = None,
-        max_tokens: Optional[int] = None,
-        timeout: Optional[float] = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
+        timeout: float | None = None,
     ) -> dict[str, Any]:
         """Chat completion that returns a parsed JSON object.
 
@@ -323,10 +323,10 @@ class LLMClient:
     def _complete(
         self,
         messages: list[dict[str, str]],
-        temperature: Optional[float] = None,
-        max_tokens: Optional[int] = None,
-        timeout: Optional[float] = None,
-        response_format: Optional[dict[str, Any]] = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
+        timeout: float | None = None,
+        response_format: dict[str, Any] | None = None,
     ) -> str:
         budget = timeout if timeout is not None else self.timeout
         extra: dict[str, Any] = {}
@@ -386,9 +386,9 @@ class LLMClient:
     def _stream(
         self,
         messages: list[dict[str, str]],
-        temperature: Optional[float] = None,
-        max_tokens: Optional[int] = None,
-        timeout: Optional[float] = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
+        timeout: float | None = None,
     ) -> Iterator[str]:
         budget = timeout if timeout is not None else self.timeout
         stream = self._client.chat.completions.create(

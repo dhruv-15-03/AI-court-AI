@@ -1,10 +1,10 @@
 import numpy as np
-from flask import Blueprint, request, jsonify
 from flasgger import swag_from
-from werkzeug.exceptions import BadRequest
+from flask import Blueprint, jsonify, request
 from pydantic import ValidationError
+from werkzeug.exceptions import BadRequest
 
-from ai_court.api import state, dependencies, models, config
+from ai_court.api import config, dependencies, models, state
 from ai_court.api.extensions import limiter
 from ai_court.retrieval.hybrid import reciprocal_rank_fusion
 from ai_court.utils.cache import ResponseCache, make_key

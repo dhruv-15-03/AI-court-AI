@@ -1,30 +1,33 @@
-import os
-import json
-import uuid
 import copy
+import json
 import logging
+import os
 import time
+import uuid
+from collections.abc import Callable
 from datetime import datetime, timezone
-from flask import Blueprint, request, jsonify
-from flasgger import swag_from
-from werkzeug.exceptions import BadRequest
-from pydantic import ValidationError
-import numpy as np
+from typing import Any
 
-from ai_court.api import state, dependencies, models, constants, config
+import numpy as np
+from flasgger import swag_from
+from flask import Blueprint, jsonify, request
+from pydantic import ValidationError
+from werkzeug.exceptions import BadRequest
+
+from ai_court.api import config, constants, dependencies, models, state
 from ai_court.api.extensions import limiter
 from ai_court.utils.cache import ResponseCache, make_key, normalize_text
-from typing import Any, Callable, List, Dict, Optional
 
 # Type aliases for explainability functions
-ExtractTopFeaturesType = Callable[[Any, str, int, int], List[Dict[str, Any]]]
-FormatExplanationType = Callable[[List[Dict[str, Any]], str, Optional[float]], str]
+ExtractTopFeaturesType = Callable[[Any, str, int, int], list[dict[str, Any]]]
+FormatExplanationType = Callable[[list[dict[str, Any]], str, float | None], str]
 
-extract_top_features: Optional[ExtractTopFeaturesType] = None
-format_explanation: Optional[FormatExplanationType] = None
+extract_top_features: ExtractTopFeaturesType | None = None
+format_explanation: FormatExplanationType | None = None
 
 try:
-    from ai_court.utils.explainability import extract_top_features as _extract, format_explanation as _format
+    from ai_court.utils.explainability import extract_top_features as _extract
+    from ai_court.utils.explainability import format_explanation as _format
     extract_top_features = _extract
     format_explanation = _format
 except ImportError:
@@ -33,12 +36,12 @@ except ImportError:
 # Import performance utilities
 try:
     from ai_court.utils.performance import (
+        OUTCOME_DESCRIPTIONS,
+        format_detailed_response,
+        format_full_response,
+        format_minimal_response,
         get_confidence_language,
         get_outcome_description,
-        OUTCOME_DESCRIPTIONS,
-        format_minimal_response,
-        format_full_response,
-        format_detailed_response
     )
 except ImportError:
     get_confidence_language = None  # type: ignore[assignment]
@@ -51,10 +54,10 @@ except ImportError:
 # Import extractive summary utilities
 try:
     from ai_court.scraper.extractive_summary import (
-        get_outcome_indicators,
-        extract_key_holdings,
         extract_citations,
+        extract_key_holdings,
         extract_parties,
+        get_outcome_indicators,
     )
 except ImportError:
     get_outcome_indicators = None  # type: ignore[assignment]
@@ -90,11 +93,11 @@ def _utc_iso_now() -> str:
 
 
 def _finalize_analyze_cache_hit(
-    cached: Dict[str, Any],
-    raw: Dict[str, Any],
+    cached: dict[str, Any],
+    raw: dict[str, Any],
     request_id: str,
     start_time: float,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Return a per-request copy of a cached /analyze response.
 
     The cached body omits volatile/identity fields; here we restore the caller's
@@ -164,20 +167,20 @@ def _auto_queue_prediction(
 
 
 def _generate_case_summary(
-    raw_input: Dict[str, Any],
+    raw_input: dict[str, Any],
     case_type: str,
     judgment: str,
-    confidence: Optional[float],
-    key_factors: List[Dict[str, Any]],
-    similar_cases: Optional[List[Dict[str, Any]]] = None,
-) -> Dict[str, Any]:
+    confidence: float | None,
+    key_factors: list[dict[str, Any]],
+    similar_cases: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     """Build a brief structured analysis summary from the submitted case facts.
 
     Returned in PRO+ plans alongside the model prediction so the user sees a
     concise narrative of *what was submitted* plus how the model interpreted it.
     """
     # --- 1. Narrative summary of submitted facts ---
-    parts: List[str] = []
+    parts: list[str] = []
     ct = case_type or raw_input.get('case_type') or 'Unknown'
     parties = raw_input.get('parties', '')
     if parties:
@@ -209,7 +212,7 @@ def _generate_case_summary(
         'marriage_duration': 'Marriage duration',
         'employment_duration': 'Employment duration',
     }
-    detail_parts: List[str] = []
+    detail_parts: list[str] = []
     for field, label in field_labels.items():
         val = raw_input.get(field)
         if val and str(val).strip() and str(val).strip().lower() not in ('none', 'unknown', 'n/a', ''):
@@ -220,7 +223,7 @@ def _generate_case_summary(
     narrative = ' '.join(parts)
 
     # --- 2. Key factors digest (top-3 one-liners) ---
-    factors_digest: List[str] = []
+    factors_digest: list[str] = []
     for f in key_factors[:3]:
         direction_icon = '+' if f.get('direction') == 'positive' else '-'
         factors_digest.append(
@@ -228,7 +231,7 @@ def _generate_case_summary(
         )
 
     # --- 3. Precedent snapshot ---
-    precedent_snapshot: Optional[Dict[str, Any]] = None
+    precedent_snapshot: dict[str, Any] | None = None
     if similar_cases:
         outcomes_in_similar = [sc.get('outcome') for sc in similar_cases if sc.get('outcome')]
         matching = sum(1 for o in outcomes_in_similar if o == judgment)
@@ -252,7 +255,7 @@ def _generate_case_summary(
     }
 
 
-def _generate_basic_explanation(judgment: str, confidence: Optional[float]) -> str:
+def _generate_basic_explanation(judgment: str, confidence: float | None) -> str:
     """Generate a basic explanation when key factors are unavailable."""
     conf_str = f"{int((confidence or 0) * 100)}%" if confidence else "unknown"
     
@@ -274,7 +277,7 @@ def _generate_basic_explanation(judgment: str, confidence: Optional[float]) -> s
 def _get_similar_cases(
     processed_text: str,
     k: int = 3
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Retrieve similar cases using the search index."""
     # Ensure lazy-loaded search index is available
     dependencies.ensure_search_index()
@@ -312,9 +315,9 @@ def _get_similar_cases(
 def _generate_legal_analysis(
     judgment: str,
     case_type: str,
-    key_factors: List[Dict[str, Any]],
-    confidence: Optional[float]
-) -> Dict[str, Any]:
+    key_factors: list[dict[str, Any]],
+    confidence: float | None
+) -> dict[str, Any]:
     """Generate legal analysis section for UNLIMITED plan.
     
     Uses LLM when available, falls back to template-based analysis.
@@ -338,8 +341,8 @@ def _generate_legal_analysis(
                 f'- "mitigating_factors": list of strings\n\n'
                 f"Return ONLY valid JSON, no markdown fences."
             )
-            from ai_court.llm.prompts import SYSTEM_PROMPT_LEGAL_AGENT
             from ai_court.llm.client import route_timeout
+            from ai_court.llm.prompts import SYSTEM_PROMPT_LEGAL_AGENT
             return state.llm_client.chat_json(
                 [{"role": "system", "content": SYSTEM_PROMPT_LEGAL_AGENT},
                  {"role": "user", "content": prompt}],
@@ -391,10 +394,10 @@ def _generate_legal_analysis(
 def _generate_full_report(
     judgment: str,
     case_type: str,
-    key_factors: List[Dict[str, Any]],
-    confidence: Optional[float],
-    explanation: Optional[str]
-) -> Dict[str, Any]:
+    key_factors: list[dict[str, Any]],
+    confidence: float | None,
+    explanation: str | None
+) -> dict[str, Any]:
     """Generate full report section for UNLIMITED plan.
 
     Uses LLM when available for a comprehensive court-ready report.
@@ -429,8 +432,8 @@ def _generate_full_report(
                 f'"conditions": "when this could happen"}}\n\n'
                 f"Return ONLY valid JSON. No markdown fences."
             )
-            from ai_court.llm.prompts import SYSTEM_PROMPT_LEGAL_AGENT
             from ai_court.llm.client import route_timeout
+            from ai_court.llm.prompts import SYSTEM_PROMPT_LEGAL_AGENT
             return state.llm_client.chat_json(
                 [{"role": "system", "content": SYSTEM_PROMPT_LEGAL_AGENT},
                  {"role": "user", "content": prompt}],
@@ -471,7 +474,7 @@ def _generate_full_report(
     }
 
 
-def _get_alternative_outcomes(judgment: str, confidence: Optional[float]) -> List[Dict[str, Any]]:
+def _get_alternative_outcomes(judgment: str, confidence: float | None) -> list[dict[str, Any]]:
     """Generate alternative outcome possibilities."""
     conf = confidence or 0.5
     remaining = 1 - conf
@@ -527,7 +530,7 @@ def _get_timeline_estimate(case_type: str) -> str:
     return timelines.get(case_type, "Variable based on court and case complexity")
 
 
-def _get_risk_level(judgment: str, confidence: Optional[float]) -> str:
+def _get_risk_level(judgment: str, confidence: float | None) -> str:
     """Derive risk level from outcome class and confidence."""
     conf = confidence or 0.0
     high_risk_outcomes = {"Acquittal/Conviction Overturned", "Bail Denied"}
@@ -538,7 +541,7 @@ def _get_risk_level(judgment: str, confidence: Optional[float]) -> str:
     return "LOW"
 
 
-def _get_confidence_band(confidence: Optional[float]) -> str:
+def _get_confidence_band(confidence: float | None) -> str:
     """Convert raw confidence float to a readable band label."""
     conf = (confidence or 0.0) * 100
     if conf >= 85:
@@ -581,7 +584,7 @@ def _get_outcome_description(judgment: str) -> str:
     )
 
 
-_APPLICABLE_STATUTES: Dict[str, List[Dict[str, str]]] = {
+_APPLICABLE_STATUTES: dict[str, list[dict[str, str]]] = {
     "Criminal": [
         {"section": "Section 302 IPC", "subject": "Punishment for murder", "note": "Life imprisonment or death penalty"},
         {"section": "Section 307 IPC", "subject": "Attempt to murder", "note": "Up to 10 years or life if hurt caused"},
@@ -621,7 +624,7 @@ _APPLICABLE_STATUTES: Dict[str, List[Dict[str, str]]] = {
 }
 
 
-def _get_applicable_statutes(case_type: str) -> List[Dict[str, str]]:
+def _get_applicable_statutes(case_type: str) -> list[dict[str, str]]:
     """Return applicable legal sections based on case type."""
     return _APPLICABLE_STATUTES.get(case_type, _APPLICABLE_STATUTES["Civil"])
 
@@ -731,8 +734,8 @@ def analyze_case():
         )
     
     # Extract explainability features
-    key_factors: List[Dict[str, Any]] = []
-    explanation: Optional[str] = None
+    key_factors: list[dict[str, Any]] = []
+    explanation: str | None = None
     if extract_top_features is not None and state.classifier and state.classifier.model and pred_idx is not None:
         try:
             key_factors = extract_top_features(
@@ -793,7 +796,7 @@ def analyze_case():
     
     # ==================== BUILD RESPONSE ====================
     # Core fields (All Plans)
-    response_data: Dict[str, Any] = {
+    response_data: dict[str, Any] = {
         "judgment": primary_judgment,
         "confidence": round(confidence or 0, 4),
         "class_probabilities": all_probabilities,
@@ -848,14 +851,14 @@ def analyze_case():
         response_data["applicable_statutes"] = _get_applicable_statutes(inferred_case_type)
 
     # Similar Cases (PRO+ Plans) with outcome_distribution
-    similar_cases: List[Dict[str, Any]] = []
+    similar_cases: list[dict[str, Any]] = []
     if plan in ('pro', 'unlimited') and config.INCLUDE_SIMILAR_CASES:
         similar_cases = _get_similar_cases(processed, config.SIMILAR_CASES_COUNT)
         response_data["similar_cases"] = similar_cases
 
         # Outcome distribution across similar cases
         if similar_cases:
-            outcome_counts: Dict[str, int] = {}
+            outcome_counts: dict[str, int] = {}
             for sc in similar_cases:
                 oc = sc.get('outcome', 'Unknown')
                 outcome_counts[oc] = outcome_counts.get(oc, 0) + 1
@@ -871,7 +874,7 @@ def analyze_case():
 
     # Text analysis — citations and parties extracted from input (PRO+)
     if plan in ('pro', 'unlimited'):
-        text_analysis: Dict[str, Any] = {}
+        text_analysis: dict[str, Any] = {}
         if extract_citations is not None:
             try:
                 cites = extract_citations(processed or '')
@@ -912,7 +915,7 @@ def analyze_case():
 
     # Shadow multi-axis model breakdown (PRO+ Plans)
     if plan in ('pro', 'unlimited') and shadow and isinstance(shadow, dict):
-        shadow_info: Dict[str, Any] = {}
+        shadow_info: dict[str, Any] = {}
         axes = shadow.get('axes')
         if isinstance(axes, dict):
             shadow_info["axes"] = axes
@@ -1186,8 +1189,8 @@ def analyze_batch():
         response_format = 'minimal'
     
     start_time = time.perf_counter()
-    results: List[Dict[str, Any]] = []
-    errors: List[Dict[str, Any]] = []
+    results: list[dict[str, Any]] = []
+    errors: list[dict[str, Any]] = []
     
     for idx, case in enumerate(cases):
         if not isinstance(case, dict):
@@ -1262,7 +1265,7 @@ def analyze_batch():
     })
 
 
-def _infer_case_type(raw: Dict[str, Any]) -> str:
+def _infer_case_type(raw: dict[str, Any]) -> str:
     """Infer case type from input fields."""
     if raw.get("violence_level", "None") != "None" or raw.get("police_report") == "Yes":
         return "Criminal"

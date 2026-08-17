@@ -12,30 +12,31 @@ import logging
 import os
 import re
 import threading
-from typing import Any, FrozenSet, List, Optional
+from typing import Any
 
 # ── CRITICAL: download NLTK data BEFORE importing any corpus readers ──────
 # NLTK corpus readers capture their search paths at import time.
 # If data isn't downloaded yet (e.g. fresh CI runner), the readers
 # will fail with LookupError even though ensure_nltk_resources()
 # downloads the files later, because their path list is already frozen.
-from ai_court.utils.nltk_setup import ensure_nltk_resources  # noqa: E402
+from ai_court.utils.nltk_setup import ensure_nltk_resources
+
 ensure_nltk_resources()  # Must run BEFORE the nltk.corpus imports below
 
-from nltk.corpus import stopwords  # noqa: E402
-from nltk.stem import WordNetLemmatizer  # noqa: E402
-from nltk.tokenize import word_tokenize  # noqa: E402
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
 
 __all__ = ["TextPreprocessor"]
 
 logger = logging.getLogger(__name__)
 
 # Thread-safe cache for outcome rules
-_OUTCOME_RULES: Optional[List[dict[str, Any]]] = None
+_OUTCOME_RULES: list[dict[str, Any]] | None = None
 _OUTCOME_RULES_LOCK = threading.Lock()
 
 # Fallback rules used when config file cannot be loaded
-_FALLBACK_OUTCOME_RULES: List[dict[str, Any]] = [
+_FALLBACK_OUTCOME_RULES: list[dict[str, Any]] = [
     {"label": "Acquittal/Conviction Overturned", "phrases": ["acquitted", "acquittal", "conviction overturned"]},
     {"label": "Conviction Upheld/Appeal Dismissed", "phrases": ["appeal dismissed", "conviction upheld"]},
     {"label": "Bail Granted", "phrases": ["bail granted", "anticipatory bail granted"]},
@@ -64,7 +65,7 @@ def _load_outcome_rules() -> None:
         if _OUTCOME_RULES is not None:
             return
         
-        config_path: Optional[str] = None
+        config_path: str | None = None
         try:
             base_dir = os.path.dirname(os.path.abspath(__file__))
             config_path = os.path.normpath(os.path.join(base_dir, '..', 'config', 'outcome_rules.json'))
@@ -75,15 +76,15 @@ def _load_outcome_rules() -> None:
                 
                 # Validate the loaded structure
                 if not isinstance(loaded_rules, list):
-                    raise ValueError("Outcome rules must be a list")
-                
+                    raise TypeError("Outcome rules must be a list")
+
                 for idx, rule in enumerate(loaded_rules):
                     if not isinstance(rule, dict):
-                        raise ValueError(f"Rule at index {idx} must be a dictionary")
+                        raise TypeError(f"Rule at index {idx} must be a dictionary")
                     if 'label' not in rule or 'phrases' not in rule:
                         raise ValueError(f"Rule at index {idx} missing 'label' or 'phrases' key")
                     if not isinstance(rule.get('phrases'), list):
-                        raise ValueError(f"Rule at index {idx} 'phrases' must be a list")
+                        raise TypeError(f"Rule at index {idx} 'phrases' must be a list")
                 
                 _OUTCOME_RULES = loaded_rules
                 logger.info("Loaded %d outcome rules from %s", len(_OUTCOME_RULES), config_path)
@@ -97,10 +98,12 @@ def _load_outcome_rules() -> None:
         except json.JSONDecodeError as e:
             logger.error("Invalid JSON in outcome rules config %s: %s", config_path, e)
             _OUTCOME_RULES = _FALLBACK_OUTCOME_RULES.copy()
-        except (OSError, IOError) as e:
+        except OSError as e:
             logger.error("Failed to read outcome rules config %s: %s", config_path, e)
             _OUTCOME_RULES = _FALLBACK_OUTCOME_RULES.copy()
-        except ValueError as e:
+        except (ValueError, TypeError) as e:
+            # TypeError covers the isinstance() shape checks above; both must
+            # still fall back to the built-in rules rather than propagate.
             logger.error("Invalid outcome rules structure in %s: %s", config_path, e)
             _OUTCOME_RULES = _FALLBACK_OUTCOME_RULES.copy()
 
@@ -127,7 +130,7 @@ class TextPreprocessor:
     """
     
     # Class-level constants for legal vocabulary (immutable)
-    LEGAL_TERMS: FrozenSet[str] = frozenset({
+    LEGAL_TERMS: frozenset[str] = frozenset({
         'plaintiff', 'defendant', 'appeal', 'appeals', 'judgment', 'judgement', 
         'court', 'section', 'act', 'article', 'respondent', 'appellant', 
         'petitioner', 'accused', 'evidence', 'conviction', 'acquittal', 
@@ -145,10 +148,10 @@ class TextPreprocessor:
 
     def __init__(self) -> None:
         """Initialize the preprocessor with NLTK resources."""
-        self.stop_words: FrozenSet[str] = frozenset(stopwords.words('english'))
+        self.stop_words: frozenset[str] = frozenset(stopwords.words('english'))
         self.lemmatizer: WordNetLemmatizer = WordNetLemmatizer()
         # Instance attribute for backward compatibility
-        self.legal_terms: FrozenSet[str] = self.LEGAL_TERMS
+        self.legal_terms: frozenset[str] = self.LEGAL_TERMS
 
     def preprocess(self, text: str) -> str:
         """
@@ -184,10 +187,10 @@ class TextPreprocessor:
             return ""
 
         # Tokenize
-        tokens: List[str] = word_tokenize(text)
+        tokens: list[str] = word_tokenize(text)
         
         # Keep tokens if either not a stopword or part of legal vocabulary
-        filtered: List[str] = [
+        filtered: list[str] = [
             t for t in tokens 
             if t not in self.stop_words or t in self.legal_terms
         ]
@@ -196,7 +199,7 @@ class TextPreprocessor:
             return ""
         
         # Lemmatize (verbs then nouns for better normalization)
-        lemmas: List[str] = [
+        lemmas: list[str] = [
             self.lemmatizer.lemmatize(
                 self.lemmatizer.lemmatize(t, pos='v'), 
                 pos='n'
@@ -207,7 +210,7 @@ class TextPreprocessor:
         return " ".join(lemmas)
 
     @staticmethod
-    def normalize_outcome(text: Optional[str]) -> str:
+    def normalize_outcome(text: str | None) -> str:
         """
         Map raw judgment text to a standardized outcome class.
         

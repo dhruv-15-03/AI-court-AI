@@ -18,7 +18,7 @@ import logging
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, ClassVar
 
 logger = logging.getLogger(__name__)
 
@@ -43,9 +43,9 @@ class JudgePatternAnalyzer:
 
     def __init__(self, search_index=None):
         self.search_index = search_index
-        self._judge_cache: Dict[str, Dict] = {}
+        self._judge_cache: dict[str, dict] = {}
 
-    def analyze_judge(self, judge_name: str, court: str = "") -> Dict[str, Any]:
+    def analyze_judge(self, judge_name: str, court: str = "") -> dict[str, Any]:
         """
         Analyze a judge's ruling patterns from the case database.
         
@@ -79,7 +79,7 @@ class JudgePatternAnalyzer:
             top_idx = np.argsort(-scores)[:100]  # Top 100 matches
 
             # Analyze outcomes
-            outcomes: Dict[str, int] = {}
+            outcomes: dict[str, int] = {}
             for idx in top_idx:
                 if idx < len(meta) and scores[idx] > 0.1:
                     m = meta[idx]
@@ -121,7 +121,7 @@ class JudgePatternAnalyzer:
             logger.warning(f"Judge analysis failed: {e}")
             return {"judge": judge_name, "available": False, "error": str(e)}
 
-    def _generate_insight(self, outcomes: Dict[str, int], total: int) -> str:
+    def _generate_insight(self, outcomes: dict[str, int], total: int) -> str:
         """Generate a human-readable insight about the judge's tendencies."""
         if total < 5:
             return "Insufficient data for reliable pattern analysis."
@@ -134,7 +134,7 @@ class JudgePatternAnalyzer:
             f"'{top_outcome}' ({top_pct:.0f}%). "
         )
 
-    def format_for_context(self, analysis: Dict[str, Any]) -> str:
+    def format_for_context(self, analysis: dict[str, Any]) -> str:
         """Format judge analysis for inclusion in LLM prompt."""
         if not analysis.get("available"):
             return ""
@@ -186,7 +186,7 @@ class EvidenceAdmissibilityChecker:
     """
 
     # Evidence rules — each rule checks for a specific issue
-    RULES: List[Dict[str, Any]] = [
+    RULES: ClassVar[list[dict[str, Any]]] = [
         {
             "id": "electronic_evidence_cert",
             "triggers": ["whatsapp", "email", "sms", "screenshot", "cctv", "video", "audio recording",
@@ -259,7 +259,7 @@ class EvidenceAdmissibilityChecker:
         },
     ]
 
-    def check(self, case_text: str, evidence_descriptions: Optional[List[str]] = None) -> List[EvidenceIssue]:
+    def check(self, case_text: str, evidence_descriptions: list[str] | None = None) -> list[EvidenceIssue]:
         """
         Check evidence in a case for admissibility issues.
         
@@ -288,7 +288,7 @@ class EvidenceAdmissibilityChecker:
 
         return issues
 
-    def format_for_context(self, issues: List[EvidenceIssue]) -> str:
+    def format_for_context(self, issues: list[EvidenceIssue]) -> str:
         """Format evidence issues for inclusion in LLM prompt."""
         if not issues:
             return ""
@@ -308,7 +308,7 @@ class EvidenceAdmissibilityChecker:
 # 3. PROCEDURAL CHECKLISTS
 # ═══════════════════════════════════════════════════════════════════════════
 
-PROCEDURAL_CHECKLISTS: Dict[str, Dict[str, Any]] = {
+PROCEDURAL_CHECKLISTS: dict[str, dict[str, Any]] = {
     "bail_application": {
         "title": "Bail Application Checklist",
         "case_types": ["criminal", "murder", "narcotics", "assault"],
@@ -439,7 +439,7 @@ class ProceduralChecklistEngine:
     Provides case-type-specific procedural checklists with deadlines.
     """
 
-    def get_checklist(self, case_type: str) -> Optional[Dict[str, Any]]:
+    def get_checklist(self, case_type: str) -> dict[str, Any] | None:
         """Get the procedural checklist for a case type."""
         case_type_lower = case_type.lower()
         for key, checklist in PROCEDURAL_CHECKLISTS.items():
@@ -449,7 +449,7 @@ class ProceduralChecklistEngine:
                 return checklist
         return None
 
-    def get_all_checklists(self) -> Dict[str, Dict]:
+    def get_all_checklists(self) -> dict[str, dict]:
         return PROCEDURAL_CHECKLISTS
 
     def format_for_context(self, case_type: str) -> str:
@@ -493,8 +493,8 @@ class CrossReferenceEngine:
 
     def __init__(self, statutes_dir: str = "data/statutes"):
         self.statutes_dir = Path(statutes_dir)
-        self._ipc_bns: List[Dict] = []
-        self._crpc_bnss: List[Dict] = []
+        self._ipc_bns: list[dict] = []
+        self._crpc_bnss: list[dict] = []
         self._loaded = False
 
     def load(self):
@@ -503,18 +503,20 @@ class CrossReferenceEngine:
         crpc_bnss_path = self.statutes_dir / "crpc_bnss_mapping.json"
 
         if ipc_bns_path.exists():
-            data = json.load(open(ipc_bns_path, encoding="utf-8"))
+            with open(ipc_bns_path, encoding="utf-8") as f:
+                data = json.load(f)
             self._ipc_bns = data.get("mappings", [])
             logger.info(f"Loaded {len(self._ipc_bns)} IPC↔BNS mappings")
 
         if crpc_bnss_path.exists():
-            data = json.load(open(crpc_bnss_path, encoding="utf-8"))
+            with open(crpc_bnss_path, encoding="utf-8") as f:
+                data = json.load(f)
             self._crpc_bnss = data.get("mappings", [])
             logger.info(f"Loaded {len(self._crpc_bnss)} CrPC↔BNSS mappings")
 
         self._loaded = True
 
-    def ipc_to_bns(self, ipc_section: str) -> Optional[Dict]:
+    def ipc_to_bns(self, ipc_section: str) -> dict | None:
         """Find BNS equivalent of an IPC section."""
         if not self._loaded:
             self.load()
@@ -524,7 +526,7 @@ class CrossReferenceEngine:
                 return m
         return None
 
-    def bns_to_ipc(self, bns_section: str) -> Optional[Dict]:
+    def bns_to_ipc(self, bns_section: str) -> dict | None:
         """Find IPC equivalent of a BNS section."""
         if not self._loaded:
             self.load()
@@ -555,7 +557,7 @@ class CrossReferenceEngine:
         text = re.sub(r"Section\s+(\d+[A-Z]?)\s+(?:of\s+)?(?:the\s+)?IPC", replace_ipc, text)
         return text
 
-    def format_for_context(self, sections_mentioned: List[str]) -> str:
+    def format_for_context(self, sections_mentioned: list[str]) -> str:
         """Generate cross-reference context for mentioned sections."""
         if not self._loaded:
             self.load()

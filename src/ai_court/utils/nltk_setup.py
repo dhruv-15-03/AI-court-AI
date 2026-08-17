@@ -6,11 +6,11 @@ the download directory must already be on `nltk.data.path` when the corpus
 objects are first created.
 """
 
-import os
 import logging
+import os
 
-import nltk          # safe — only core package, no corpus objects
-import nltk.data     # ensure path list exists
+import nltk  # safe — only core package, no corpus objects
+import nltk.data  # ensure path list exists
 
 logger = logging.getLogger(__name__)
 

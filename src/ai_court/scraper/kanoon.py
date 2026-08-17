@@ -1,12 +1,13 @@
-import requests  # type: ignore[import-untyped]
-import re
-import time
+import logging
 import os
 import random
-import logging
-import pandas as pd
-from typing import Any, Optional
+import re
+import time
+from typing import Any
 from urllib.parse import quote_plus
+
+import pandas as pd
+import requests  # type: ignore[import-untyped]
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
@@ -51,7 +52,7 @@ SCRAPER_RESPECT_ROBOTS = os.getenv("SCRAPER_RESPECT_ROBOTS", "1") == "1"
 
 # Rate-limit + robots.txt state
 _last_request_ts = 0.0
-_robots_parser: Optional[Any] = None
+_robots_parser: Any | None = None
 _robots_loaded = False
 
 

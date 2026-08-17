@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 import logging
 import os
-from typing import Optional
 from typing import Any
 
 import numpy as np
@@ -18,13 +17,13 @@ logger = logging.getLogger(__name__)
 class StatuteCorpus:
     """Load and search Indian statutory provisions from JSON files."""
 
-    def __init__(self, corpus_dir: Optional[str] = None):
+    def __init__(self, corpus_dir: str | None = None):
         self.corpus_dir = corpus_dir or os.path.join(
             os.path.dirname(__file__), "..", "..", "..", "data", "statutes"
         )
         self._sections: list[StatuteSection] = []
         self._acts: dict[str, ActInfo] = {}
-        self._vectorizer: Optional[TfidfVectorizer] = None
+        self._vectorizer: TfidfVectorizer | None = None
         self._matrix = None
         self._section_lookup: dict[tuple[str, str], StatuteSection] = {}
         # Optional semantic index (lazy-loaded)
@@ -103,10 +102,10 @@ class StatuteCorpus:
     def search_sections(
         self,
         query: str,
-        act_filter: Optional[str] = None,
+        act_filter: str | None = None,
         *,
         k: int = 10,
-        use_semantic: Optional[bool] = None,
+        use_semantic: bool | None = None,
         alpha: float = 0.5,
     ) -> list[StatuteSection]:
         """Search for relevant statute sections by query text.
@@ -166,12 +165,12 @@ class StatuteCorpus:
 
     def get_section(
         self, act_id: str, section_number: str
-    ) -> Optional[StatuteSection]:
+    ) -> StatuteSection | None:
         """Direct lookup of a specific section."""
         return self._section_lookup.get((act_id.upper(), section_number)) or \
                self._section_lookup.get((act_id, section_number))
 
-    def get_act_overview(self, act_id: str) -> Optional[ActInfo]:
+    def get_act_overview(self, act_id: str) -> ActInfo | None:
         """Get act metadata."""
         return self._acts.get(act_id) or self._acts.get(act_id.upper())
 

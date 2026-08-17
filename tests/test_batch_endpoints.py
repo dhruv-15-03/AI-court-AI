@@ -1,6 +1,7 @@
 """Tests for batch and quick analyze endpoints."""
 
 import json
+
 from ai_court.api.server import app
 
 

@@ -1,8 +1,9 @@
+import glob
 import os
 import re
-import glob
+from collections.abc import Iterable
+
 import pandas as pd
-from typing import List, Iterable
 
 REQUIRED = ["case_data", "case_type", "judgement"]
 
@@ -34,7 +35,7 @@ def coerce_schema(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def build_processed_dataset(inputs: List[str], out_csv: str = os.path.join("data", "processed", "all_cases.csv")) -> str:
+def build_processed_dataset(inputs: list[str], out_csv: str = os.path.join("data", "processed", "all_cases.csv")) -> str:
     frames = []
     for path in inputs:
         if not os.path.exists(path):
@@ -50,8 +51,7 @@ def build_processed_dataset(inputs: List[str], out_csv: str = os.path.join("data
                 base = os.path.basename(path)
                 name = os.path.splitext(base)[0]
                 # strip common prefixes
-                if name.startswith("kanoon_"):
-                    name = name[len("kanoon_"):]
+                name = name.removeprefix("kanoon_")
                 case_type_val = name.replace("_", " ")
                 out = pd.DataFrame({
                     "case_data": df["case_summary"].astype(str),
@@ -71,8 +71,8 @@ def build_processed_dataset(inputs: List[str], out_csv: str = os.path.join("data
     return out_csv
 
 
-def _iter_csvs_from_dirs(dirs: Iterable[str]) -> List[str]:
-    paths: List[str] = []
+def _iter_csvs_from_dirs(dirs: Iterable[str]) -> list[str]:
+    paths: list[str] = []
     for d in dirs:
         if not d:
             continue
@@ -80,7 +80,7 @@ def _iter_csvs_from_dirs(dirs: Iterable[str]) -> List[str]:
         pattern = os.path.join(d, "**", "*.csv")
         paths.extend(glob.glob(pattern, recursive=True))
     # stable order
-    return sorted(list({os.path.normpath(p) for p in paths}))
+    return sorted({os.path.normpath(p) for p in paths})
 
 
 def _canonicalize(text: str) -> str:
@@ -91,7 +91,7 @@ def _canonicalize(text: str) -> str:
     return t
 
 
-def build_from_dirs(input_dirs: List[str], out_csv: str, min_text_len: int = 0, dedupe: bool = True) -> str:
+def build_from_dirs(input_dirs: list[str], out_csv: str, min_text_len: int = 0, dedupe: bool = True) -> str:
     csvs = _iter_csvs_from_dirs(input_dirs)
     if not csvs:
         raise RuntimeError(f"No CSVs found in: {input_dirs}")

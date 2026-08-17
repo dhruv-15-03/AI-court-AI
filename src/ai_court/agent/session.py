@@ -13,7 +13,7 @@ import threading
 import time
 import uuid
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -26,11 +26,11 @@ class CaseSession:
     """A single user's case analysis session."""
 
     session_id: str
-    user_id: Optional[str] = None
+    user_id: str | None = None
     case_query: str = ""
     case_type: str = ""
-    analysis_result: Optional[Dict[str, Any]] = None
-    conversation_history: List[Dict[str, Any]] = field(default_factory=list)
+    analysis_result: dict[str, Any] | None = None
+    conversation_history: list[dict[str, Any]] = field(default_factory=list)
     created_at: float = field(default_factory=time.time)
     last_active: float = field(default_factory=time.time)
     ttl: float = DEFAULT_SESSION_TTL
@@ -49,14 +49,14 @@ class CaseSession:
         )
         self.touch()
 
-    def get_history_for_llm(self, max_messages: int = 20) -> List[Dict[str, str]]:
+    def get_history_for_llm(self, max_messages: int = 20) -> list[dict[str, str]]:
         """Return history formatted for LLM messages (role + content only)."""
         return [
             {"role": m["role"], "content": m["content"]}
             for m in self.conversation_history[-max_messages:]
         ]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "session_id": self.session_id,
             "user_id": self.user_id,
@@ -74,7 +74,7 @@ class SessionManager:
     """Manages per-case chat sessions with TTL-based cleanup."""
 
     def __init__(self, max_sessions: int = 1000, cleanup_interval: int = 300):
-        self._sessions: Dict[str, CaseSession] = {}
+        self._sessions: dict[str, CaseSession] = {}
         self._lock = threading.Lock()
         self._max_sessions = max_sessions
         self._cleanup_interval = cleanup_interval
@@ -83,10 +83,10 @@ class SessionManager:
     def create_session(
         self,
         *,
-        user_id: Optional[str] = None,
+        user_id: str | None = None,
         case_query: str = "",
         case_type: str = "",
-        analysis_result: Optional[Dict[str, Any]] = None,
+        analysis_result: dict[str, Any] | None = None,
         tier: str = "free",
         ttl: float = DEFAULT_SESSION_TTL,
     ) -> CaseSession:
@@ -122,7 +122,7 @@ class SessionManager:
         logger.info("Created session %s for user %s", session_id, user_id)
         return session
 
-    def get_session(self, session_id: str) -> Optional[CaseSession]:
+    def get_session(self, session_id: str) -> CaseSession | None:
         """Get session by ID, returns None if expired or not found."""
         with self._lock:
             session = self._sessions.get(session_id)
@@ -152,7 +152,7 @@ class SessionManager:
             if expired:
                 logger.info("Cleaned up %d expired sessions", len(expired))
 
-    def list_sessions(self, user_id: Optional[str] = None) -> List[Dict[str, Any]]:
+    def list_sessions(self, user_id: str | None = None) -> list[dict[str, Any]]:
         """List active sessions, optionally filtered by user."""
         with self._lock:
             sessions = list(self._sessions.values())

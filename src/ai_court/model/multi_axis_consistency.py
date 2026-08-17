@@ -12,7 +12,8 @@ Future extensions:
   - Conflict confidence scoring.
 """
 from __future__ import annotations
-from typing import Dict, Any
+
+from typing import Any
 
 # Simple keyword sets (placeholder heuristics)
 ACQUITTAL_KEYS = {"acquittal", "acquitted", "overturned"}
@@ -35,7 +36,7 @@ def _bucket(label: str) -> str:
     return "other"
 
 
-def reconcile_axes(axis_preds: Dict[str,str]) -> Dict[str, Any]:
+def reconcile_axes(axis_preds: dict[str,str]) -> dict[str, Any]:
     buckets = {ax: _bucket(lbl) for ax,lbl in axis_preds.items()}
     # Precedence driven resolution
     for tag in PRECEDENCE:

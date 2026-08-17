@@ -1,9 +1,10 @@
-import os
 import json
+import os
+
 import pytest
 
-from ai_court.api.server import app
 from ai_court.api.config import PROJECT_ROOT
+from ai_court.api.server import app
 
 
 def test_version_endpoint_model_metadata():
@@ -103,8 +104,8 @@ def test_drift_compare_validation_error():
 
 
 def test_per_class_metrics_presence():
-    import os
     import json
+    import os
     metrics_path = os.path.join(PROJECT_ROOT, 'models', 'metrics.json')
     if not os.path.exists(metrics_path):
         import pytest

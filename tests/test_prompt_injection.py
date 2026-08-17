@@ -3,7 +3,6 @@ import pytest
 
 from ai_court.api.routes.agent import _INJECTION_RE, _validate_query
 
-
 LEGITIMATE_QUERIES = [
     "My client was charged under IPC 302 for an alleged offence. What defenses apply?",
     "The appellate court chose to ignore the previous ruling of the trial court.",

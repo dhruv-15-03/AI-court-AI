@@ -1,28 +1,29 @@
-import os
 import json
-import uuid
-import joblib
 import logging
+import os
+import uuid
+from datetime import datetime
+from typing import Any
+
+import joblib
 import numpy as np
 import pandas as pd
-from datetime import datetime
-from typing import Dict, Tuple, Optional, Any
-from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import Pipeline
-from sklearn.metrics import f1_score, accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, f1_score
 from sklearn.model_selection import cross_val_score
+from sklearn.pipeline import Pipeline
 
-from ai_court.model.preprocessor import TextPreprocessor
 from ai_court.data.loader import DataLoader
+from ai_court.model.preprocessor import TextPreprocessor
 from ai_court.ontology import ontology_metadata
 
 logger = logging.getLogger(__name__)
 
 # Check for imbalanced-learn availability (optional dependency)
 try:
-    from imblearn.over_sampling import SMOTE, ADASYN
+    from imblearn.over_sampling import ADASYN, SMOTE
     from imblearn.pipeline import Pipeline as ImbPipeline
     IMBALANCED_AVAILABLE = True
 except ImportError:
@@ -43,9 +44,9 @@ class Trainer:
     def __init__(self):
         self.preprocessor = TextPreprocessor()
         self.data_loader = DataLoader()
-        self.model: Optional[Pipeline] = None
+        self.model: Pipeline | None = None
         
-    def _apply_resampling(self, X_tfidf, y_train) -> Tuple:
+    def _apply_resampling(self, X_tfidf, y_train) -> tuple:
         """Apply SMOTE/ADASYN resampling if enabled and available.
         
         Args:
@@ -110,7 +111,7 @@ class Trainer:
             logger.warning(f"SMOTE resampling failed: {e}. Continuing without resampling.")
             return X_tfidf, y_train
         
-    def train(self, X_train: pd.Series, y_train: np.ndarray, sample_weight=None) -> Tuple[Pipeline, float]:
+    def train(self, X_train: pd.Series, y_train: np.ndarray, sample_weight=None) -> tuple[Pipeline, float]:
         """Train TF-IDF + Optimized RandomForest pipeline.
         
         Optionally applies SMOTE resampling if ENABLE_SMOTE=1.
@@ -219,7 +220,7 @@ class Trainer:
         pipeline.fit(X_train, y_train)
         return pipeline
 
-    def evaluate(self, model: Pipeline, X_test: pd.Series, y_test: np.ndarray, label_encoder) -> Dict:
+    def evaluate(self, model: Pipeline, X_test: pd.Series, y_test: np.ndarray, label_encoder) -> dict:
         if len(X_test) == 0:
             logger.warning("No test samples available")
             return {'accuracy': 0.0, 'report': '', 'macro_f1': 0.0, 'weighted_f1': 0.0, 'per_class_f1': {}}
@@ -372,7 +373,9 @@ class Trainer:
         eval_metrics = self.evaluate(self.model, X_test, y_test, self.data_loader.label_encoder)
 
         # ── Persist artifacts ───────────────────────────────────────────────
-        run_id = datetime.now().strftime("%Y%m%d%H%M%S") + f"_{uuid.uuid4().hex[:8]}"
+        # UTC keeps run ids monotonic and comparable regardless of the host's
+        # local timezone (CI, Render and dev machines all differ).
+        run_id = datetime.now(tz=_tz.utc).strftime("%Y%m%d%H%M%S") + f"_{uuid.uuid4().hex[:8]}"
         trained_at = datetime.now(tz=_tz.utc).isoformat().replace('+00:00', 'Z')
         run_dir = os.path.join(output_dir, "runs", run_id)
         os.makedirs(run_dir, exist_ok=True)

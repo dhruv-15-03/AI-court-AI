@@ -2,7 +2,8 @@
 
 import functools
 import logging
-from typing import Optional, Callable, Dict, Any, List
+from collections.abc import Callable
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,7 @@ def create_cached_preprocessor(
     return cached_preprocess
 
 
-def get_cache_stats(cached_fn: Callable[..., Any]) -> Dict[str, Any]:
+def get_cache_stats(cached_fn: Callable[..., Any]) -> dict[str, Any]:
     """Get cache statistics from a cached function."""
     try:
         info = cached_fn.cache_info()  # type: ignore[attr-defined]
@@ -92,7 +93,7 @@ CONFIDENCE_LANGUAGE = {
 }
 
 
-def get_confidence_level(confidence: Optional[float]) -> str:
+def get_confidence_level(confidence: float | None) -> str:
     """Map confidence score to categorical level."""
     if confidence is None:
         return "unknown"
@@ -103,7 +104,7 @@ def get_confidence_level(confidence: Optional[float]) -> str:
     return "very_low"
 
 
-def get_confidence_language(confidence: Optional[float]) -> Dict[str, Any]:
+def get_confidence_language(confidence: float | None) -> dict[str, Any]:
     """
     Generate human-friendly confidence information.
     
@@ -142,9 +143,9 @@ def get_confidence_language(confidence: Optional[float]) -> Dict[str, Any]:
 
 def format_minimal_response(
     judgment: str,
-    confidence: Optional[float],
+    confidence: float | None,
     case_type: str
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Generate minimal response format for fast API responses."""
     return {
         "judgment": judgment,
@@ -155,16 +156,16 @@ def format_minimal_response(
 
 def format_full_response(
     judgment: str,
-    confidence: Optional[float],
+    confidence: float | None,
     case_type: str,
-    key_factors: Optional[List[Dict[str, Any]]] = None,
-    explanation: Optional[str] = None,
+    key_factors: list[dict[str, Any]] | None = None,
+    explanation: str | None = None,
     needs_review: bool = False,
-    abstention_reason: Optional[str] = None,
-    similar_cases: Optional[List[Dict[str, Any]]] = None
-) -> Dict[str, Any]:
+    abstention_reason: str | None = None,
+    similar_cases: list[dict[str, Any]] | None = None
+) -> dict[str, Any]:
     """Generate full response format with all details."""
-    response: Dict[str, Any] = {
+    response: dict[str, Any] = {
         "judgment": judgment,
         "confidence": round(confidence or 0, 3),
         "case_type": case_type,
@@ -186,17 +187,17 @@ def format_full_response(
 
 def format_detailed_response(
     judgment: str,
-    confidence: Optional[float],
+    confidence: float | None,
     case_type: str,
-    answers: Dict[str, Any],
-    key_factors: Optional[List[Dict[str, Any]]] = None,
-    explanation: Optional[str] = None,
+    answers: dict[str, Any],
+    key_factors: list[dict[str, Any]] | None = None,
+    explanation: str | None = None,
     needs_review: bool = False,
-    abstention_reason: Optional[str] = None,
-    similar_cases: Optional[List[Dict[str, Any]]] = None,
-    shadow_result: Optional[Dict[str, Any]] = None,
-    agreement_rate: Optional[float] = None
-) -> Dict[str, Any]:
+    abstention_reason: str | None = None,
+    similar_cases: list[dict[str, Any]] | None = None,
+    shadow_result: dict[str, Any] | None = None,
+    agreement_rate: float | None = None
+) -> dict[str, Any]:
     """Generate detailed response format with full audit trail."""
     response = format_full_response(
         judgment=judgment,
@@ -223,7 +224,7 @@ def format_detailed_response(
 # Outcome Description Helper
 # =============================================================================
 
-OUTCOME_DESCRIPTIONS: Dict[str, Dict[str, str]] = {
+OUTCOME_DESCRIPTIONS: dict[str, dict[str, str]] = {
     "Bail Granted": {
         "meaning": "The court has granted bail to the accused.",
         "implications": "The accused can be released from custody pending trial, usually with conditions.",
@@ -277,6 +278,6 @@ OUTCOME_DESCRIPTIONS: Dict[str, Dict[str, str]] = {
 }
 
 
-def get_outcome_description(judgment: str) -> Dict[str, str]:
+def get_outcome_description(judgment: str) -> dict[str, str]:
     """Get detailed description of an outcome."""
     return OUTCOME_DESCRIPTIONS.get(judgment, OUTCOME_DESCRIPTIONS["Other"])

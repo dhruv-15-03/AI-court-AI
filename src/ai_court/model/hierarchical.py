@@ -8,11 +8,12 @@ Design:
 Current status: placeholder forward interface & config dataclass.
 """
 from __future__ import annotations
+
 from dataclasses import dataclass
 
 try:  # optional heavy dep
     import torch
-    import torch.nn as nn
+    from torch import nn
 except Exception:  # pragma: no cover
     torch = None  # type: ignore
     nn = object  # type: ignore

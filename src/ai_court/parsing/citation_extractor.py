@@ -11,8 +11,8 @@ Returns list of dicts: { 'raw': str, 'normalized': str|None, 'reporter': str|Non
 Future: Link to internal case graph resolver.
 """
 from __future__ import annotations
+
 import re
-from typing import List, Dict
 
 SCC_RE = re.compile(r"\((20\d{2})\)\s+(\d+)\s+SCC\s+(\d+)")
 AIR_RE = re.compile(r"AIR\s+(20\d{2})\s+SC\s+(\d+)")
@@ -20,10 +20,10 @@ NEUTRAL_RE = re.compile(r"20\d{2}\s+SCC\s+OnLine\s+SC\s+\d+")
 GENERIC_RE = re.compile(r"\((20\d{2})\)\s+(\d+)\s+([A-Z]{2,10})\s+(\d+)")
 
 
-def extract_citations(text: str) -> List[Dict]:
+def extract_citations(text: str) -> list[dict]:
     if not text:
         return []
-    found: List[Dict] = []
+    found: list[dict] = []
     # Order matters; more specific first
     for m in SCC_RE.finditer(text):
         year, vol, page = m.groups()

@@ -1,20 +1,28 @@
+import json
+import logging
 import signal
 import sys
 import time
 import uuid
-import json
-import logging
 from datetime import datetime, timezone
-from flask import Flask, request, g, jsonify
-from flask_cors import CORS
-from flasgger import Swagger
-from prometheus_client import Counter, Histogram, Gauge
+
 import sentry_sdk
+from flasgger import Swagger
+from flask import Flask, g, jsonify, request
+from flask_cors import CORS
+from prometheus_client import Counter, Gauge, Histogram
 from sentry_sdk.integrations.flask import FlaskIntegration
 
-from ai_court.api import config, state, dependencies
-from ai_court.api.routes import analysis_bp, search_bp, monitoring_bp, feedback_bp, agent_bp, audit_bp
+from ai_court.api import config, dependencies, state
 from ai_court.api.extensions import limiter
+from ai_court.api.routes import (
+    agent_bp,
+    analysis_bp,
+    audit_bp,
+    feedback_bp,
+    monitoring_bp,
+    search_bp,
+)
 
 # Ensure project root is on path (legacy support)
 if config.PROJECT_ROOT not in sys.path:
@@ -130,7 +138,10 @@ def _handle_rate_limited(e):
 
 @app.errorhandler(500)
 def _handle_internal_error(e):
-    logger.error("Unhandled server error: %s", e, exc_info=True)
+    # Flask invokes error handlers from inside its own `except`, but that is not
+    # lexically visible here; pass the exception instance so the traceback is
+    # captured without relying on ambient sys.exc_info().
+    logger.error("Unhandled server error: %s", e, exc_info=e)
     return jsonify({
         "error": "internal_server_error",
         "request_id": getattr(g, 'request_id', None),

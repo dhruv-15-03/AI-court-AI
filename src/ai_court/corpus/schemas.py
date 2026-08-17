@@ -1,7 +1,6 @@
 """Pydantic schemas for the statute corpus."""
 from __future__ import annotations
 
-from typing import Optional
 from pydantic import BaseModel
 
 
@@ -11,7 +10,7 @@ class StatuteSection(BaseModel):
     section_number: str
     heading: str
     body_text: str
-    chapter: Optional[str] = None
+    chapter: str | None = None
 
 
 class ActInfo(BaseModel):

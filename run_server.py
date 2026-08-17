@@ -1,4 +1,5 @@
 import os
+
 from src.ai_court.api.server import app
 
 if __name__ == "__main__":

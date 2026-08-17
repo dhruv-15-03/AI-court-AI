@@ -1,3 +1,9 @@
 pytest>=7.4
-ruff>=0.5
-mypy>=1.8
+# Pinned exactly, not >=. ruff's *default* rule set changes between minor
+# releases, so an open range silently rewrites what CI enforces: 0.15.21 was
+# green on this repo, 0.16.x then reported 866 pre-existing findings and turned
+# main red without a single source change. Bump this deliberately, fix the new
+# findings in the same PR, and CI stays reproducible.
+ruff==0.16.3
+# Pinned for the same reason - a new mypy minor can add checks mid-flight.
+mypy==2.3.0

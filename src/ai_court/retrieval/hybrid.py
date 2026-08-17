@@ -4,18 +4,20 @@ Provides reusable reciprocal-rank fusion independent of API layer,
 with support for weighted fusion and outcome filtering.
 """
 from __future__ import annotations
-from typing import List, Dict, Any, Optional, Sequence
+
+from collections.abc import Sequence
+from typing import Any
 
 
 def reciprocal_rank_fusion(
-    semantic: Sequence[Dict[str, Any]],
-    lexical: Sequence[Dict[str, Any]],
+    semantic: Sequence[dict[str, Any]],
+    lexical: Sequence[dict[str, Any]],
     k: int = 10,
     K: int = 60,
     semantic_weight: float = 1.0,
     lexical_weight: float = 1.0,
-    outcome_filter: Optional[str] = None,
-) -> List[Dict[str, Any]]:
+    outcome_filter: str | None = None,
+) -> list[dict[str, Any]]:
     """Fuse semantic and lexical search results using reciprocal-rank fusion.
 
     Args:
@@ -34,7 +36,7 @@ def reciprocal_rank_fusion(
     s_index = {(r.get('url'), r.get('title')): i for i, r in enumerate(semantic)}
     l_index = {(r.get('url'), r.get('title')): i for i, r in enumerate(lexical)}
     all_keys = set(s_index) | set(l_index)
-    fused: List[Dict[str, Any]] = []
+    fused: list[dict[str, Any]] = []
     for key in all_keys:
         sr = s_index.get(key, 10**6)
         lr = l_index.get(key, 10**6)

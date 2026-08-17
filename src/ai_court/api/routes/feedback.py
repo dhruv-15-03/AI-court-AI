@@ -1,11 +1,12 @@
-import uuid
 import json
 import logging
 import os
+import uuid
 from datetime import datetime, timezone
-from flask import Blueprint, request, jsonify
 
-from ai_court.api import state, config
+from flask import Blueprint, jsonify, request
+
+from ai_court.api import config, state
 
 feedback_bp = Blueprint('feedback', __name__)
 logger = logging.getLogger(__name__)
@@ -182,7 +183,7 @@ def al_retrain():
 
         return jsonify(result)
     except Exception as exc:
-        logger.error("Retraining failed: %s", exc, exc_info=True)
+        logger.exception("Retraining failed")
         return jsonify({"error": "retrain_failed", "message": str(exc)}), 500
 
 
@@ -243,7 +244,7 @@ def al_sync_outcomes():
                 logger.warning("Hot-reload of retrained model failed: %s", exc)
         return jsonify(result)
     except Exception as exc:
-        logger.error("sync_outcomes failed: %s", exc, exc_info=True)
+        logger.exception("sync_outcomes failed")
         return jsonify({"error": "sync_failed", "message": str(exc)}), 500
 
 

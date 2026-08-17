@@ -1,23 +1,21 @@
-import os
 import logging
-from typing import Optional
+import os
 
 import pandas as pd
 
 # Import scraper functions from src package
 from ..scraper.kanoon import (
-    get_case_links,
-    get_case_content,
     extract_judgment_section,
+    get_case_content,
+    get_case_links,
     get_case_summary,
 )
-
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-def scrape_kanoon(query: str, pages: int = 2, out_csv: Optional[str] = None) -> str:
+def scrape_kanoon(query: str, pages: int = 2, out_csv: str | None = None) -> str:
     """Scrape Indian Kanoon search results and save raw dataset.
 
     Returns path to the saved CSV under data/raw.

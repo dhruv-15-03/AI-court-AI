@@ -20,7 +20,6 @@ import sqlite3
 import threading
 import time
 from contextlib import contextmanager
-from typing import Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -128,13 +127,13 @@ def init_db() -> None:
 
 # ── AL Queue ──────────────────────────────────────────────────────────
 
-def al_queue_list() -> List[Dict]:
+def al_queue_list() -> list[dict]:
     with _cursor() as cur:
         cur.execute("SELECT * FROM al_queue WHERE label IS NULL ORDER BY uncertainty DESC")
         return [dict(r) for r in cur.fetchall()]
 
 
-def al_queue_add(item: Dict) -> None:
+def al_queue_add(item: dict) -> None:
     with _cursor() as cur:
         cur.execute(
             "INSERT OR REPLACE INTO al_queue (id, text, uncertainty, uncertainty_method, "
@@ -165,7 +164,7 @@ def al_queue_count() -> int:
 # ── Labels ────────────────────────────────────────────────────────────
 
 def label_add(text: str, label: str, case_type: str = "", source: str = "human",
-              metadata: Optional[Dict] = None) -> None:
+              metadata: dict | None = None) -> None:
     with _cursor() as cur:
         cur.execute(
             "INSERT INTO labels (text, label, case_type, source, timestamp, metadata) "
@@ -180,7 +179,7 @@ def label_count() -> int:
         return cur.fetchone()[0]
 
 
-def label_load_all() -> List[Dict]:
+def label_load_all() -> list[dict]:
     with _cursor() as cur:
         cur.execute("SELECT * FROM labels ORDER BY timestamp")
         rows = cur.fetchall()
@@ -199,8 +198,8 @@ def label_load_all() -> List[Dict]:
 # ── Audit Log ─────────────────────────────────────────────────────────
 
 def audit_record(action: str, *, actor: str = "system", entity_type: str = "",
-                 entity_id: str = "", details: Optional[Dict] = None,
-                 ip_address: str = "") -> Dict:
+                 entity_id: str = "", details: dict | None = None,
+                 ip_address: str = "") -> dict:
     from datetime import datetime, timezone
     entry = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -222,7 +221,7 @@ def audit_record(action: str, *, actor: str = "system", entity_type: str = "",
     return entry
 
 
-def audit_query(limit: int = 200, entity_type: str = "", entity_id: str = "") -> List[Dict]:
+def audit_query(limit: int = 200, entity_type: str = "", entity_id: str = "") -> list[dict]:
     with _cursor() as cur:
         sql = "SELECT * FROM audit_log WHERE 1=1"
         params: list = []
@@ -261,7 +260,7 @@ def feedback_add(response_type: str, helpful: bool, query_excerpt: str = "",
         )
 
 
-def feedback_stats() -> Dict:
+def feedback_stats() -> dict:
     with _cursor() as cur:
         cur.execute("SELECT COUNT(*) as total, "
                     "SUM(CASE WHEN helpful=1 THEN 1 ELSE 0 END) as helpful, "
@@ -277,7 +276,7 @@ def feedback_stats() -> Dict:
 
 # ── Sessions ──────────────────────────────────────────────────────────
 
-def session_save(session_id: str, data: Dict) -> None:
+def session_save(session_id: str, data: dict) -> None:
     with _cursor() as cur:
         cur.execute(
             "INSERT OR REPLACE INTO sessions (session_id, user_id, case_query, "
@@ -291,7 +290,7 @@ def session_save(session_id: str, data: Dict) -> None:
         )
 
 
-def session_load(session_id: str) -> Optional[Dict]:
+def session_load(session_id: str) -> dict | None:
     with _cursor() as cur:
         cur.execute("SELECT * FROM sessions WHERE session_id = ?", (session_id,))
         r = cur.fetchone()
@@ -313,7 +312,7 @@ def session_delete(session_id: str) -> bool:
         return cur.rowcount > 0
 
 
-def session_list(user_id: str = "") -> List[Dict]:
+def session_list(user_id: str = "") -> list[dict]:
     with _cursor() as cur:
         if user_id:
             cur.execute("SELECT session_id, user_id, case_query, tier, created_at, last_active "

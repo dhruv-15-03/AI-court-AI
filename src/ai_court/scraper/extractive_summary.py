@@ -7,9 +7,8 @@ Zero API cost, works offline, memory-efficient.
 """
 from __future__ import annotations
 
-import re
 import logging
-from typing import List, Tuple, Optional
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -33,16 +32,22 @@ def extract_judgment_section(text: str) -> str:
         # Strong markers
         r'(?:ORDER|JUDGMENT|CONCLUSION|HELD|THEREFORE|RESULT)(.*?)(?:\n\n|$)',
         # Common legal phrases
-        r'(?:we\s+hold|we\s+direct|it\s+is\s+ordered|it\s+is\s+hereby|accordingly|'
-        r'the\s+appeal\s+is|the\s+petition\s+is|we\s+find\s+that|'
-        r'for\s+the\s+reasons\s+stated|in\s+the\s+result)(.*?)(?:\n\n|$)',
+        (
+            r'(?:we\s+hold|we\s+direct|it\s+is\s+ordered|it\s+is\s+hereby|accordingly|'
+            r'the\s+appeal\s+is|the\s+petition\s+is|we\s+find\s+that|'
+            r'for\s+the\s+reasons\s+stated|in\s+the\s+result)(.*?)(?:\n\n|$)'
+        ),
         # Conclusion markers
-        r'(?:for\s+the\s+foregoing\s+reasons|in\s+view\s+of\s+the\s+above|'
-        r'in\s+the\s+light\s+of\s+the\s+above|considering\s+the\s+above)(.*?)(?:\n\n|$)',
+        (
+            r'(?:for\s+the\s+foregoing\s+reasons|in\s+view\s+of\s+the\s+above|'
+            r'in\s+the\s+light\s+of\s+the\s+above|considering\s+the\s+above)(.*?)(?:\n\n|$)'
+        ),
         # Disposition markers
-        r'(?:the\s+appeal\s+(?:is|stands)\s+(?:dismissed|allowed)|'
-        r'the\s+petition\s+(?:is|stands)\s+(?:dismissed|allowed)|'
-        r'the\s+writ\s+petition\s+is)(.*?)(?:\n\n|$)',
+        (
+            r'(?:the\s+appeal\s+(?:is|stands)\s+(?:dismissed|allowed)|'
+            r'the\s+petition\s+(?:is|stands)\s+(?:dismissed|allowed)|'
+            r'the\s+writ\s+petition\s+is)(.*?)(?:\n\n|$)'
+        ),
     ]
     
     judgment_texts = []
@@ -64,7 +69,7 @@ def extract_judgment_section(text: str) -> str:
     return " ".join(last_lines)[:1500]
 
 
-def extract_key_holdings(text: str, max_holdings: int = 5) -> List[str]:
+def extract_key_holdings(text: str, max_holdings: int = 5) -> list[str]:
     """Extract key legal holdings from the text.
     
     Args:
@@ -78,10 +83,14 @@ def extract_key_holdings(text: str, max_holdings: int = 5) -> List[str]:
     
     # Patterns that typically precede key holdings
     holding_patterns = [
-        r'(?:held\s+that|we\s+hold\s+that|it\s+is\s+held\s+that|'
-        r'the\s+court\s+held|this\s+court\s+holds)(.*?[.!?])',
-        r'(?:we\s+are\s+of\s+the\s+view|in\s+our\s+view|'
-        r'we\s+are\s+of\s+the\s+opinion)(.*?[.!?])',
+        (
+            r'(?:held\s+that|we\s+hold\s+that|it\s+is\s+held\s+that|'
+            r'the\s+court\s+held|this\s+court\s+holds)(.*?[.!?])'
+        ),
+        (
+            r'(?:we\s+are\s+of\s+the\s+view|in\s+our\s+view|'
+            r'we\s+are\s+of\s+the\s+opinion)(.*?[.!?])'
+        ),
         r'(?:it\s+is\s+well\s+settled|the\s+settled\s+position)(.*?[.!?])',
     ]
     
@@ -104,7 +113,7 @@ def extract_key_holdings(text: str, max_holdings: int = 5) -> List[str]:
     return unique_holdings[:max_holdings]
 
 
-def extract_parties(text: str) -> Tuple[Optional[str], Optional[str]]:
+def extract_parties(text: str) -> tuple[str | None, str | None]:
     """Extract appellant/petitioner and respondent names.
     
     Args:
@@ -141,7 +150,7 @@ def extract_parties(text: str) -> Tuple[Optional[str], Optional[str]]:
     return appellant, respondent
 
 
-def extract_citations(text: str, max_citations: int = 5) -> List[str]:
+def extract_citations(text: str, max_citations: int = 5) -> list[str]:
     """Extract legal citations from the text.
     
     Args:
@@ -229,7 +238,7 @@ def create_extractive_summary(
     return summary
 
 
-def get_outcome_indicators(text: str) -> List[str]:
+def get_outcome_indicators(text: str) -> list[str]:
     """Extract words/phrases that indicate case outcome.
     
     Useful for understanding why a particular outcome was predicted.
@@ -265,10 +274,10 @@ def get_outcome_indicators(text: str) -> List[str]:
 
 
 __all__ = [
-    'extract_judgment_section',
-    'extract_key_holdings', 
-    'extract_parties',
-    'extract_citations',
     'create_extractive_summary',
+    'extract_citations',
+    'extract_judgment_section',
+    'extract_key_holdings',
+    'extract_parties',
     'get_outcome_indicators',
 ]

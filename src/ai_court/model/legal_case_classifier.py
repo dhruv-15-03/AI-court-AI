@@ -1,22 +1,22 @@
+import argparse
+import logging
 import os
 import warnings
+from typing import Any
+
 import dill
 import joblib
 import numpy as np
 import pandas as pd
-import argparse
-from typing import List, Tuple, Dict, Any
 from sklearn.pipeline import Pipeline
-
-import logging
 
 try:
     import mlflow
 except Exception:
     mlflow: Any = None  # type: ignore[no-redef]
 
-from ai_court.model.preprocessor import TextPreprocessor
 from ai_court.data.loader import DataLoader
+from ai_court.model.preprocessor import TextPreprocessor
 from ai_court.model.trainer import Trainer
 
 warnings.filterwarnings('ignore')
@@ -54,15 +54,15 @@ class LegalCaseClassifier:
         """Map raw judgment text to a manageable set of outcome classes."""
         return TextPreprocessor.normalize_outcome(text)
 
-    def load_data(self, file_paths: List[str]) -> pd.DataFrame:
+    def load_data(self, file_paths: list[str]) -> pd.DataFrame:
         """Load and concatenate datasets."""
         return self.data_loader.load_data(file_paths)
 
-    def analyze_dataset(self, df: pd.DataFrame) -> Dict:
+    def analyze_dataset(self, df: pd.DataFrame) -> dict:
         """Compute basic dataset stats."""
         return self.data_loader.analyze_dataset(df)
 
-    def prepare_data(self, df: pd.DataFrame) -> Tuple[pd.Series, pd.Series, np.ndarray, np.ndarray]:
+    def prepare_data(self, df: pd.DataFrame) -> tuple[pd.Series, pd.Series, np.ndarray, np.ndarray]:
         """Build text features and encode labels."""
         X_train, X_test, y_train, y_test = self.data_loader.prepare_data(df)
         # Sync internal state for backward compatibility
@@ -71,7 +71,7 @@ class LegalCaseClassifier:
         self._test_weights = self.data_loader._test_weights
         return X_train, X_test, y_train, y_test
 
-    def train_model(self, X_train: pd.Series, y_train: np.ndarray, sample_weight=None) -> Tuple[Pipeline, float]:
+    def train_model(self, X_train: pd.Series, y_train: np.ndarray, sample_weight=None) -> tuple[Pipeline, float]:
         """Train TF-IDF + AdaBoost(RandomForest) pipeline."""
         pipeline, f1 = self.trainer.train(X_train, y_train, sample_weight)
         self.model = pipeline
@@ -81,7 +81,7 @@ class LegalCaseClassifier:
         """Train a fast Logistic Regression baseline."""
         return self.trainer.train_logreg_baseline(X_train, y_train)
 
-    def evaluate(self, model: Pipeline, X_test: pd.Series, y_test: np.ndarray) -> Dict:
+    def evaluate(self, model: Pipeline, X_test: pd.Series, y_test: np.ndarray) -> dict:
         return self.trainer.evaluate(model, X_test, y_test, self.label_encoder)
 
     def save_model(self, filepath: str):
@@ -111,7 +111,7 @@ class LegalCaseClassifier:
         # Ensure preprocessor is available
         self.preprocessor = TextPreprocessor()
             
-    def predict(self, case_data: str, case_type: str) -> Dict[str, Any]:
+    def predict(self, case_data: str, case_type: str) -> dict[str, Any]:
         """
         Predict judgment with confidence score.
         
@@ -169,7 +169,7 @@ class LegalCaseClassifier:
             }
         except Exception as e:
             logger.error(f"Prediction failed: {e}")
-            raise RuntimeError(f"Prediction failed: {str(e)}") from e
+            raise RuntimeError(f"Prediction failed: {e!s}") from e
 
     def predict_judgement(self, case_data: str, case_type: str) -> str:
         """
@@ -179,7 +179,7 @@ class LegalCaseClassifier:
             result = self.predict(case_data, case_type)
             return result["judgment"]
         except Exception as e:
-            return f"Error during prediction: {str(e)}"
+            return f"Error during prediction: {e!s}"
 
 def main():
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -220,8 +220,8 @@ def main():
         if args.abstention_report:
             logger.info("Abstention report is not yet fully integrated into the new Trainer pipeline.")
             
-    except Exception as e:
-        logger.error(f"Training failed: {e}", exc_info=True)
+    except Exception:
+        logger.exception("Training failed")
 
 if __name__ == "__main__":
     main()

@@ -24,9 +24,10 @@ from __future__ import annotations
 import logging
 import re
 import time
-from flask import Blueprint, request, jsonify, Response, stream_with_context
 
-from ai_court.api import state, config, dependencies
+from flask import Blueprint, Response, jsonify, request, stream_with_context
+
+from ai_court.api import config, dependencies, state
 from ai_court.api.extensions import limiter
 
 logger = logging.getLogger(__name__)
@@ -509,7 +510,10 @@ def agent_upload_documents():
 
     # Process documents
     try:
-        from ai_court.documents.processor import DocumentProcessor, format_documents_for_llm
+        from ai_court.documents.processor import (
+            DocumentProcessor,
+            format_documents_for_llm,
+        )
 
         processor = DocumentProcessor(llm_client=state.llm_client)
         file_data = []
@@ -561,7 +565,7 @@ def agent_upload_documents():
         })
 
     except Exception as exc:
-        logger.error("Document processing failed: %s", exc, exc_info=True)
+        logger.exception("Document processing failed")
         return jsonify({"error": "processing_failed", "message": str(exc)}), 500
 
 
@@ -606,7 +610,10 @@ def agent_analyze_with_docs():
     # Process any new uploaded files
     if request.files:
         try:
-            from ai_court.documents.processor import DocumentProcessor, format_documents_for_llm
+            from ai_court.documents.processor import (
+                DocumentProcessor,
+                format_documents_for_llm,
+            )
             processor = DocumentProcessor(llm_client=state.llm_client)
             file_data = []
             for key in request.files:
@@ -764,7 +771,7 @@ def agent_generate_document():
     except ValueError as e:
         return jsonify({"error": "invalid_doc_type", "message": str(e)}), 400
     except Exception as exc:
-        logger.error("Document generation failed: %s", exc, exc_info=True)
+        logger.exception("Document generation failed")
         return jsonify({"error": "generation_failed", "message": str(exc)}), 500
 
 
@@ -963,7 +970,7 @@ def agent_stream():
                 "legal_disclaimer": LEGAL_DISCLAIMER,
             }))
         except Exception as exc:
-            logger.error("stream: unhandled: %s", exc, exc_info=True)
+            logger.exception("stream: unhandled")
             yield _sse_event("error", _json.dumps({"message": str(exc)}))
 
     return Response(

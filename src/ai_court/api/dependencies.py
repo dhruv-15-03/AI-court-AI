@@ -1,11 +1,13 @@
 import gc
-import os
 import json
-import threading
-import dill
 import logging
-from typing import Dict, Any, Optional, List
-from flask import request, jsonify
+import os
+import threading
+from typing import Any
+
+import dill
+from flask import jsonify, request
+
 from ai_court.api import config, state
 
 logger = logging.getLogger("api")
@@ -17,7 +19,7 @@ logger = logging.getLogger("api")
 # semantic search request. Cache the loaded encoder per model_name (there's
 # normally exactly one) and reuse it; guarded by a lock since gunicorn runs
 # this worker with multiple threads (see gunicorn.conf.py worker_class=gthread).
-_sentence_transformer_cache: Dict[str, Any] = {}
+_sentence_transformer_cache: dict[str, Any] = {}
 _sentence_transformer_lock = threading.Lock()
 
 
@@ -55,20 +57,20 @@ def relieve_memory_pressure() -> None:
 
 try:
     from ai_court.ontology import (
-        ontology_metadata,
-        load_ontology,
         flatten_leaves,
+        load_ontology,
         map_coarse_label,
+        ontology_metadata,
     )
 except Exception:
     # Fallback stubs when ontology module unavailable
-    def ontology_metadata() -> Dict[str, Any]:  # type: ignore[misc]
+    def ontology_metadata() -> dict[str, Any]:  # type: ignore[misc]
         return {}
 
-    def load_ontology() -> Dict[str, Any]:  # type: ignore[misc]
+    def load_ontology() -> dict[str, Any]:  # type: ignore[misc]
         return {}
 
-    def flatten_leaves(_data: Any) -> List[Any]:  # type: ignore[misc]
+    def flatten_leaves(_data: Any) -> list[Any]:  # type: ignore[misc]
         return []
 
     def map_coarse_label(label: str) -> tuple[str, bool]:  # type: ignore[misc]
@@ -226,11 +228,11 @@ def require_api_key():
             return jsonify({"error": "Unauthorized"}), 401
     return None
 
-def synthesize_body_from_answers(raw: Dict[str, Any]) -> str:
+def synthesize_body_from_answers(raw: dict[str, Any]) -> str:
     """Extract case body text excluding case_type for cleaner API usage."""
     if not isinstance(raw, dict):
         return ""
-    parts: List[str] = []
+    parts: list[str] = []
     summary = raw.get("summary")
     if isinstance(summary, str) and summary.strip():
         parts.append(summary.strip())
@@ -246,7 +248,7 @@ def synthesize_body_from_answers(raw: Dict[str, Any]) -> str:
         parts.append(f"{kk}: {sv}")
     return ". ".join(parts).strip()
 
-def synthesize_text_from_answers(raw: Dict[str, Any]) -> str:
+def synthesize_text_from_answers(raw: dict[str, Any]) -> str:
     if not isinstance(raw, dict):
         return ""
     ct = str(raw.get("case_type") or "").strip()
@@ -270,7 +272,7 @@ def multi_axis_predict_single(text: str):
     main_judgment = pred_axes.get('relief_label') or pred_axes.get('substantive_label') or pred_axes.get('procedural_label')
     return {'axes': pred_axes, 'main_judgment': main_judgment}
 
-def record_agreement(classical_label: str, shadow_axes: Optional[Dict[str, Any]]) -> None:
+def record_agreement(classical_label: str, shadow_axes: dict[str, Any] | None) -> None:
     if not shadow_axes or not isinstance(shadow_axes, dict):
         return
     unified_candidate = shadow_axes.get('relief_label') or shadow_axes.get('substantive_label') or shadow_axes.get('procedural_label')
@@ -398,7 +400,7 @@ def load_agent():
 # Ontology helpers
 _ontology_cache = None
 
-def ontology_tree_cached() -> Dict[str, Any]:
+def ontology_tree_cached() -> dict[str, Any]:
     global _ontology_cache
     if _ontology_cache is None:
         try:
@@ -407,35 +409,35 @@ def ontology_tree_cached() -> Dict[str, Any]:
             _ontology_cache = {}
     return _ontology_cache
 
-def build_parent_map(node: Dict[str, Any], parent: Optional[str], acc: Dict[str, Optional[str]]):
+def build_parent_map(node: dict[str, Any], parent: str | None, acc: dict[str, str | None]):
     nid = node.get('id')
     if nid:
         acc[nid] = parent
     for ch in (node.get('children') or []):
         build_parent_map(ch, nid, acc)
 
-def aggregate_hierarchical_f1(per_class_f1: Dict[str, float], class_counts: Dict[str, int]) -> Dict[str, Any]:
+def aggregate_hierarchical_f1(per_class_f1: dict[str, float], class_counts: dict[str, int]) -> dict[str, Any]:
     ontology = ontology_tree_cached()
     root = ontology.get('root') or {}
     if not root:
         return {}
-    parent_map: Dict[str, Optional[str]] = {}
+    parent_map: dict[str, str | None] = {}
     build_parent_map(root, None, parent_map)
     leaves = {leaf['id'] for leaf in flatten_leaves(ontology)} if ontology else set()
 
-    leaf_f1: Dict[str, float] = {}
+    leaf_f1: dict[str, float] = {}
     for k, v in per_class_f1.items():
         leaf_id, _ = map_coarse_label(k)
         if leaf_id not in leaves and k in leaves:
             leaf_id = k
         leaf_f1[leaf_id] = float(v)
 
-    children: Dict[str, List[str]] = {nid: [] for nid in parent_map}
+    children: dict[str, list[str]] = {nid: [] for nid in parent_map}
     for nid, parent in parent_map.items():
         if parent is not None and parent in children:
             children[parent].append(nid)
 
-    aggregated: Dict[str, Dict[str, Any]] = {}
+    aggregated: dict[str, dict[str, Any]] = {}
 
     def visit(nid: str):
         ch = children.get(nid, [])
@@ -465,7 +467,7 @@ def aggregate_hierarchical_f1(per_class_f1: Dict[str, float], class_counts: Dict
     visit(root_id)
     return aggregated.get(root_id, {})
 
-def js_divergence(p: List[float], q: List[float]) -> float:
+def js_divergence(p: list[float], q: list[float]) -> float:
     import math
     if len(p) != len(q):
         raise ValueError("Distribution length mismatch")

@@ -28,7 +28,7 @@ import logging
 import threading
 import time
 from collections import OrderedDict
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -112,14 +112,14 @@ class ResponseCache:
         self.max_size = max(1, max_size)
         self.key_prefix = key_prefix
         self._lock = threading.Lock()
-        self._store: "OrderedDict[str, tuple[float, dict[str, Any]]]" = OrderedDict()
+        self._store: OrderedDict[str, tuple[float, dict[str, Any]]] = OrderedDict()
         self._hits = 0
         self._misses = 0
-        self._redis: Optional[Any] = None
+        self._redis: Any | None = None
         if enabled and redis_url:
             self._redis = self._connect_redis(redis_url)
 
-    def _connect_redis(self, redis_url: str) -> Optional[Any]:
+    def _connect_redis(self, redis_url: str) -> Any | None:
         try:
             import redis  # type: ignore[import-not-found]
 
@@ -146,7 +146,7 @@ class ResponseCache:
     def _redis_key(self, key: str) -> str:
         return f"{self.key_prefix}:{key}"
 
-    def get(self, key: str) -> Optional[dict[str, Any]]:
+    def get(self, key: str) -> dict[str, Any] | None:
         """Return a cached value for ``key`` or ``None`` on a miss/expiry."""
         if not self.enabled:
             return None

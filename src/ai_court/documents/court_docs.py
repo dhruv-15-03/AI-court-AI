@@ -18,14 +18,14 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Any, Dict, List, Optional
+from datetime import datetime, timezone
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 # ── Document Templates ────────────────────────────────────────────────────
 
-DOCUMENT_TYPES: Dict[str, Dict[str, Any]] = {
+DOCUMENT_TYPES: dict[str, dict[str, Any]] = {
     "bail_application": {
         "title": "Application for Bail",
         "sections": ["header", "court_details", "case_details", "grounds", "prayer", "verification"],
@@ -122,13 +122,17 @@ class GeneratedDocument:
     doc_type: str
     title: str
     content: str  # Full document text
-    case_id: Optional[str] = None
+    case_id: str | None = None
     generated_at: str = ""
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
         if not self.generated_at:
-            self.generated_at = datetime.utcnow().isoformat() + "Z"
+            # tz-aware now, offset stripped: keeps the emitted string identical
+            # to the previous naive utcnow().isoformat() + "Z".
+            self.generated_at = (
+                datetime.now(timezone.utc).replace(tzinfo=None).isoformat() + "Z"
+            )
 
 
 class CourtDocumentGenerator:
@@ -146,7 +150,7 @@ class CourtDocumentGenerator:
         """
         self.llm_client = llm_client
 
-    def list_document_types(self) -> List[Dict[str, str]]:
+    def list_document_types(self) -> list[dict[str, str]]:
         """List available document types."""
         return [
             {"id": k, "title": v["title"], "sections": v["sections"]}
@@ -162,7 +166,7 @@ class CourtDocumentGenerator:
         precedents: str = "",
         document_context: str = "",
         user_instructions: str = "",
-        case_id: Optional[str] = None,
+        case_id: str | None = None,
     ) -> GeneratedDocument:
         """
         Generate a court document.
@@ -226,7 +230,7 @@ class CourtDocumentGenerator:
     def generate_case_brief(
         self,
         case_info: str,
-        analysis: Dict[str, Any],
+        analysis: dict[str, Any],
         documents_context: str = "",
     ) -> GeneratedDocument:
         """

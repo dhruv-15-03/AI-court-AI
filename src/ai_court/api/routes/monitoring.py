@@ -1,18 +1,19 @@
-import os
 import json
+import os
 import platform
 from datetime import datetime, timezone
-from flask import Blueprint, request, jsonify, Response
+
+from flask import Blueprint, Response, jsonify, request
 from pydantic import ValidationError
 
-from ai_court.api import config, state, dependencies, models
-from ai_court.ontology import ontology_metadata, flatten_leaves
+from ai_court.api import config, dependencies, models, state
+from ai_court.ontology import flatten_leaves, ontology_metadata
 
 monitoring_bp = Blueprint('monitoring', __name__)
 
 @monitoring_bp.route("/metrics", methods=["GET"])
 def metrics():
-    from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+    from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
     return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
 
 @monitoring_bp.route("/version", methods=["GET"])
@@ -142,7 +143,9 @@ def governance_refresh():
         import subprocess
         import sys
         cmd = [sys.executable, 'scripts/governance_status.py']
-        rc = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        # check=False: the non-zero path is handled explicitly below so the
+        # endpoint can return the subprocess stderr instead of raising.
+        rc = subprocess.run(cmd, capture_output=True, text=True, timeout=60, check=False)
         if rc.returncode != 0:
             return jsonify({'status':'error','detail': rc.stderr.strip()}), 500
         return jsonify({'status':'ok'}), 200
