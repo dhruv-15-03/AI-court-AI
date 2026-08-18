@@ -25,8 +25,7 @@ import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
-
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +109,7 @@ def _get_pdfplumber():
     return _pdfplumber
 
 
-def _get_easyocr(languages: Optional[List[str]] = None):
+def _get_easyocr(languages: list[str] | None = None):
     """Get or create EasyOCR reader. Lazy-loaded and cached."""
     global _easyocr_reader
     if _easyocr_reader is None:
@@ -140,14 +139,14 @@ class ExtractedDocument:
     text: str  # Full extracted text
     page_count: int = 1
     language_detected: str = "en"
-    sections_mentioned: List[str] = field(default_factory=list)
-    citations_found: List[str] = field(default_factory=list)
-    parties_mentioned: List[str] = field(default_factory=list)
-    dates_found: List[str] = field(default_factory=list)
+    sections_mentioned: list[str] = field(default_factory=list)
+    citations_found: list[str] = field(default_factory=list)
+    parties_mentioned: list[str] = field(default_factory=list)
+    dates_found: list[str] = field(default_factory=list)
     doc_type_guess: str = ""  # FIR, charge_sheet, court_order, judgment, evidence, petition, etc.
     confidence: float = 1.0
     evidence_description: str = ""  # For photos: what the image shows
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def summary(self, max_len: int = 2000) -> str:
         """Get a summary suitable for LLM context."""
@@ -175,7 +174,7 @@ class DocumentProcessor:
     - Regex for legal entity extraction
     """
 
-    def __init__(self, llm_client=None, ocr_languages: Optional[List[str]] = None):
+    def __init__(self, llm_client=None, ocr_languages: list[str] | None = None):
         """
         Args:
             llm_client: Optional LLM client for evidence photo analysis.
@@ -184,8 +183,8 @@ class DocumentProcessor:
         self.llm_client = llm_client
         self.ocr_languages = ocr_languages or ["en", "hi"]
 
-    def process_file(self, file_path: Optional[str] = None, file_bytes: Optional[bytes] = None,
-                     filename: str = "document", content_type: Optional[str] = None) -> ExtractedDocument:
+    def process_file(self, file_path: str | None = None, file_bytes: bytes | None = None,
+                     filename: str = "document", content_type: str | None = None) -> ExtractedDocument:
         """
         Process a single document file.
         
@@ -233,7 +232,7 @@ class DocumentProcessor:
         else:  # text
             return self._process_text(file_bytes, filename)
 
-    def process_multiple(self, files: List[Dict[str, Any]]) -> List[ExtractedDocument]:
+    def process_multiple(self, files: list[dict[str, Any]]) -> list[ExtractedDocument]:
         """
         Process multiple documents.
         
@@ -257,7 +256,7 @@ class DocumentProcessor:
                 results.append(ExtractedDocument(
                     filename=f.get("filename", "unknown"),
                     file_type="error",
-                    text=f"[Error processing document: {str(e)}]",
+                    text=f"[Error processing document: {e!s}]",
                     confidence=0.0,
                 ))
         return results
@@ -385,9 +384,7 @@ class DocumentProcessor:
         if any(w in fn for w in ["evidence", "photo", "scene", "weapon", "injury", "exhibit"]):
             return True
         # Low text content suggests it's a photo, not a document
-        if len(ocr_text.strip()) < 50:
-            return True
-        return False
+        return len(ocr_text.strip()) < 50
 
     def _describe_evidence(self, data: bytes, filename: str) -> str:
         """Use LLM (GPT-4o vision) to describe evidence in a photo."""
@@ -555,7 +552,7 @@ class DocumentProcessor:
 
 # ── Format for Agent Context ─────────────────────────────────────────────
 
-def format_documents_for_llm(docs: List[ExtractedDocument], max_total_chars: int = 15000) -> str:
+def format_documents_for_llm(docs: list[ExtractedDocument], max_total_chars: int = 15000) -> str:
     """
     Format multiple documents into a single context string for the LLM.
     

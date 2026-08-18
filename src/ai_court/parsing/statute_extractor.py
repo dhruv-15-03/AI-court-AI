@@ -10,8 +10,8 @@ Returns list of dicts: { 'raw': str, 'act_id': str|None, 'section': str|None }
 Future: canonical mapping via act dictionary.
 """
 from __future__ import annotations
+
 import re
-from typing import List, Dict
 
 SECTION_RE = re.compile(r"\b(?:section|sec\.|s\.)\s*(\d+[A-Za-z]*)(?:\s*[-/]?\s*\(?\w+\)?)?\s*(?:of\s+the\s+)?(?:(?:code\s+of\s+criminal\s+procedure|crpc|code\s+of\s+criminal\s+procedure,?\s*1973)|ipc|indian\s+penal\s+code|ni\s+act|negotiable\s+instruments\s+act)\b", re.IGNORECASE)
 
@@ -28,10 +28,10 @@ ACT_ALIASES = {
 ACT_CAPTURE = re.compile(r"(crpc|code of criminal procedure(?:,?\s*1973)?|ipc|indian penal code|ni act|negotiable instruments act)", re.IGNORECASE)
 
 
-def extract_statutes(text: str) -> List[Dict]:
+def extract_statutes(text: str) -> list[dict]:
     if not text:
         return []
-    refs: List[Dict] = []
+    refs: list[dict] = []
     for m in SECTION_RE.finditer(text):
         raw = m.group(0)
         section = m.group(1)

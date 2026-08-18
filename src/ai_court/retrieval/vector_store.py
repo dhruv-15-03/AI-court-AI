@@ -20,8 +20,9 @@ from __future__ import annotations
 
 import logging
 import os
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Any, List, Optional, Sequence
+from typing import Any
 
 import numpy as np
 
@@ -49,7 +50,7 @@ class VectorStore:
         self,
         embeddings: np.ndarray,
         texts: Sequence[str],
-        metadata: Optional[Sequence[dict]] = None,
+        metadata: Sequence[dict] | None = None,
         model_name: str = DEFAULT_EMBED_MODEL,
     ):
         if embeddings.ndim != 2:
@@ -77,10 +78,10 @@ class VectorStore:
     def build(
         cls,
         texts: Sequence[str],
-        metadata: Optional[Sequence[dict]] = None,
+        metadata: Sequence[dict] | None = None,
         model_name: str = DEFAULT_EMBED_MODEL,
         batch_size: int = 32,
-    ) -> "VectorStore":
+    ) -> VectorStore:
         """Embed ``texts`` and construct a VectorStore."""
         encoder = _load_encoder(model_name)
         logger.info("[vector_store] embedding %d texts with %s", len(texts), model_name)
@@ -116,7 +117,7 @@ class VectorStore:
         return self._encoder
 
     # ------------------------------------------------------------------
-    def search(self, query: str, k: int = 5, min_score: float = 0.0) -> List[VectorHit]:
+    def search(self, query: str, k: int = 5, min_score: float = 0.0) -> list[VectorHit]:
         """Return the top-k most semantically similar entries to ``query``."""
         if not query or not query.strip():
             return []
@@ -134,7 +135,7 @@ class VectorStore:
             idx = np.argsort(-sims)[:k]
             scores = sims[idx]
 
-        results: List[VectorHit] = []
+        results: list[VectorHit] = []
         for i, s in zip(idx, scores):
             if i < 0 or s < min_score:
                 continue
@@ -152,7 +153,7 @@ class VectorStore:
     def add(
         self,
         texts: Sequence[str],
-        metadata: Optional[Sequence[dict]] = None,
+        metadata: Sequence[dict] | None = None,
         batch_size: int = 32,
     ) -> int:
         """Incrementally embed and append ``texts`` to this store.
@@ -201,7 +202,7 @@ class VectorStore:
         logger.info("[vector_store] saved %d vectors → %s", len(self._texts), path)
 
     @classmethod
-    def load(cls, path: str) -> "VectorStore":
+    def load(cls, path: str) -> VectorStore:
         data = np.load(path, allow_pickle=True)
         model_name = str(data["model_name"][0])
         vs = cls(
@@ -218,11 +219,11 @@ class VectorStore:
         return len(self._texts)
 
     @property
-    def texts(self) -> List[str]:
+    def texts(self) -> list[str]:
         return list(self._texts)
 
     @property
-    def metadata(self) -> List[dict]:
+    def metadata(self) -> list[dict]:
         return list(self._metadata)
 
 

@@ -8,13 +8,14 @@ Features:
  - LLM label suggestion (optional)
 """
 from __future__ import annotations
-from dataclasses import dataclass, field
-from typing import List, Dict, Any, Optional
+
 import heapq
 import json
 import logging
 import os
 import time
+from dataclasses import dataclass, field
+from typing import Any
 
 import numpy as np
 
@@ -25,18 +26,18 @@ logger = logging.getLogger(__name__)
 class QueueItem:
     priority: float
     doc_id: str = field(compare=False)
-    payload: Dict[str, Any] = field(compare=False, default_factory=dict)
+    payload: dict[str, Any] = field(compare=False, default_factory=dict)
     queued_at: float = field(compare=False, default_factory=lambda: time.time())
 
 
 class ActiveLearningQueue:
     def __init__(self):
-        self._heap: List[QueueItem] = []
+        self._heap: list[QueueItem] = []
 
-    def push(self, doc_id: str, uncertainty: float, payload: Dict[str, Any]):
+    def push(self, doc_id: str, uncertainty: float, payload: dict[str, Any]):
         heapq.heappush(self._heap, QueueItem(-uncertainty, doc_id, payload))  # negative for max-heap
 
-    def pop_batch(self, n: int = 10) -> List[QueueItem]:
+    def pop_batch(self, n: int = 10) -> list[QueueItem]:
         out = []
         for _ in range(min(n, len(self._heap))):
             out.append(heapq.heappop(self._heap))
@@ -48,7 +49,7 @@ class ActiveLearningQueue:
 
 # ── Uncertainty Scoring ───────────────────────────────────────────────
 
-def entropy_uncertainty(probabilities: Dict[str, float]) -> float:
+def entropy_uncertainty(probabilities: dict[str, float]) -> float:
     """Shannon entropy over predicted class probabilities (higher = more uncertain)."""
     probs = np.array(list(probabilities.values()), dtype=float)
     probs = probs[probs > 0]
@@ -57,7 +58,7 @@ def entropy_uncertainty(probabilities: Dict[str, float]) -> float:
     return float(-np.sum(probs * np.log2(probs)))
 
 
-def margin_uncertainty(probabilities: Dict[str, float]) -> float:
+def margin_uncertainty(probabilities: dict[str, float]) -> float:
     """1 minus the margin between top-2 class probabilities (higher = more uncertain)."""
     probs = sorted(probabilities.values(), reverse=True)
     if len(probs) < 2:
@@ -66,7 +67,7 @@ def margin_uncertainty(probabilities: Dict[str, float]) -> float:
 
 
 def compute_uncertainty(
-    probabilities: Dict[str, float],
+    probabilities: dict[str, float],
     method: str = "entropy",
 ) -> float:
     """Compute uncertainty score from class probabilities.
@@ -103,7 +104,7 @@ class LabeledDataStore:
         label: str,
         case_type: str = "",
         source: str = "human",
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         """Append a labeled example to the store."""
         record = {
@@ -118,7 +119,7 @@ class LabeledDataStore:
             f.write(json.dumps(record, ensure_ascii=False) + "\n")
         logger.info("Stored label: %s -> %s (source=%s)", text[:50], label, source)
 
-    def load_all(self) -> List[Dict[str, Any]]:
+    def load_all(self) -> list[dict[str, Any]]:
         """Load all labeled examples."""
         if not os.path.exists(self.store_path):
             return []
@@ -154,7 +155,7 @@ class RetrainingEngine:
         label_store: LabeledDataStore,
         retrain_threshold: int = 50,
         model_dir: str = "models",
-        data_dirs: Optional[List[str]] = None,
+        data_dirs: list[str] | None = None,
     ):
         self.label_store = label_store
         self.retrain_threshold = retrain_threshold
@@ -168,14 +169,15 @@ class RetrainingEngine:
         new_labels = current - self._labels_at_last_train
         return new_labels >= self.retrain_threshold
 
-    def retrain(self) -> Dict[str, Any]:
+    def retrain(self) -> dict[str, Any]:
         """Retrain the model with original data + new human labels.
 
         Returns metadata about the training run.
         """
         import pandas as pd
-        from ai_court.model.legal_case_classifier import LegalCaseClassifier
+
         from ai_court.data.prepare_dataset import build_from_dirs
+        from ai_court.model.legal_case_classifier import LegalCaseClassifier
 
         logger.info("Starting retraining cycle...")
 
@@ -232,8 +234,8 @@ class RetrainingEngine:
 def suggest_label_with_llm(
     text: str,
     llm_client: Any,
-    valid_labels: List[str],
-) -> Optional[Dict[str, Any]]:
+    valid_labels: list[str],
+) -> dict[str, Any] | None:
     """Ask the LLM to suggest a label for an uncertain prediction.
 
     Returns dict with 'suggested_label', 'reasoning', 'confidence'.
@@ -272,11 +274,11 @@ def suggest_label_with_llm(
 
 __all__ = [
     'ActiveLearningQueue',
+    'LabeledDataStore',
     'QueueItem',
+    'RetrainingEngine',
     'compute_uncertainty',
     'entropy_uncertainty',
     'margin_uncertainty',
-    'LabeledDataStore',
-    'RetrainingEngine',
     'suggest_label_with_llm',
 ]

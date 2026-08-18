@@ -10,14 +10,17 @@ This is intentionally lightweight; advanced enrichment phases will replace
 heuristics with robust modules.
 """
 from __future__ import annotations
+
+import hashlib
+import json
 import os
 import re
-import json
-import hashlib
-from typing import Iterator, List
-from .schemas import CaseRaw, CaseSegment, Citation, StatuteReference, NormalizedCase
+from collections.abc import Iterator
+from datetime import datetime, timezone
+
 from bs4 import BeautifulSoup
-from datetime import datetime
+
+from .schemas import CaseRaw, CaseSegment, Citation, NormalizedCase, StatuteReference
 
 RAW_STORE_DIR = 'data/raw_html_store'
 OUT_DIR = 'data/normalized'
@@ -28,6 +31,17 @@ SECTION_PATTERN = re.compile(r'(?i)section\s+\d+[A-Za-z0-9]*')
 
 BLOCK_TAGS = {"p","div","section","article","li"}
 
+
+def _utc_now_iso_z() -> str:
+    """UTC timestamp as ``YYYY-MM-DDTHH:MM:SS.ffffffZ``.
+
+    Uses a tz-aware ``now`` then drops the offset so the emitted string stays
+    byte-identical to the previous ``datetime.utcnow().isoformat() + 'Z'``.
+    Downstream manifests and normalized-case records are compared verbatim.
+    """
+    return datetime.now(timezone.utc).replace(tzinfo=None).isoformat() + 'Z'
+
+
 def html_to_text(html: str | None) -> str:
     if not html:
         return ""
@@ -36,7 +50,7 @@ def html_to_text(html: str | None) -> str:
         # Remove scripts/styles
         for bad in soup(["script","style","noscript"]):
             bad.decompose()
-        lines: List[str] = []
+        lines: list[str] = []
         for el in soup.find_all(BLOCK_TAGS):
             txt = el.get_text(" ", strip=True)
             if txt:
@@ -65,25 +79,25 @@ def _iter_raw() -> Iterator[CaseRaw]:
         except Exception:
             continue
 
-def segment_case(cr: CaseRaw) -> List[CaseSegment]:
+def segment_case(cr: CaseRaw) -> list[CaseSegment]:
     # Prefer HTML parsing if html present and full_text empty / short
     raw_text = cr.full_text
     if (not raw_text or len(raw_text) < 50) and getattr(cr,'html', None):
         raw_text = html_to_text(cr.html)  # type: ignore[arg-type]
     parts = [p.strip() for p in re.split(r'\n{2,}', raw_text or '') if p.strip()]
-    segs: List[CaseSegment] = []
+    segs: list[CaseSegment] = []
     for i, p in enumerate(parts):
         segs.append(CaseSegment(case_id=cr.case_id, segment_id=f"{cr.case_id}::seg::{i}", position=i, text=p))
     return segs
 
-def extract_citations(text: str, case_id: str) -> List[Citation]:
-    cites: List[Citation] = []
+def extract_citations(text: str, case_id: str) -> list[Citation]:
+    cites: list[Citation] = []
     for m in CITATION_PATTERN.finditer(text):
         cites.append(Citation(case_id=case_id, target_id='UNKNOWN', raw_text=m.group(0), offset=m.start()))
     return cites
 
-def extract_sections(text: str, case_id: str) -> List[StatuteReference]:
-    refs: List[StatuteReference] = []
+def extract_sections(text: str, case_id: str) -> list[StatuteReference]:
+    refs: list[StatuteReference] = []
     for m in SECTION_PATTERN.finditer(text):
         refs.append(StatuteReference(case_id=case_id, section_id='UNKNOWN', span_text=m.group(0), offset=m.start()))
     return refs
@@ -91,20 +105,21 @@ def extract_sections(text: str, case_id: str) -> List[StatuteReference]:
 
 def run_normalize():
     os.makedirs(OUT_DIR, exist_ok=True)
-    cases_out = open(os.path.join(OUT_DIR,'cases.jsonl'),'w',encoding='utf-8')
-    segments_out = open(os.path.join(OUT_DIR,'segments.jsonl'),'w',encoding='utf-8')
-    citations_out = open(os.path.join(OUT_DIR,'citations.jsonl'),'w',encoding='utf-8')
-    statutes_out = open(os.path.join(OUT_DIR,'statute_refs.jsonl'),'w',encoding='utf-8')
-    meta: List[NormalizedCase] = []
+    meta: list[NormalizedCase] = []
     count = 0
-    try:
+    with (
+        open(os.path.join(OUT_DIR,'cases.jsonl'),'w',encoding='utf-8') as cases_out,
+        open(os.path.join(OUT_DIR,'segments.jsonl'),'w',encoding='utf-8') as segments_out,
+        open(os.path.join(OUT_DIR,'citations.jsonl'),'w',encoding='utf-8') as citations_out,
+        open(os.path.join(OUT_DIR,'statute_refs.jsonl'),'w',encoding='utf-8') as statutes_out,
+    ):
         for raw in _iter_raw():
             # Derive case_id if missing
             cid = raw.case_id if getattr(raw,'case_id', None) else hashlib.sha256(raw.source_url.encode('utf-8')).hexdigest()[:20]
             raw.case_id = cid
             segs = segment_case(raw)
-            cites: List[Citation] = []
-            sections: List[StatuteReference] = []
+            cites: list[Citation] = []
+            sections: list[StatuteReference] = []
             for s in segs:
                 cites.extend(extract_citations(s.text, cid))
                 sections.extend(extract_sections(s.text, cid))
@@ -122,26 +137,19 @@ def run_normalize():
                 num_segments=len(segs),
                 num_citations=len(cites),
                 num_statutes=len(sections),
-                created_at=datetime.utcnow().isoformat()+'Z'
+                created_at=_utc_now_iso_z()
             )
             cases_out.write(raw.model_dump_json()+"\n")
             for s in segs:
                 segments_out.write(s.model_dump_json()+"\n")
-            for c in cites:
-                citations_out.write(c.model_dump_json()+"\n")
-            for st in sections:
-                statutes_out.write(st.model_dump_json()+"\n")
+            citations_out.writelines(c.model_dump_json()+"\n" for c in cites)
+            statutes_out.writelines(st.model_dump_json()+"\n" for st in sections)
             meta.append(norm)
             count += 1
-    finally:
-        cases_out.close()
-        segments_out.close()
-        citations_out.close()
-        statutes_out.close()
     # Write manifest
     manifest = {
         'cases': count,
-        'generated_at': datetime.utcnow().isoformat()+'Z',
+        'generated_at': _utc_now_iso_z(),
         'totals': {
             'segments': sum(m.num_segments for m in meta),
             'citations': sum(m.num_citations for m in meta),

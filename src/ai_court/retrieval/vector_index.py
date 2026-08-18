@@ -3,11 +3,13 @@
 Stores embeddings + metadata; supports top-k similarity search.
 """
 from __future__ import annotations
-import os
-import json
+
 import hashlib
+import json
+import os
 from dataclasses import dataclass
-from typing import List, Dict, Any, Tuple, Optional
+from typing import Any
+
 import numpy as np
 
 try:  # optional
@@ -23,7 +25,7 @@ def sha256_bytes(data: bytes) -> str:
 @dataclass
 class VectorIndex:
     embeddings: np.ndarray
-    meta: List[Dict[str, Any]]
+    meta: list[dict[str, Any]]
     use_faiss: bool = False
 
     def __post_init__(self):
@@ -39,7 +41,7 @@ class VectorIndex:
             self.embeddings = self.embeddings / norms
             self.index = None
 
-    def search(self, query_vecs: np.ndarray, k: int = 5) -> List[List[Tuple[int, float]]]:
+    def search(self, query_vecs: np.ndarray, k: int = 5) -> list[list[tuple[int, float]]]:
         if self.use_faiss and _HAS_FAISS and self.index is not None:
             q = query_vecs.copy()
             faiss.normalize_L2(q)
@@ -65,8 +67,7 @@ class VectorIndex:
         np.save(emb_path, self.embeddings.astype('float32'))
         meta_path = os.path.join(out_dir, 'segments.jsonl')
         with open(meta_path, 'w', encoding='utf-8') as f:
-            for m in self.meta:
-                f.write(json.dumps(m) + '\n')
+            f.writelines(json.dumps(m) + '\n' for m in self.meta)
         # Hash
         with open(emb_path, 'rb') as ef:
             emb_hash = sha256_bytes(ef.read())
@@ -76,7 +77,7 @@ class VectorIndex:
         centroid_hash = sha256_bytes(centroid.tobytes())
         # Persist centroid vector for precise drift computations
         _centroid_filename = os.path.join(out_dir, 'centroid.npy')
-        centroid_path: Optional[str] = _centroid_filename
+        centroid_path: str | None = _centroid_filename
         try:
             np.save(_centroid_filename, centroid.astype('float32'))
         except Exception:

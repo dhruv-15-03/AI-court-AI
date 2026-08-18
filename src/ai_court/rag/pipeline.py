@@ -10,7 +10,9 @@ Contract:
 from __future__ import annotations
 
 import logging
-from typing import List, Dict, Any, Optional, Callable
+from collections.abc import Callable
+from typing import Any
+
 import numpy as np
 
 from ai_court.llm.faithfulness import verify_citations
@@ -20,10 +22,10 @@ logger = logging.getLogger(__name__)
 
 def _lexical_retrieve(
     query: str,
-    search_index: Optional[Dict[str, Any]],
-    preprocess_fn: Optional[Callable[[str], str]],
+    search_index: dict[str, Any] | None,
+    preprocess_fn: Callable[[str], str] | None,
     k: int,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """TF-IDF retrieval leg (the historical behaviour)."""
     if search_index is None:
         return []
@@ -40,7 +42,7 @@ def _lexical_retrieve(
         scores = (matrix @ query_vector.T).toarray().ravel()
         top_indices = np.argsort(-scores)[:k]
 
-        documents: List[Dict[str, Any]] = []
+        documents: list[dict[str, Any]] = []
         for idx in top_indices:
             if idx < len(meta) and scores[idx] > 0:
                 m = meta[idx]
@@ -60,10 +62,10 @@ def _lexical_retrieve(
 
 def _semantic_retrieve(
     query: str,
-    semantic_index: Optional[Dict[str, Any]],
-    query_embed_fn: Optional[Callable[[str], Any]],
+    semantic_index: dict[str, Any] | None,
+    query_embed_fn: Callable[[str], Any] | None,
     k: int,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Dense/semantic retrieval leg using a pre-built embedding index.
 
     ``query_embed_fn`` embeds the raw query (it applies its own preprocessing)
@@ -83,7 +85,7 @@ def _semantic_retrieve(
         sims = np.dot(dense, qv[0])
         top_indices = np.argsort(-sims)[:k]
 
-        documents: List[Dict[str, Any]] = []
+        documents: list[dict[str, Any]] = []
         for idx in top_indices:
             if idx < len(meta):
                 m = meta[idx]
@@ -103,12 +105,12 @@ def _semantic_retrieve(
 
 def retrieve(
     query: str,
-    search_index: Optional[Dict[str, Any]] = None,
-    preprocess_fn: Optional[Callable[[str], str]] = None,
+    search_index: dict[str, Any] | None = None,
+    preprocess_fn: Callable[[str], str] | None = None,
     k: int = 5,
-    semantic_index: Optional[Dict[str, Any]] = None,
-    query_embed_fn: Optional[Callable[[str], Any]] = None,
-) -> List[Dict[str, Any]]:
+    semantic_index: dict[str, Any] | None = None,
+    query_embed_fn: Callable[[str], Any] | None = None,
+) -> list[dict[str, Any]]:
     """Retrieve relevant documents.
 
     Fuses dense semantic search with TF-IDF via reciprocal-rank fusion when a
@@ -145,7 +147,7 @@ def retrieve(
 
 def augment(
     query: str,
-    docs: List[Dict[str, Any]],
+    docs: list[dict[str, Any]],
     max_context_length: int = 4000
 ) -> str:
     """Format retrieved documents as context for the response.
@@ -194,10 +196,10 @@ def augment(
 def generate(
     query: str,
     context: str,
-    documents: List[Dict[str, Any]],
+    documents: list[dict[str, Any]],
     llm_client: Any = None,
     statute_corpus: Any = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Generate response based on retrieved context.
     
     If llm_client is provided, uses LLM for intelligent generation.
@@ -233,8 +235,8 @@ def generate(
         })
     
     # Outcome distribution
-    outcomes: List[str] = [str(d.get('outcome')) for d in documents if d.get('outcome')]
-    outcome_counts: Dict[str, int] = {}
+    outcomes: list[str] = [str(d.get('outcome')) for d in documents if d.get('outcome')]
+    outcome_counts: dict[str, int] = {}
     for o in outcomes:
         outcome_counts[o] = outcome_counts.get(o, 0) + 1
     
@@ -330,14 +332,14 @@ def generate(
 
 def rag_query(
     question: str,
-    search_index: Optional[Dict[str, Any]] = None,
-    preprocess_fn: Optional[Callable[[str], str]] = None,
+    search_index: dict[str, Any] | None = None,
+    preprocess_fn: Callable[[str], str] | None = None,
     k: int = 5,
     llm_client: Any = None,
     statute_corpus: Any = None,
-    semantic_index: Optional[Dict[str, Any]] = None,
-    query_embed_fn: Optional[Callable[[str], Any]] = None,
-) -> Dict[str, Any]:
+    semantic_index: dict[str, Any] | None = None,
+    query_embed_fn: Callable[[str], Any] | None = None,
+) -> dict[str, Any]:
     """Complete RAG pipeline: retrieve, augment, generate.
     
     Convenience function that chains all pipeline steps.
@@ -378,4 +380,4 @@ def rag_query(
     return response
 
 
-__all__ = ['retrieve', 'augment', 'generate', 'rag_query']
+__all__ = ['augment', 'generate', 'rag_query', 'retrieve']

@@ -7,7 +7,7 @@ import logging
 import os
 import time
 from datetime import datetime, timezone
-from typing import Any, Dict, Optional
+from typing import Any
 
 from flask import Blueprint, jsonify, request
 
@@ -23,9 +23,9 @@ def record(
     actor: str = "system",
     entity_type: str = "",
     entity_id: str = "",
-    details: Optional[Dict[str, Any]] = None,
+    details: dict[str, Any] | None = None,
     ip_address: str = "",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Append an audit entry — SQLite primary, JSONL fallback."""
     try:
         from ai_court.storage import audit_record

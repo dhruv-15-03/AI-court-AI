@@ -1,5 +1,6 @@
-import os
 import json
+import os
+
 import pytest
 
 HISTORY_PATH = os.path.join('models', 'history.log')

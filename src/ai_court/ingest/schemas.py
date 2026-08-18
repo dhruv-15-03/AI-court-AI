@@ -4,24 +4,25 @@ These pydantic models define the intermediate and normalized representations
 for Indian legal case ingestion and statute/section structures.
 """
 from __future__ import annotations
+
 from pydantic import BaseModel
-from typing import Optional
+
 
 class CaseRaw(BaseModel):
     case_id: str
     source_url: str
-    court: Optional[str]
-    decision_date: Optional[str]
-    title: Optional[str]
+    court: str | None
+    decision_date: str | None
+    title: str | None
     full_text: str
-    html: Optional[str]
+    html: str | None
     scraped_at: str
 
 class CaseSegment(BaseModel):
     case_id: str
     segment_id: str
     position: int
-    role: Optional[str] = None  # rhetorical role placeholder
+    role: str | None = None  # rhetorical role placeholder
     text: str
 
 class Citation(BaseModel):
@@ -41,26 +42,26 @@ class SectionVersion(BaseModel):
     act_id: str
     number: str
     version: int = 1
-    heading: Optional[str]
+    heading: str | None
     body_text: str
-    effective_start: Optional[str]
-    effective_end: Optional[str]
+    effective_start: str | None
+    effective_end: str | None
 
 class ActMetadata(BaseModel):
     act_id: str
     short_name: str
-    long_name: Optional[str]
-    year: Optional[int]
+    long_name: str | None
+    year: int | None
     version: int = 1
 
 class NormalizedCase(BaseModel):
     case_id: str
-    court: Optional[str]
-    decision_date: Optional[str]
-    title: Optional[str]
-    outcome_axis: Optional[str]
-    procedural_axis: Optional[str]
-    relief_axis: Optional[str]
+    court: str | None
+    decision_date: str | None
+    title: str | None
+    outcome_axis: str | None
+    procedural_axis: str | None
+    relief_axis: str | None
     raw_hash: str
     num_segments: int
     num_citations: int
@@ -68,5 +69,11 @@ class NormalizedCase(BaseModel):
     created_at: str
 
 __all__ = [
-    'CaseRaw','CaseSegment','Citation','StatuteReference','SectionVersion','ActMetadata','NormalizedCase'
+    'ActMetadata',
+    'CaseRaw',
+    'CaseSegment',
+    'Citation',
+    'NormalizedCase',
+    'SectionVersion',
+    'StatuteReference'
 ]

@@ -8,8 +8,8 @@ heavy ML/OCR stack installed.
 import pytest
 
 from ai_court.documents.processor import (
-    DocumentProcessor,
     _MAX_DOCUMENT_BYTES,
+    DocumentProcessor,
     _sniff_kind,
     _validate_upload,
 )

@@ -15,12 +15,14 @@ Current status: placeholder structures & contracts.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Iterable, Dict, Any, Optional
 import hashlib
-import os
 import json
+import os
 import time
+from collections.abc import Iterable
+from dataclasses import dataclass
+from typing import Any
+
 
 @dataclass
 class RawJudgment:
@@ -56,10 +58,10 @@ class JudgmentStore:
 
 class CrawlerClient:
     """Placeholder orchestrator (would internally dispatch Scrapy requests)."""
-    def __init__(self, store: Optional[JudgmentStore] = None) -> None:
+    def __init__(self, store: JudgmentStore | None = None) -> None:
         self.store = store or JudgmentStore()
 
-    def crawl_seed(self, seed_urls: Iterable[str]) -> Dict[str, Any]:
+    def crawl_seed(self, seed_urls: Iterable[str]) -> dict[str, Any]:
         # Placeholder: pretend to fetch and store skeleton docs
         new, skipped = 0, 0
         for url in seed_urls:
@@ -72,5 +74,7 @@ class CrawlerClient:
 
 
 __all__ = [
-    'RawJudgment','JudgmentStore','CrawlerClient'
+    'CrawlerClient',
+    'JudgmentStore',
+    'RawJudgment'
 ]

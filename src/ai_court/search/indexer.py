@@ -1,10 +1,11 @@
-import os
 import glob
+import logging
+import os
+
 import dill
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
-from typing import Optional
-import logging
+
 from ai_court.model.legal_case_classifier import LegalCaseClassifier
 
 logger = logging.getLogger(__name__)
@@ -16,7 +17,7 @@ def pick_first(df: pd.DataFrame, candidates: list[str]) -> pd.Series | None:
             return df[c]
     return None
 
-def load_cases(raw_dir: str, raw_enriched_dir: str, processed_path: str, input_dir: Optional[str] = None) -> pd.DataFrame:
+def load_cases(raw_dir: str, raw_enriched_dir: str, processed_path: str, input_dir: str | None = None) -> pd.DataFrame:
     """Load cases from CSVs under input_dir (if provided) or default directories.
     Prefers data/raw_enriched when present; otherwise falls back to data/raw; finally to processed/all_cases.csv.
     """

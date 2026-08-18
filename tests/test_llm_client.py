@@ -110,7 +110,7 @@ def test_retries_are_bounded_and_fast():
     completions = _FakeCompletions(error=RuntimeError("503 server error: upstream"))
     c = _client_with(completions, timeout=0.5, max_retries=3, max_backoff=0.01)
     start = time.perf_counter()
-    with pytest.raises(Exception):
+    with pytest.raises(RuntimeError):
         c.chat([{"role": "user", "content": "hi"}])
     elapsed = time.perf_counter() - start
     # Bounded by the budget, nowhere near the old 3x exponential-backoff worst case.
@@ -122,7 +122,7 @@ def test_retries_are_bounded_and_fast():
 def test_non_retryable_error_not_retried():
     completions = _FakeCompletions(error=RuntimeError("400 Bad Request: invalid prompt"))
     c = _client_with(completions, timeout=5.0, max_retries=3, max_backoff=0.01)
-    with pytest.raises(Exception):
+    with pytest.raises(RuntimeError):
         c.chat([{"role": "user", "content": "hi"}])
     # 4xx is deterministic — exactly one attempt, no retries.
     assert len(completions.calls) == 1

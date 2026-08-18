@@ -17,8 +17,9 @@ from __future__ import annotations
 import json
 import logging
 import time
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 
 from ai_court.llm.client import LLMClient
 from ai_court.llm.prompts import (
@@ -40,7 +41,7 @@ class LegalAgentPipeline:
         classifier: Any = None,
         search_index: Any = None,
         statute_corpus: Any = None,
-        preprocess_fn: Optional[Callable[[str], str]] = None,
+        preprocess_fn: Callable[[str], str] | None = None,
     ):
         self.llm = llm_client
         self.classifier = classifier
@@ -59,10 +60,10 @@ class LegalAgentPipeline:
         """Initialize elite intelligence modules."""
         try:
             from ai_court.intelligence import (
-                EvidenceAdmissibilityChecker,
-                ProceduralChecklistEngine,
                 CrossReferenceEngine,
+                EvidenceAdmissibilityChecker,
                 JudgePatternAnalyzer,
+                ProceduralChecklistEngine,
             )
             self._evidence_checker = EvidenceAdmissibilityChecker()
             self._checklist_engine = ProceduralChecklistEngine()
@@ -76,7 +77,7 @@ class LegalAgentPipeline:
     # ------------------------------------------------------------------
     # Step 1: Understand the query
     # ------------------------------------------------------------------
-    def understand_query(self, query: str) -> Dict[str, Any]:
+    def understand_query(self, query: str) -> dict[str, Any]:
         """Use LLM to extract structured information from the user's query."""
         prompt = QUERY_UNDERSTANDING_PROMPT.format(query=query)
         messages = [
@@ -109,7 +110,7 @@ class LegalAgentPipeline:
     # ------------------------------------------------------------------
     # Step 2: ML prediction
     # ------------------------------------------------------------------
-    def predict_outcome(self, query: str, case_type: str) -> Dict[str, Any]:
+    def predict_outcome(self, query: str, case_type: str) -> dict[str, Any]:
         """Get ML classifier prediction."""
         if self.classifier is None:
             return {"judgment": "Unknown", "confidence": 0.0, "all_probabilities": {}}
@@ -123,7 +124,7 @@ class LegalAgentPipeline:
     # ------------------------------------------------------------------
     # Step 3: Search for similar cases
     # ------------------------------------------------------------------
-    def find_similar_cases(self, query: str, k: int = 5) -> List[Dict[str, Any]]:
+    def find_similar_cases(self, query: str, k: int = 5) -> list[dict[str, Any]]:
         """Retrieve similar cases using TF-IDF search index."""
         if self.search_index is None:
             return []
@@ -164,7 +165,7 @@ class LegalAgentPipeline:
     # Step 4: Find relevant statutes
     # ------------------------------------------------------------------
     def find_relevant_statutes(
-        self, query: str, acts: Optional[List[str]] = None, k: int = 10
+        self, query: str, acts: list[str] | None = None, k: int = 10
     ) -> str:
         """Search statute corpus for relevant provisions."""
         if self.statute_corpus is None or not self.statute_corpus.loaded:
@@ -182,7 +183,7 @@ class LegalAgentPipeline:
     # ------------------------------------------------------------------
     # Step 5: Full case analysis via LLM
     # ------------------------------------------------------------------
-    def _format_case_context(self, cases: List[Dict[str, Any]]) -> str:
+    def _format_case_context(self, cases: list[dict[str, Any]]) -> str:
         """Format similar cases for LLM prompt."""
         if not cases:
             return "No directly relevant precedent cases found in database."
@@ -200,7 +201,7 @@ class LegalAgentPipeline:
             parts.append(entry)
         return "\n".join(parts)
 
-    def _format_ml_prediction(self, prediction: Dict[str, Any]) -> str:
+    def _format_ml_prediction(self, prediction: dict[str, Any]) -> str:
         """Format ML prediction for LLM prompt."""
         judgment = prediction.get("judgment", "Unknown")
         confidence = prediction.get("confidence")
@@ -223,7 +224,7 @@ class LegalAgentPipeline:
         k_statutes: int = 10,
         include_strategy: bool = True,
         documents_context: str = "",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Run the FULL agent pipeline: understand → predict → search → analyze.
 
         Args:
@@ -359,7 +360,7 @@ class LegalAgentPipeline:
     # ------------------------------------------------------------------
     # RAG-powered answer (lighter than full analysis)
     # ------------------------------------------------------------------
-    def rag_answer(self, question: str, k: int = 5) -> Dict[str, Any]:
+    def rag_answer(self, question: str, k: int = 5) -> dict[str, Any]:
         """Retrieval-Augmented Generation: search cases → LLM generates answer.
 
         Lighter-weight than full analyze() — no ML prediction or strategy synthesis.
@@ -388,7 +389,7 @@ class LegalAgentPipeline:
         answer = self.llm.chat(messages)
 
         # Outcome distribution from retrieved cases
-        outcome_counts: Dict[str, int] = {}
+        outcome_counts: dict[str, int] = {}
         for c in cases:
             o = c.get("outcome", "Unknown")
             outcome_counts[o] = outcome_counts.get(o, 0) + 1
@@ -414,7 +415,7 @@ class LegalAgentPipeline:
     # Follow-up on existing analysis (per-case chat)
     # ------------------------------------------------------------------
     def follow_up(
-        self, query: str, history: List[Dict[str, str]]
+        self, query: str, history: list[dict[str, str]]
     ) -> str:
         """Answer a follow-up question given conversation history."""
         from ai_court.llm.prompts import FOLLOW_UP_PROMPT

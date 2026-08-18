@@ -17,11 +17,10 @@ import pytest
 
 from ai_court.llm.client import (
     LLMClient,
-    parse_json_object,
     _is_unsupported_response_format,
+    parse_json_object,
 )
 from ai_court.llm.faithfulness import extract_case_citations, verify_citations
-
 
 # --------------------------------------------------------------------------- #
 # parse_json_object
@@ -163,7 +162,7 @@ def test_chat_json_reraises_transient_error():
         RuntimeError("503 server error: upstream overloaded"),
     ])
     c = _client_with(completions, timeout=2.0, max_retries=0)
-    with pytest.raises(Exception):
+    with pytest.raises(RuntimeError):
         c.chat_json([{"role": "user", "content": "return json"}])
 
 
@@ -217,6 +216,7 @@ def test_verify_citations_no_citation_is_grounded():
 def test_retrieve_semantic_only_path():
     pytest.importorskip("numpy")
     import numpy as np
+
     from ai_court.rag import pipeline
 
     semantic_index = {
@@ -244,6 +244,7 @@ def test_retrieve_semantic_only_path():
 def test_retrieve_fuses_both_legs(monkeypatch):
     pytest.importorskip("numpy")
     import numpy as np
+
     from ai_court.rag import pipeline
 
     lexical_docs = [

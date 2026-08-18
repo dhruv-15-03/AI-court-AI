@@ -9,10 +9,10 @@ Future extensions: semantic diffing, migration scripts, hierarchical metrics agg
 """
 from __future__ import annotations
 
-import os
 import json
+import os
 from functools import lru_cache
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 try:
     import yaml  # type: ignore
@@ -28,7 +28,7 @@ class OntologyLoadError(RuntimeError):
 
 
 @lru_cache(maxsize=1)
-def load_ontology() -> Dict[str, Any]:
+def load_ontology() -> dict[str, Any]:
     """Load ontology YAML if available; otherwise return a safe fallback.
 
     The fallback keeps the system operational by defining a minimal flat ontology that
@@ -48,7 +48,7 @@ def load_ontology() -> Dict[str, Any]:
         return _default_fallback_ontology()
 
 
-def _default_fallback_ontology() -> Dict[str, Any]:
+def _default_fallback_ontology() -> dict[str, Any]:
     """Return a minimal ontology structure and mapping used as a fallback.
 
     The mapping covers the coarse outcomes produced by normalize_outcome() in
@@ -86,7 +86,7 @@ def _default_fallback_ontology() -> Dict[str, Any]:
     }
 
 
-def _walk(node: Dict[str, Any], path: List[str], leaves: List[Dict[str, Any]]):
+def _walk(node: dict[str, Any], path: list[str], leaves: list[dict[str, Any]]):
     children = node.get('children') or []
     node_id = str(node.get('id') or '')
     if not children:
@@ -96,15 +96,15 @@ def _walk(node: Dict[str, Any], path: List[str], leaves: List[Dict[str, Any]]):
             _walk(ch, path + [node_id], leaves)
 
 
-def flatten_leaves(data: Dict[str, Any]) -> List[Dict[str, Any]]:
-    leaves: List[Dict[str, Any]] = []
+def flatten_leaves(data: dict[str, Any]) -> list[dict[str, Any]]:
+    leaves: list[dict[str, Any]] = []
     root = data.get('root') or {}
     _walk(root, [], leaves)
     return leaves
 
 
 @lru_cache(maxsize=128)
-def map_coarse_label(coarse: str) -> Tuple[str, bool]:
+def map_coarse_label(coarse: str) -> tuple[str, bool]:
     """Map old coarse label to ontology leaf id.
     Returns tuple (leaf_id, created_flag) where created_flag is False for existing mapping,
     True if fallback to unrecognized.
@@ -116,7 +116,7 @@ def map_coarse_label(coarse: str) -> Tuple[str, bool]:
     return 'unrecognized', True
 
 
-def ontology_metadata() -> Dict[str, Any]:
+def ontology_metadata() -> dict[str, Any]:
     data = load_ontology()
     leaves = flatten_leaves(data)
     return {

@@ -8,7 +8,8 @@ Memory-efficient: Uses existing model, no additional loading.
 from __future__ import annotations
 
 import logging
-from typing import List, Dict, Any, Optional
+from typing import Any
+
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -167,7 +168,7 @@ def extract_top_features(
     processed_text: str,
     prediction_idx: int,
     top_k: int = 5
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Extract top-K features that contributed most to a prediction.
     
     Args:
@@ -224,7 +225,7 @@ def extract_top_features(
                 })
         
         # Sort by absolute importance and take top-k
-        def _importance_key(item: Dict[str, Any]) -> float:
+        def _importance_key(item: dict[str, Any]) -> float:
             val = item.get('importance', 0)
             return abs(float(val)) if val is not None else 0.0
         feature_scores.sort(key=_importance_key, reverse=True)
@@ -240,7 +241,7 @@ def _get_feature_importances(
     tfidf_vector,
     prediction_idx: int,
     n_features: int
-) -> Optional[np.ndarray]:
+) -> np.ndarray | None:
     """Extract feature importances from various classifier types."""
     try:
         # RandomForest and tree-based models
@@ -276,9 +277,9 @@ def _get_feature_importances(
 
 
 def format_explanation(
-    key_factors: List[Dict[str, Any]],
+    key_factors: list[dict[str, Any]],
     judgment: str,
-    confidence: Optional[float]
+    confidence: float | None
 ) -> str:
     """Format a human-readable explanation string.
     

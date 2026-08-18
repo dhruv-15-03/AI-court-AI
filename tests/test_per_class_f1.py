@@ -19,7 +19,6 @@ from __future__ import annotations
 
 import json
 import os
-from typing import Dict, Optional
 
 import pytest
 
@@ -42,7 +41,7 @@ DEFAULT_CLASS_FLOOR = float(os.getenv("DEFAULT_CLASS_F1_FLOOR", "0.60"))
 ALLOWED_PER_CLASS_DROP = float(os.getenv("ALLOWED_PER_CLASS_F1_DROP", "0.25"))
 
 # Classes known to be safety-critical — each gets its own floor.
-CRITICAL_CLASS_FLOORS: Dict[str, float] = {
+CRITICAL_CLASS_FLOORS: dict[str, float] = {
     "Acquittal/Conviction Overturned": ACQUITTAL_FLOOR,
     "acquitted": ACQUITTAL_FLOOR,
     "Acquittal": ACQUITTAL_FLOOR,
@@ -53,14 +52,14 @@ CRITICAL_CLASS_FLOORS: Dict[str, float] = {
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _load_metrics_json() -> Optional[dict]:
+def _load_metrics_json() -> dict | None:
     if not os.path.exists(METRICS_PATH):
         return None
     with open(METRICS_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
-def _load_metadata_json() -> Optional[dict]:
+def _load_metadata_json() -> dict | None:
     if not os.path.exists(METADATA_PATH):
         return None
     with open(METADATA_PATH, "r", encoding="utf-8") as f:
@@ -83,12 +82,12 @@ def _load_history() -> list:
     return entries
 
 
-def _per_class_f1_from_metrics(data: dict) -> Optional[Dict[str, float]]:
+def _per_class_f1_from_metrics(data: dict) -> dict[str, float] | None:
     """Extract per_class_f1 from a metrics.json dict."""
     return data.get("final_model", {}).get("per_class_f1")
 
 
-def _per_class_f1_from_history_entry(entry: dict) -> Optional[Dict[str, float]]:
+def _per_class_f1_from_history_entry(entry: dict) -> dict[str, float] | None:
     """Extract per_class_f1 from a history.log entry."""
     return entry.get("per_class_f1")
 
@@ -208,11 +207,14 @@ def test_metrics_metadata_consistency():
     # test_macro_f1 must agree (within floating point tolerance)
     metrics_mf1 = fm.get("test_macro_f1")
     meta_mf1 = meta_data.get("test_macro_f1")
-    if metrics_mf1 is not None and meta_mf1 is not None:
-        if abs(metrics_mf1 - meta_mf1) > 1e-6:
-            mismatches.append(
-                f"  test_macro_f1: metrics.json={metrics_mf1} vs metadata.json={meta_mf1}"
-            )
+    if (
+        metrics_mf1 is not None
+        and meta_mf1 is not None
+        and abs(metrics_mf1 - meta_mf1) > 1e-6
+    ):
+        mismatches.append(
+            f"  test_macro_f1: metrics.json={metrics_mf1} vs metadata.json={meta_mf1}"
+        )
 
     # per_class_f1 must agree
     metrics_pcf1 = fm.get("per_class_f1") or {}

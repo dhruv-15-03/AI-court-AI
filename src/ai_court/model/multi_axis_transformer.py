@@ -18,25 +18,27 @@ Environment variables:
     MULTI_AXIS_EPOCHS, MULTI_AXIS_BATCH, MULTI_AXIS_LR, MULTI_AXIS_MAX_LEN (used by pipeline shim)
 """
 from __future__ import annotations
-import os
+
 import argparse
 import json
+import os
+import uuid
 from dataclasses import dataclass
-from typing import List, Dict, Optional, Any
+from datetime import datetime, timezone
+from typing import Any
+
 import pandas as pd
 import torch
-from torch import nn
-from torch.utils.data import Dataset, DataLoader
-from transformers import AutoTokenizer, AutoModel
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import f1_score
-from datetime import datetime
-import uuid
+from torch import nn
+from torch.utils.data import DataLoader, Dataset
+from transformers import AutoModel, AutoTokenizer
 
 try:
     from .multi_axis_consistency import reconcile_axes  # type: ignore
 except Exception:  # pragma: no cover
-    def reconcile_axes(axis_preds: Dict[str, str]) -> Dict[str, Any]:  # fallback
+    def reconcile_axes(axis_preds: dict[str, str]) -> dict[str, Any]:  # fallback
         return {'unified_outcome': 'other', 'reason': {'buckets':{}, 'conflicts':[], 'precedence_order':[]}}
 
 BACKBONE = os.getenv('MULTI_AXIS_MODEL','distilbert-base-uncased')
@@ -46,10 +48,10 @@ AXES = ['procedural_label','substantive_label','relief_label']
 @dataclass
 class Row:
     text: str
-    labels: Dict[str,int]
+    labels: dict[str,int]
 
 class RetrievalAugmentor:
-    def __init__(self, texts: List[str], top_k: int, max_corpus: int):
+    def __init__(self, texts: list[str], top_k: int, max_corpus: int):
         self.top_k = top_k
         sample = texts[:max_corpus]
         self.vectorizer = TfidfVectorizer(max_features=20000, ngram_range=(1,2), sublinear_tf=True)
@@ -65,8 +67,8 @@ class RetrievalAugmentor:
         return (text + '\n[CTX]\n' + ctx) if ctx else text
 
 class AxisDataset(Dataset):
-    def __init__(self, df: pd.DataFrame, tokenizer: Any, max_len: int, label_maps: Dict[str, Dict[str,int]], augmentor: Any = None):
-        self.rows: List[Row] = []
+    def __init__(self, df: pd.DataFrame, tokenizer: Any, max_len: int, label_maps: dict[str, dict[str,int]], augmentor: Any = None):
+        self.rows: list[Row] = []
         for _, r in df.iterrows():
             base_text = (str(r.get('case_type','')) + ' ' + str(r.get('case_data','')))[:9000]
             if augmentor:
@@ -91,7 +93,7 @@ class AxisDataset(Dataset):
         return item
 
 class MultiAxisModel(nn.Module):
-    def __init__(self, backbone_name: str, num_labels: Dict[str,int]):
+    def __init__(self, backbone_name: str, num_labels: dict[str,int]):
         super().__init__()
         self.backbone = AutoModel.from_pretrained(backbone_name)
         hidden = self.backbone.config.hidden_size
@@ -104,8 +106,8 @@ class MultiAxisModel(nn.Module):
 @torch.no_grad()
 def evaluate(model: MultiAxisModel, loader: DataLoader, axes=AXES):
     model.eval()
-    preds_ax: Dict[str, List[int]] = {ax: [] for ax in axes}
-    gold_ax: Dict[str, List[int]] = {ax: [] for ax in axes}
+    preds_ax: dict[str, list[int]] = {ax: [] for ax in axes}
+    gold_ax: dict[str, list[int]] = {ax: [] for ax in axes}
     for batch in loader:
         input_ids = batch['input_ids'].to(DEVICE)
         attention_mask = batch['attention_mask'].to(DEVICE)
@@ -114,7 +116,7 @@ def evaluate(model: MultiAxisModel, loader: DataLoader, axes=AXES):
             pred = logits[ax].argmax(dim=1).cpu().tolist()
             preds_ax[ax].extend(pred)
             gold_ax[ax].extend(batch[ax].tolist())
-    metrics: Dict[str, Any] = {}
+    metrics: dict[str, Any] = {}
     for ax in axes:
         correct = sum(int(a==b) for a,b in zip(preds_ax[ax], gold_ax[ax]))
         acc = correct/len(preds_ax[ax]) if preds_ax[ax] else 0.0
@@ -135,7 +137,7 @@ def evaluate(model: MultiAxisModel, loader: DataLoader, axes=AXES):
     metrics['consistency_violations'] = inconsistencies
     return metrics
 
-def compute_class_weights(label_maps: Dict[str, Dict[str,int]], dataset: AxisDataset) -> Dict[str, torch.Tensor]:
+def compute_class_weights(label_maps: dict[str, dict[str,int]], dataset: AxisDataset) -> dict[str, torch.Tensor]:
     counts = {ax: [0]*len(m) for ax,m in label_maps.items()}
     for row in dataset.rows:
         for ax,val in row.labels.items():
@@ -151,7 +153,7 @@ def compute_class_weights(label_maps: Dict[str, Dict[str,int]], dataset: AxisDat
 
 class SemanticRetriever:
     """Optional semantic retrieval using sentence-transformers embeddings."""
-    def __init__(self, texts: List[str], model_name: str, top_k: int, max_corpus: Optional[int]=None):
+    def __init__(self, texts: list[str], model_name: str, top_k: int, max_corpus: int | None=None):
         from sentence_transformers import SentenceTransformer
         if max_corpus is not None:
             texts = texts[:max_corpus]
@@ -207,7 +209,7 @@ def train(args):
         df = df.head(args.limit)
     df = df[df['case_data'].astype(str).str.strip().astype(bool)]
     tokenizer = AutoTokenizer.from_pretrained(BACKBONE)
-    label_maps: Dict[str, Dict[str,int]] = {ax: {} for ax in AXES}
+    label_maps: dict[str, dict[str,int]] = {ax: {} for ax in AXES}
     dataset, retrieval_meta = _prepare_dataset(df, tokenizer, args, label_maps)
     num_labels = {ax: len(m) for ax,m in label_maps.items()}
     model = MultiAxisModel(BACKBONE, num_labels).to(DEVICE)
@@ -271,7 +273,8 @@ def train(args):
         'macro_f1_axes_avg': macro_avg,
         'retrieval': retrieval_meta,
     }
-    run_id = datetime.now().strftime('%Y%m%d%H%M%S') + '_' + uuid.uuid4().hex[:8]
+    # UTC keeps run ids monotonic and comparable regardless of host timezone.
+    run_id = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S') + '_' + uuid.uuid4().hex[:8]
     base_dir = 'models/multi_axis'
     run_dir = os.path.join(base_dir, 'runs', run_id)
     os.makedirs(run_dir, exist_ok=True)
@@ -296,9 +299,10 @@ def train(args):
         eval_model = os.getenv('RETRIEVAL_EVAL_MODEL','sentence-transformers/all-MiniLM-L6-v2')
         index_dir = os.getenv('RETRIEVAL_EVAL_INDEX','retrieval_index/segments')
         if os.path.exists(queries_csv) and os.path.exists(os.path.join(index_dir,'embeddings.npy')):
+            import json as _json
+
             import numpy as _np
             import pandas as _pd
-            import json as _json
             from sentence_transformers import SentenceTransformer as _ST
             emb = _np.load(os.path.join(index_dir,'embeddings.npy'))
             metas = []

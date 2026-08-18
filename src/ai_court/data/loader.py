@@ -1,12 +1,14 @@
 import os
 import warnings
-import pandas as pd
+
 import numpy as np
-from typing import List, Dict, Tuple
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
+
 from ai_court.model.preprocessor import TextPreprocessor
 from ai_court.ontology import map_coarse_label
+
 
 class DataLoader:
     def __init__(self):
@@ -122,12 +124,12 @@ class DataLoader:
                     return label
         return "Other"
 
-    def load_data(self, file_paths: List[str]) -> pd.DataFrame:
+    def load_data(self, file_paths: list[str]) -> pd.DataFrame:
         """Load and concatenate datasets from multiple CSVs."""
         if isinstance(file_paths, str):
             file_paths = [file_paths]
         frames = []
-        errors: Dict[str, str] = {}
+        errors: dict[str, str] = {}
         for p in file_paths:
             try:
                 frames.append(self._read_single(p))
@@ -143,7 +145,7 @@ class DataLoader:
             warnings.warn("Dataset is quite small (<20 rows); results may be unstable.")
         return df
 
-    def analyze_dataset(self, df: pd.DataFrame) -> Dict:
+    def analyze_dataset(self, df: pd.DataFrame) -> dict:
         """Compute basic dataset stats."""
         canon = (
             df['case_data']
@@ -169,7 +171,7 @@ class DataLoader:
             raise ValueError("At least 2 judgement classes required")
         return analysis
 
-    def prepare_data(self, df: pd.DataFrame) -> Tuple[pd.Series, pd.Series, np.ndarray, np.ndarray]:
+    def prepare_data(self, df: pd.DataFrame) -> tuple[pd.Series, pd.Series, np.ndarray, np.ndarray]:
         """Build text features and encode labels."""
         df['legal_features'] = df['case_type'].astype(str).str.lower() + " " + df['case_data'].astype(str)
         df['processed_text'] = df['legal_features'].apply(self.preprocessor.preprocess)

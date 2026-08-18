@@ -1,6 +1,6 @@
-from typing import Any, Dict, List, Optional
 import threading
 import time
+from typing import Any
 
 # Global Model State
 classifier: Any = None  # Instance of LegalCaseClassifier
@@ -10,12 +10,12 @@ def preprocess_fn(x: str) -> str: # Deprecated: Use classifier.preprocess_text
     return x
 
 # Multi-axis Model State
-multi_axis_bundle: Optional[Dict[str, Any]] = None
+multi_axis_bundle: dict[str, Any] | None = None
 multi_axis_lock = threading.Lock()
 
 # Search Indices
-search_index: Optional[Dict[str, Any]] = None
-semantic_index: Optional[Dict[str, Any]] = None
+search_index: dict[str, Any] | None = None
+semantic_index: dict[str, Any] | None = None
 
 # Agent State
 llm_client: Any = None  # Instance of LLMClient
@@ -24,7 +24,7 @@ session_manager: Any = None  # Instance of SessionManager
 agent_pipeline: Any = None  # Instance of LegalAgentPipeline
 
 # Active Learning Queue
-AL_QUEUE: List[Dict[str, Any]] = []
+AL_QUEUE: list[dict[str, Any]] = []
 AL_QUEUE_MAX_SIZE = 1000  # Prevent unbounded growth
 
 # Agreement Stats
@@ -68,7 +68,7 @@ def update_prediction_stats(confidence: float, abstained: bool = False):
         prediction_stats['abstentions'] = int(prediction_stats.get('abstentions') or 0) + 1
 
 
-def get_memory_usage() -> Dict[str, Any]:
+def get_memory_usage() -> dict[str, Any]:
     """Get current memory usage information."""
     try:
         import psutil

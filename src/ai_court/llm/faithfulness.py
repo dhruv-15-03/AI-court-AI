@@ -15,7 +15,8 @@ never retrieved.
 from __future__ import annotations
 
 import re
-from typing import Any, Dict, List, Sequence, Set
+from collections.abc import Sequence
+from typing import Any
 
 # Matches "<Party> v./vs./versus <Party>" with each party up to ~7 tokens. Party
 # tokens allow letters, digits, dots, ampersands, apostrophes and hyphens so a
@@ -37,14 +38,14 @@ def _normalize(text: Any) -> str:
     return re.sub(r"[^a-z0-9 ]+", " ", str(text or "").lower()).strip()
 
 
-def _significant_tokens(norm: str) -> Set[str]:
+def _significant_tokens(norm: str) -> set[str]:
     return {t for t in norm.split() if len(t) >= 4 and t not in _STOPWORDS}
 
 
-def extract_case_citations(text: str) -> List[str]:
+def extract_case_citations(text: str) -> list[str]:
     """Return de-duplicated "X v. Y" style case citations found in *text*."""
-    seen: Set[str] = set()
-    out: List[str] = []
+    seen: set[str] = set()
+    out: list[str] = []
     for m in _CASE_RE.finditer(text or ""):
         cite = re.sub(r"\s+", " ", m.group(0)).strip().rstrip(".,;:")
         key = _normalize(cite)
@@ -68,8 +69,8 @@ def _matches_any(cite_norm: str, doc_norms: Sequence[str]) -> bool:
 
 
 def verify_citations(
-    answer: str, documents: Sequence[Dict[str, Any]]
-) -> Dict[str, Any]:
+    answer: str, documents: Sequence[dict[str, Any]]
+) -> dict[str, Any]:
     """Cross-check case citations in *answer* against retrieved *documents*.
 
     Returns a dict with ``cited_cases``, ``verified_citations``,
@@ -82,8 +83,8 @@ def verify_citations(
         for d in (documents or [])
         if isinstance(d, dict) and d.get("title")
     ]
-    verified: List[str] = []
-    unverified: List[str] = []
+    verified: list[str] = []
+    unverified: list[str] = []
     for cite in cited:
         if _matches_any(_normalize(cite), doc_norms):
             verified.append(cite)
@@ -97,4 +98,4 @@ def verify_citations(
     }
 
 
-__all__ = ["verify_citations", "extract_case_citations"]
+__all__ = ["extract_case_citations", "verify_citations"]
