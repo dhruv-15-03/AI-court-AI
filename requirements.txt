@@ -21,7 +21,7 @@ transformers==5.12.1
 sentence-transformers==5.6.0
 accelerate==1.14.0
 safetensors==0.8.0
-tokenizers==0.22.2
+tokenizers==0.23.1
 
 # ── LLM Agent ────────────────────────────────────────────────────────
 openai==2.30.0
